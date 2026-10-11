@@ -10,7 +10,7 @@
     Title="{Binding Title}"
     Width="1020"
     Height="690"
-    MinWidth="760"
+    MinWidth="900"
     MinHeight="420"
     Closing="OnClosing"
     FontSize="12"
@@ -178,19 +178,19 @@
 
         <GridView x:Key="DetailsView">
             <GridViewColumn
-                Width="300"
+                Width="180"
                 CellTemplate="{StaticResource NameCellTemplate}"
                 Header="{DynamicResource Str.ColName}" />
             <GridViewColumn
-                Width="90"
+                Width="80"
                 DisplayMemberBinding="{Binding TypeText}"
                 Header="{DynamicResource Str.ColType}" />
             <GridViewColumn
-                Width="100"
+                Width="80"
                 DisplayMemberBinding="{Binding SizeText}"
                 Header="{DynamicResource Str.ColSize}" />
             <GridViewColumn
-                Width="150"
+                Width="130"
                 DisplayMemberBinding="{Binding PackedSizeText}"
                 Header="{DynamicResource Str.ColPacked}" />
         </GridView>
@@ -232,6 +232,16 @@
         <!--  The text of a cell of the list of the compared files: in the middle of the line, like the icon of the state.  -->
         <Style x:Key="CellTextStyle" TargetType="TextBlock">
             <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+
+        <!--  A cell of the list of the compared files: a short line, with its content in the middle (the theme gives the cells room that a list of thousands of files cannot afford).  -->
+        <Style
+            x:Key="ComparisonCellStyle"
+            BasedOn="{StaticResource {x:Type DataGridCell}}"
+            TargetType="DataGridCell">
+            <Setter Property="MinHeight" Value="0" />
+            <Setter Property="Padding" Value="4,0" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
         </Style>
 
         <!--  The numbers of the lines of the differences: small, at the right of their place.  -->
@@ -668,12 +678,15 @@
                     IsEnabled="{Binding Busy.IsBusy, Converter={StaticResource InverseBool}}"
                     Visibility="{Binding IsComparing, Converter={StaticResource InverseBoolToVisibility}}">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <!--  When the window is narrow it is the buttons that are cut, never the search.  -->
+                    <StackPanel
+                        Grid.Column="0"
+                        ClipToBounds="True"
+                        Orientation="Horizontal">
                         <Button
                             Command="{Binding OpenCommand, Mode=OneTime}"
                             Style="{StaticResource ToolButton}"
@@ -778,12 +791,12 @@
                     </StackPanel>
 
                     <StackPanel
-                        Grid.Column="2"
+                        Grid.Column="1"
                         VerticalAlignment="Center"
                         Orientation="Horizontal">
                         <TextBox
                             x:Name="SearchBox"
-                            Width="180"
+                            Width="160"
                             Height="24"
                             VerticalContentAlignment="Center"
                             behaviors:FocusBehavior.Trigger="{Binding SearchFocusRequests}"
@@ -1195,11 +1208,12 @@
                                             AutoGenerateColumns="False"
                                             CanUserAddRows="False"
                                             CanUserDeleteRows="False"
+                                            CellStyle="{StaticResource ComparisonCellStyle}"
                                             GridLinesVisibility="Horizontal"
                                             HeadersVisibility="Column"
                                             IsReadOnly="True"
                                             ItemsSource="{Binding Comparison.Rows}"
-                                            RowHeight="24"
+                                            RowHeight="20"
                                             SelectionChanged="OnComparisonSelectionChanged"
                                             SelectionMode="Extended"
                                             SelectionUnit="FullRow">
@@ -1218,10 +1232,12 @@
                                                         <DataTemplate>
                                                             <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
                                                                 <TextBlock
-                                                                    Width="24"
+                                                                    Width="20"
                                                                     VerticalAlignment="Center"
                                                                     FontFamily="{StaticResource IconFont}"
-                                                                    FontSize="14"
+                                                                    FontSize="12"
+                                                                    LineHeight="14"
+                                                                    LineStackingStrategy="BlockLineHeight"
                                                                     Text="{Binding Glyph}"
                                                                     TextAlignment="Center" />
                                                                 <TextBlock

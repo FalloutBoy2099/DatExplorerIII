@@ -19,7 +19,7 @@ namespace DatExplorerIII.ViewModels
 	/// A movie shown in the viewer: the picture, a button to play or pause it with its sound, a bar to move in it, and its
 	/// description. The pictures are decoded as the movie plays.
 	/// </summary>
-	public sealed class VideoViewerViewModel : ObservableObject, IDisposable
+	public sealed class VideoViewerViewModel : ObservableObject, ISeekable, IDisposable
 	{
 		private readonly WavPlayer _player = new();
 		private readonly IUiTimer _timer;

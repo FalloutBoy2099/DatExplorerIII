@@ -5,9 +5,9 @@ namespace DatExplorerIII.Services
 	using System.Media;
 
 	/// <summary>
-	/// Plays a WAV file held in memory.
+	/// Plays a WAV file held in memory, with the sound card of the computer.
 	/// </summary>
-	public sealed class WavPlayer : IDisposable
+	public sealed class WavPlayer : ISoundPlayer
 	{
 		private SoundPlayer? _player;
 		private MemoryStream? _stream;

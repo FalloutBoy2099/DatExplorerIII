@@ -35,7 +35,7 @@ namespace DatExplorerIII.Tests
 		public void EveryKeyBinding_NamesACommandOfTheViewModel()
 		{
 			String xaml = ReadMainWindowXaml();
-			List<String> names = Regex.Matches(xaml, "<KeyBinding [^>]*Command=\"\\{Binding (\\w+)")
+			List<String> names = Regex.Matches(xaml, "<KeyBinding[\\s][^>]*Command=\"\\{Binding (\\w+)")
 				.Select(match => match.Groups[1].Value)
 				.ToList();
 

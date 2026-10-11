@@ -21,12 +21,16 @@ namespace DatExplorerIII.ViewModels
 	}
 
 	/// <summary>
-	/// A sound shown in the viewer: its shape, its description and a button to play it.
+	/// A sound shown in the viewer: its shape, a button to play or pause it, a bar to move in it, and its description.
 	/// </summary>
-	public sealed class AudioViewerViewModel : ObservableObject, IDisposable
+	public sealed class AudioViewerViewModel : ObservableObject, ISeekable, IDisposable
 	{
-		private readonly WavPlayer _player = new();
-		private readonly IUiTimer _endTimer;
+		/// <summary>The sound is that close to its end (or closer): playing it again starts from the beginning.</summary>
+		private static readonly TimeSpan EndMargin = TimeSpan.FromMilliseconds(50);
+
+		private readonly ISoundPlayer _player;
+		private readonly IUiTimer _timer;
+		private readonly TimeProvider _time;
 
 		private Byte[] _source = Array.Empty<Byte>();
 		private String _extension = String.Empty;
@@ -38,14 +42,25 @@ namespace DatExplorerIII.ViewModels
 		private IReadOnlyList<ChannelChoice> _channelChoices;
 		private ChannelChoice _selectedChannels;
 		private Int32 _generation;
+		private TimeSpan _position;
+		private TimeSpan _clockStart;
+		private Int64 _clockTimestamp;
+		private Boolean _isSeeking;
+		private Boolean _resumeAfterSeek;
 
-		public AudioViewerViewModel(IUiThread uiThread)
+		/// <param name="uiThread">Gives the timer that follows the sound as it plays.</param>
+		/// <param name="player">What plays the sound (the sound card of the computer when null).</param>
+		/// <param name="time">The clock that tells how far the sound has played (the system clock when null).</param>
+		public AudioViewerViewModel(IUiThread uiThread, ISoundPlayer? player = null, TimeProvider? time = null)
 		{
-			_endTimer = uiThread.CreateTimer();
+			_player = player ?? new WavPlayer();
+			_time = time ?? TimeProvider.System;
+			_timer = uiThread.CreateTimer();
+			_timer.Interval = TimeSpan.FromMilliseconds(50);
 			_channelChoices = CreateChannelChoices();
 			_selectedChannels = _channelChoices[0];
-			_endTimer.Tick += (_, _) => Stop();
-			PlayStopCommand = new RelayCommand(PlayOrStop, () => _clip != null);
+			_timer.Tick += (_, _) => OnTick();
+			PlayStopCommand = new RelayCommand(PlayOrPause, () => _clip != null);
 		}
 
 		public ICommand PlayStopCommand { get; }
@@ -108,6 +123,42 @@ namespace DatExplorerIII.ViewModels
 			private set => SetProperty(ref _isPlaying, value);
 		}
 
+		/// <summary>The length of the sound in milliseconds: the end of the position bar.</summary>
+		public Double Maximum => Math.Max(1, _clip?.Duration.TotalMilliseconds ?? 1);
+
+		/// <summary>Where the sound is, in milliseconds. Setting it goes there, and the sound goes on from there if it was playing.</summary>
+		public Double Position
+		{
+			get => _position.TotalMilliseconds;
+			set
+			{
+				if (_clip == null)
+				{
+					return;
+				}
+
+				TimeSpan target = TimeSpan.FromMilliseconds(Math.Clamp(value, 0, Maximum));
+				if (target == _position)
+				{
+					return;
+				}
+
+				SetPosition(target);
+				if (_isPlaying && !_isSeeking)
+				{
+					// Going to the end ends the sound; anywhere else it goes on from there.
+					StopPlayback();
+					if (target < _clip.Duration - EndMargin)
+					{
+						Play();
+					}
+				}
+			}
+		}
+
+		/// <summary>The time reached and the length of the sound.</summary>
+		public String PositionText => _clip == null ? String.Empty : $"{FormatDuration(_position)} / {FormatDuration(_clip.Duration)}";
+
 		/// <summary>Decodes and shows a sound.</summary>
 		/// <param name="data">The content of the sound file.</param>
 		/// <param name="extension">The extension of the file (.acm, .wav or .mp3), which tells how it is decoded.</param>
@@ -126,11 +177,29 @@ namespace DatExplorerIII.ViewModels
 			Reset();
 		}
 
+		/// <summary>Pauses the sound (when another file is shown, for example).</summary>
 		public void Stop()
 		{
-			_endTimer.Stop();
-			_player.Stop();
-			IsPlaying = false;
+			Pause();
+		}
+
+		/// <summary>The user takes the bar: the sound waits while the bar moves.</summary>
+		public void BeginSeek()
+		{
+			_isSeeking = true;
+			_resumeAfterSeek = _isPlaying;
+			Pause();
+		}
+
+		/// <summary>The user lets go of the bar: the sound goes on from there if it was playing.</summary>
+		public void EndSeek()
+		{
+			_isSeeking = false;
+			if (_resumeAfterSeek)
+			{
+				_resumeAfterSeek = false;
+				Play();
+			}
 		}
 
 		public void Dispose()
@@ -176,9 +245,13 @@ namespace DatExplorerIII.ViewModels
 			_source = Array.Empty<Byte>();
 			_extension = String.Empty;
 			_clip = null;
+			_isSeeking = false;
+			_resumeAfterSeek = false;
 			Shape = null;
 			Info = String.Empty;
 			Warning = String.Empty;
+			SetPosition(TimeSpan.Zero);
+			OnPropertyChanged(nameof(Maximum));
 			OnPropertyChanged(nameof(HasClip));
 			OnPropertyChanged(nameof(CanChooseChannels));
 		}
@@ -200,6 +273,8 @@ namespace DatExplorerIII.ViewModels
 				}
 
 				_clip = clip;
+				SetPosition(TimeSpan.Zero);
+				OnPropertyChanged(nameof(Maximum));
 				Shape = CreateShape(clip.Envelope);
 				Info = Loc.Format(
 					"Str.ViewerAudioInfo",
@@ -219,6 +294,8 @@ namespace DatExplorerIII.ViewModels
 				if (generation == _generation)
 				{
 					_clip = null;
+					SetPosition(TimeSpan.Zero);
+					OnPropertyChanged(nameof(Maximum));
 					Shape = null;
 					Info = String.Empty;
 					Warning = Loc.Get("Str.ViewerInvalid");
@@ -276,30 +353,90 @@ namespace DatExplorerIII.ViewModels
 			return geometry;
 		}
 
-		private void PlayOrStop()
+		private void SetPosition(TimeSpan position)
+		{
+			_position = position;
+			OnPropertyChanged(nameof(Position));
+			OnPropertyChanged(nameof(PositionText));
+		}
+
+		private void PlayOrPause()
 		{
 			if (_isPlaying)
 			{
-				Stop();
-				return;
+				Pause();
 			}
+			else
+			{
+				Play();
+			}
+		}
 
-			if (_clip == null)
+		/// <summary>Plays from the position; from the beginning when the sound is at its end.</summary>
+		private void Play()
+		{
+			if (_clip == null || _isPlaying)
 			{
 				return;
 			}
 
+			if (_position >= _clip.Duration - EndMargin)
+			{
+				SetPosition(TimeSpan.Zero);
+			}
+
+			Byte[] wav = WavWriter.Slice(_clip.WavData, _position) ?? _clip.WavData;
 			try
 			{
-				_player.Play(_clip.WavData);
-				IsPlaying = true;
-				_endTimer.Interval = _clip.Duration + TimeSpan.FromMilliseconds(300);
-				_endTimer.Start();
+				_player.Play(wav);
 			}
 			catch (Exception exception) when (exception is InvalidOperationException or FileNotFoundException or TimeoutException or Win32Exception)
 			{
 				Warning = Loc.Get("Str.ViewerCannotPlay");
+				return;
 			}
+
+			_clockStart = wav == _clip.WavData ? TimeSpan.Zero : _position;
+			_clockTimestamp = _time.GetTimestamp();
+			IsPlaying = true;
+			_timer.Start();
+		}
+
+		/// <summary>Stops the sound where it is.</summary>
+		private void Pause()
+		{
+			if (_isPlaying && _clip != null)
+			{
+				SetPosition(TimeSpan.FromTicks(Math.Min((_clockStart + _time.GetElapsedTime(_clockTimestamp)).Ticks, _clip.Duration.Ticks)));
+			}
+
+			StopPlayback();
+		}
+
+		private void StopPlayback()
+		{
+			_timer.Stop();
+			_player.Stop();
+			IsPlaying = false;
+		}
+
+		/// <summary>Moves the bar along with the sound; at the end the sound stops and the bar goes back to the beginning.</summary>
+		private void OnTick()
+		{
+			if (_clip == null || !_isPlaying)
+			{
+				return;
+			}
+
+			TimeSpan reached = _clockStart + _time.GetElapsedTime(_clockTimestamp);
+			if (reached >= _clip.Duration)
+			{
+				StopPlayback();
+				SetPosition(TimeSpan.Zero);
+				return;
+			}
+
+			SetPosition(reached);
 		}
 	}
 }

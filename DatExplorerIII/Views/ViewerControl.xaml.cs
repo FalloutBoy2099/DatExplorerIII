@@ -83,12 +83,12 @@ namespace DatExplorerIII.Views
 
 		private void OnSeekStarted(Object sender, DragStartedEventArgs e)
 		{
-			(((FrameworkElement)sender).DataContext as VideoViewerViewModel)?.BeginSeek();
+			(((FrameworkElement)sender).DataContext as ISeekable)?.BeginSeek();
 		}
 
 		private void OnSeekCompleted(Object sender, DragCompletedEventArgs e)
 		{
-			(((FrameworkElement)sender).DataContext as VideoViewerViewModel)?.EndSeek();
+			(((FrameworkElement)sender).DataContext as ISeekable)?.EndSeek();
 		}
 	}
 }

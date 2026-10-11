@@ -71,22 +71,7 @@ namespace DatExplorerIII.Formats
 				return null;
 			}
 
-			if (start <= TimeSpan.Zero)
-			{
-				return Audio.WavData;
-			}
-
-			const Int32 headerLength = 44;
-			Int64 offset = (Int64)Math.Round(start.TotalSeconds * Audio.SampleRate) * 2 * Audio.Channels;
-			Int64 remaining = Audio.WavData.Length - headerLength - offset;
-			if (remaining <= 0)
-			{
-				return null;
-			}
-
-			Byte[] samples = new Byte[remaining];
-			Array.Copy(Audio.WavData, headerLength + offset, samples, 0, remaining);
-			return WavWriter.Create(samples, Audio.SampleRate, Audio.Channels);
+			return WavWriter.Slice(Audio.WavData, start);
 		}
 
 		/// <summary>Starts decoding the pictures from the first one.</summary>
