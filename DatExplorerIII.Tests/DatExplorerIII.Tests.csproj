@@ -6,8 +6,8 @@
 		<Nullable>enable</Nullable>
 		<IsPackable>false</IsPackable>
 		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-		<AssemblyVersion>2026.10.11.3</AssemblyVersion>
-		<FileVersion>2026.10.11.3</FileVersion>
+		<AssemblyVersion>2026.10.11.4</AssemblyVersion>
+		<FileVersion>2026.10.11.4</FileVersion>
 	</PropertyGroup>
 
 	<ItemGroup>

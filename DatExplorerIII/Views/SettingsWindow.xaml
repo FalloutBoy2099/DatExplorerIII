@@ -1,112 +1,220 @@
-<Window x:Class="DatExplorerIII.Views.SettingsWindow"
-		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-		Title="{DynamicResource Str.SettingsTitle}"
-		Width="520"
-		SizeToContent="Height"
-		ResizeMode="NoResize"
-		ShowInTaskbar="False"
-		WindowStartupLocation="CenterOwner"
-		FontSize="12">
+<Window
+    x:Class="DatExplorerIII.Views.SettingsWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="{DynamicResource Str.SettingsTitle}"
+    Width="520"
+    FontSize="12"
+    ResizeMode="NoResize"
+    ShowInTaskbar="False"
+    SizeToContent="Height"
+    WindowStartupLocation="CenterOwner">
 
-	<Window.Resources>
-		<!-- A box of the settings: the options one under the other. -->
-		<Style x:Key="OptionBox" TargetType="CheckBox" BasedOn="{StaticResource {x:Type CheckBox}}">
-			<Setter Property="Margin" Value="0" />
-			<Setter Property="MinHeight" Value="26" />
-		</Style>
+    <Window.Resources>
+        <!--  A box of the settings: the options one under the other.  -->
+        <Style
+            x:Key="OptionBox"
+            BasedOn="{StaticResource {x:Type CheckBox}}"
+            TargetType="CheckBox">
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="MinHeight" Value="26" />
+        </Style>
 
-		<Style x:Key="GroupTitle" TargetType="TextBlock">
-			<Setter Property="FontWeight" Value="SemiBold" />
-			<Setter Property="Margin" Value="0,0,0,6" />
-		</Style>
-	</Window.Resources>
+        <Style x:Key="GroupTitle" TargetType="TextBlock">
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Margin" Value="0,0,0,6" />
+        </Style>
+    </Window.Resources>
 
-	<Grid>
-		<Grid.RowDefinitions>
-			<RowDefinition Height="*" />
-			<RowDefinition Height="Auto" />
-		</Grid.RowDefinitions>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
 
-		<TabControl x:Name="Tabs" Margin="16,14,16,12">
-			<TabItem x:Name="GeneralTab" Header="{DynamicResource Str.SettingsTabGeneral}">
-				<StackPanel Margin="14,14,14,10">
-					<CheckBox x:Name="SingleInstanceBox" Style="{StaticResource OptionBox}" Content="{DynamicResource Str.SingleInstance}" IsChecked="{Binding SingleInstance}" />
-					<CheckBox x:Name="WindowFrameBox" Style="{StaticResource OptionBox}" Content="{DynamicResource Str.WindowFrame}" IsChecked="{Binding WindowFrameVisible}" />
-					<CheckBox x:Name="BlockSeparatorsBox" Style="{StaticResource OptionBox}" Content="{DynamicResource Str.BlockSeparators}" IsChecked="{Binding BlockSeparatorsVisible}" />
-					<Separator Margin="0,6" />
-					<CheckBox x:Name="SaveSizeBox" Style="{StaticResource OptionBox}" Content="{DynamicResource Str.SettingsSaveSize}" IsChecked="{Binding SaveWindowSize}" />
-					<CheckBox x:Name="SavePositionBox" Style="{StaticResource OptionBox}" Content="{DynamicResource Str.SettingsSavePosition}" IsChecked="{Binding SaveWindowPosition}" />
-					<Separator Margin="0,6" />
-					<CheckBox x:Name="SubtitlesBox" Style="{StaticResource OptionBox}" Content="{DynamicResource Str.SettingsSubtitles}" IsChecked="{Binding ShowSubtitles}" />
-					<Separator Margin="0,6" />
-					<TextBlock Style="{StaticResource GroupTitle}" Text="{DynamicResource Str.SettingsScrollBars}" />
-					<Grid Margin="0,0,0,4">
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="170" />
-							<ColumnDefinition Width="*" />
-							<ColumnDefinition Width="50" />
-						</Grid.ColumnDefinitions>
-						<TextBlock VerticalAlignment="Center" Text="{DynamicResource Str.SettingsScrollBarWidth}" />
-						<Slider x:Name="ScrollBarWidthSlider" Grid.Column="1" AutomationProperties.Name="{DynamicResource Str.SettingsScrollBarWidth}" IsSnapToTickEnabled="True" Maximum="32" Minimum="10" TickFrequency="1" Value="{Binding ScrollBarWidth}" />
-						<TextBlock Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Text="{Binding Value, ElementName=ScrollBarWidthSlider, StringFormat={}{0:0} px}" />
-					</Grid>
-					<Grid>
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="170" />
-							<ColumnDefinition Width="*" />
-							<ColumnDefinition Width="50" />
-						</Grid.ColumnDefinitions>
-						<TextBlock VerticalAlignment="Center" Text="{DynamicResource Str.SettingsScrollBarThumb}" TextWrapping="Wrap" />
-						<Slider x:Name="ScrollBarThumbSlider" Grid.Column="1" AutomationProperties.Name="{DynamicResource Str.SettingsScrollBarThumb}" IsSnapToTickEnabled="True" Maximum="160" Minimum="20" TickFrequency="2" Value="{Binding ScrollBarMinimumThumb}" />
-						<TextBlock Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Text="{Binding Value, ElementName=ScrollBarThumbSlider, StringFormat={}{0:0} px}" />
-					</Grid>
-				</StackPanel>
-			</TabItem>
+        <TabControl x:Name="Tabs" Margin="16,14,16,12">
+            <TabItem x:Name="GeneralTab" Header="{DynamicResource Str.SettingsTabGeneral}">
+                <StackPanel Margin="14,14,14,10">
+                    <CheckBox
+                        x:Name="SingleInstanceBox"
+                        Content="{DynamicResource Str.SingleInstance}"
+                        IsChecked="{Binding SingleInstance}"
+                        Style="{StaticResource OptionBox}" />
+                    <CheckBox
+                        x:Name="WindowFrameBox"
+                        Content="{DynamicResource Str.WindowFrame}"
+                        IsChecked="{Binding WindowFrameVisible}"
+                        Style="{StaticResource OptionBox}" />
+                    <CheckBox
+                        x:Name="BlockSeparatorsBox"
+                        Content="{DynamicResource Str.BlockSeparators}"
+                        IsChecked="{Binding BlockSeparatorsVisible}"
+                        Style="{StaticResource OptionBox}" />
+                    <Separator Margin="0,6" />
+                    <CheckBox
+                        x:Name="SaveSizeBox"
+                        Content="{DynamicResource Str.SettingsSaveSize}"
+                        IsChecked="{Binding SaveWindowSize}"
+                        Style="{StaticResource OptionBox}" />
+                    <CheckBox
+                        x:Name="SavePositionBox"
+                        Content="{DynamicResource Str.SettingsSavePosition}"
+                        IsChecked="{Binding SaveWindowPosition}"
+                        Style="{StaticResource OptionBox}" />
+                    <Separator Margin="0,6" />
+                    <CheckBox
+                        x:Name="SubtitlesBox"
+                        Content="{DynamicResource Str.SettingsSubtitles}"
+                        IsChecked="{Binding ShowSubtitles}"
+                        Style="{StaticResource OptionBox}" />
+                    <Separator Margin="0,6" />
+                    <TextBlock Style="{StaticResource GroupTitle}" Text="{DynamicResource Str.SettingsScrollBars}" />
+                    <Grid Margin="0,0,0,4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="170" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="50" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock VerticalAlignment="Center" Text="{DynamicResource Str.SettingsScrollBarWidth}" />
+                        <Slider
+                            x:Name="ScrollBarWidthSlider"
+                            Grid.Column="1"
+                            AutomationProperties.Name="{DynamicResource Str.SettingsScrollBarWidth}"
+                            IsSnapToTickEnabled="True"
+                            Maximum="32"
+                            Minimum="10"
+                            TickFrequency="1"
+                            Value="{Binding ScrollBarWidth}" />
+                        <TextBlock
+                            Grid.Column="2"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            Text="{Binding Value, ElementName=ScrollBarWidthSlider, StringFormat={}{0:0} px}" />
+                    </Grid>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="170" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="50" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Text="{DynamicResource Str.SettingsScrollBarThumb}"
+                            TextWrapping="Wrap" />
+                        <Slider
+                            x:Name="ScrollBarThumbSlider"
+                            Grid.Column="1"
+                            AutomationProperties.Name="{DynamicResource Str.SettingsScrollBarThumb}"
+                            IsSnapToTickEnabled="True"
+                            Maximum="160"
+                            Minimum="20"
+                            TickFrequency="2"
+                            Value="{Binding ScrollBarMinimumThumb}" />
+                        <TextBlock
+                            Grid.Column="2"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            Text="{Binding Value, ElementName=ScrollBarThumbSlider, StringFormat={}{0:0} px}" />
+                    </Grid>
+                </StackPanel>
+            </TabItem>
 
-			<TabItem x:Name="CompareTab" Header="{DynamicResource Str.SettingsTabCompare}">
-				<StackPanel Margin="14,14,14,10">
-					<TextBlock Style="{StaticResource GroupTitle}" Text="{DynamicResource Str.SettingsIgnore}" />
-					<StackPanel IsEnabled="{Binding IgnoresApply}">
-						<CheckBox x:Name="IgnoreWhitespaceBox" Style="{StaticResource OptionBox}" Content="{DynamicResource Str.SettingsIgnoreWhitespace}" IsChecked="{Binding IgnoreWhitespace}" />
-						<CheckBox x:Name="IgnoreBlankLinesBox" Style="{StaticResource OptionBox}" Content="{DynamicResource Str.SettingsIgnoreBlankLines}" IsChecked="{Binding IgnoreBlankLines}" />
-						<CheckBox x:Name="IgnoreCaseBox" Style="{StaticResource OptionBox}" Content="{DynamicResource Str.SettingsIgnoreCase}" IsChecked="{Binding IgnoreCase}" />
-						<CheckBox x:Name="IgnoreLineEndingsBox" Style="{StaticResource OptionBox}" Content="{DynamicResource Str.SettingsIgnoreLineEndings}" IsChecked="{Binding IgnoreLineEndings}" />
-						<CheckBox x:Name="IgnoreCodePageBox" Style="{StaticResource OptionBox}" Content="{DynamicResource Str.SettingsIgnoreCodePage}" IsChecked="{Binding IgnoreCodePage}" />
-						<CheckBox x:Name="IgnoreNumbersBox" Style="{StaticResource OptionBox}" Content="{DynamicResource Str.SettingsIgnoreNumbers}" IsChecked="{Binding IgnoreNumbers}" />
-						<CheckBox x:Name="IgnoreCommentsBox" Style="{StaticResource OptionBox}" Content="{DynamicResource Str.SettingsIgnoreComments}" IsChecked="{Binding IgnoreComments}" />
-						<CheckBox x:Name="IgnoreFinalEolBox" Style="{StaticResource OptionBox}" Content="{DynamicResource Str.SettingsIgnoreFinalEol}" IsChecked="{Binding IgnoreMissingFinalEol}" />
-					</StackPanel>
+            <TabItem x:Name="CompareTab" Header="{DynamicResource Str.SettingsTabCompare}">
+                <StackPanel Margin="14,14,14,10">
+                    <TextBlock Style="{StaticResource GroupTitle}" Text="{DynamicResource Str.SettingsIgnore}" />
+                    <StackPanel IsEnabled="{Binding IgnoresApply}">
+                        <CheckBox
+                            x:Name="IgnoreWhitespaceBox"
+                            Content="{DynamicResource Str.SettingsIgnoreWhitespace}"
+                            IsChecked="{Binding IgnoreWhitespace}"
+                            Style="{StaticResource OptionBox}" />
+                        <CheckBox
+                            x:Name="IgnoreBlankLinesBox"
+                            Content="{DynamicResource Str.SettingsIgnoreBlankLines}"
+                            IsChecked="{Binding IgnoreBlankLines}"
+                            Style="{StaticResource OptionBox}" />
+                        <CheckBox
+                            x:Name="IgnoreCaseBox"
+                            Content="{DynamicResource Str.SettingsIgnoreCase}"
+                            IsChecked="{Binding IgnoreCase}"
+                            Style="{StaticResource OptionBox}" />
+                        <CheckBox
+                            x:Name="IgnoreLineEndingsBox"
+                            Content="{DynamicResource Str.SettingsIgnoreLineEndings}"
+                            IsChecked="{Binding IgnoreLineEndings}"
+                            Style="{StaticResource OptionBox}" />
+                        <CheckBox
+                            x:Name="IgnoreCodePageBox"
+                            Content="{DynamicResource Str.SettingsIgnoreCodePage}"
+                            IsChecked="{Binding IgnoreCodePage}"
+                            Style="{StaticResource OptionBox}" />
+                        <CheckBox
+                            x:Name="IgnoreNumbersBox"
+                            Content="{DynamicResource Str.SettingsIgnoreNumbers}"
+                            IsChecked="{Binding IgnoreNumbers}"
+                            Style="{StaticResource OptionBox}" />
+                        <CheckBox
+                            x:Name="IgnoreCommentsBox"
+                            Content="{DynamicResource Str.SettingsIgnoreComments}"
+                            IsChecked="{Binding IgnoreComments}"
+                            Style="{StaticResource OptionBox}" />
+                        <CheckBox
+                            x:Name="IgnoreFinalEolBox"
+                            Content="{DynamicResource Str.SettingsIgnoreFinalEol}"
+                            IsChecked="{Binding IgnoreMissingFinalEol}"
+                            Style="{StaticResource OptionBox}" />
+                    </StackPanel>
 
-					<Separator Margin="0,6" />
+                    <Separator Margin="0,6" />
 
-					<TextBlock Style="{StaticResource GroupTitle}" Text="{DynamicResource Str.SettingsMethod}" />
-					<RadioButton x:Name="MethodTextButton" MinHeight="26" GroupName="Method" Content="{DynamicResource Str.SettingsMethodText}" IsChecked="{Binding IsTextMethod}" />
-					<RadioButton x:Name="MethodBinaryButton" MinHeight="26" GroupName="Method" Content="{DynamicResource Str.SettingsMethodBinary}" IsChecked="{Binding IsBinaryMethod}" />
-					<TextBlock Margin="0,4,0,0" Opacity="0.7" Text="{DynamicResource Str.SettingsMethodHint}" TextWrapping="Wrap" />
+                    <TextBlock Style="{StaticResource GroupTitle}" Text="{DynamicResource Str.SettingsMethod}" />
+                    <RadioButton
+                        x:Name="MethodTextButton"
+                        MinHeight="26"
+                        Content="{DynamicResource Str.SettingsMethodText}"
+                        GroupName="Method"
+                        IsChecked="{Binding IsTextMethod}" />
+                    <RadioButton
+                        x:Name="MethodBinaryButton"
+                        MinHeight="26"
+                        Content="{DynamicResource Str.SettingsMethodBinary}"
+                        GroupName="Method"
+                        IsChecked="{Binding IsBinaryMethod}" />
+                    <TextBlock
+                        Margin="0,4,0,0"
+                        Opacity="0.7"
+                        Text="{DynamicResource Str.SettingsMethodHint}"
+                        TextWrapping="Wrap" />
 
-					<Separator Margin="0,6" />
+                    <Separator Margin="0,6" />
 
-					<CheckBox x:Name="SyncScrollBox" Style="{StaticResource OptionBox}" Content="{DynamicResource Str.SettingsSyncScroll}" IsChecked="{Binding CompareSyncScroll}" />
-				</StackPanel>
-			</TabItem>
-		</TabControl>
+                    <CheckBox
+                        x:Name="SyncScrollBox"
+                        Content="{DynamicResource Str.SettingsSyncScroll}"
+                        IsChecked="{Binding CompareSyncScroll}"
+                        Style="{StaticResource OptionBox}" />
+                </StackPanel>
+            </TabItem>
+        </TabControl>
 
-		<Border Grid.Row="1"
-				Padding="20,12"
-				Background="{DynamicResource LayerFillColorDefaultBrush}">
-			<StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-				<Button x:Name="OkButton"
-						MinWidth="96"
-						Content="{DynamicResource Str.Ok}"
-						IsDefault="True"
-						Click="OnOk" />
-				<Button MinWidth="88"
-						Margin="8,0,0,0"
-						Content="{DynamicResource Str.Cancel}"
-						IsCancel="True" />
-			</StackPanel>
-		</Border>
-	</Grid>
+        <Border
+            Grid.Row="1"
+            Padding="20,12"
+            Background="{DynamicResource LayerFillColorDefaultBrush}">
+            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                <Button
+                    x:Name="OkButton"
+                    MinWidth="96"
+                    Click="OnOk"
+                    Content="{DynamicResource Str.Ok}"
+                    IsDefault="True" />
+                <Button
+                    MinWidth="88"
+                    Margin="8,0,0,0"
+                    Content="{DynamicResource Str.Cancel}"
+                    IsCancel="True" />
+            </StackPanel>
+        </Border>
+    </Grid>
 
 </Window>

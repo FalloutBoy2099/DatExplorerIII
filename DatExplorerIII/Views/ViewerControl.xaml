@@ -1,417 +1,545 @@
-<UserControl x:Class="DatExplorerIII.Views.ViewerControl"
-			 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-			 xmlns:infrastructure="clr-namespace:DatExplorerIII.Infrastructure"
-			 FontSize="12">
-	<UserControl.Resources>
-		<BooleanToVisibilityConverter x:Key="BoolToVisibility" />
-		<infrastructure:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVisibility" />
+<UserControl
+    x:Class="DatExplorerIII.Views.ViewerControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:infrastructure="clr-namespace:DatExplorerIII.Infrastructure"
+    FontSize="12">
 
-		<!-- The grid that shows through the transparent parts of a sprite -->
-		<DrawingBrush x:Key="CheckerBrush"
-					  TileMode="Tile"
-					  Viewport="0,0,16,16"
-					  ViewportUnits="Absolute"
-					  Viewbox="0,0,16,16"
-					  ViewboxUnits="Absolute">
-			<DrawingBrush.Drawing>
-				<DrawingGroup>
-					<GeometryDrawing Brush="#26808080">
-						<GeometryDrawing.Geometry>
-							<RectangleGeometry Rect="0,0,16,16" />
-						</GeometryDrawing.Geometry>
-					</GeometryDrawing>
-					<GeometryDrawing Brush="#26FFFFFF">
-						<GeometryDrawing.Geometry>
-							<GeometryGroup>
-								<RectangleGeometry Rect="0,0,8,8" />
-								<RectangleGeometry Rect="8,8,8,8" />
-							</GeometryGroup>
-						</GeometryDrawing.Geometry>
-					</GeometryDrawing>
-				</DrawingGroup>
-			</DrawingBrush.Drawing>
-		</DrawingBrush>
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+        <infrastructure:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVisibility" />
 
-		<!-- A group of lines of a sheet (a character, a prototype) -->
-		<DataTemplate x:Key="SectionTemplate">
-			<StackPanel Margin="0,0,12,14">
-				<TextBlock Margin="0,0,0,4" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}" Text="{Binding Title}" />
-				<ItemsControl ItemsSource="{Binding Rows}">
-					<ItemsControl.ItemTemplate>
-						<DataTemplate>
-							<Grid Margin="0,1">
-								<Grid.ColumnDefinitions>
-									<ColumnDefinition Width="*" />
-									<ColumnDefinition Width="Auto" />
-								</Grid.ColumnDefinitions>
-								<TextBlock Text="{Binding Label}" TextTrimming="CharacterEllipsis" />
-								<TextBlock Grid.Column="1" Margin="16,0,0,0" FontWeight="SemiBold" Text="{Binding Value}" />
-							</Grid>
-						</DataTemplate>
-					</ItemsControl.ItemTemplate>
-				</ItemsControl>
-			</StackPanel>
-		</DataTemplate>
+        <!--  The grid that shows through the transparent parts of a sprite  -->
+        <DrawingBrush
+            x:Key="CheckerBrush"
+            TileMode="Tile"
+            Viewbox="0,0,16,16"
+            ViewboxUnits="Absolute"
+            Viewport="0,0,16,16"
+            ViewportUnits="Absolute">
+            <DrawingBrush.Drawing>
+                <DrawingGroup>
+                    <GeometryDrawing Brush="#26808080">
+                        <GeometryDrawing.Geometry>
+                            <RectangleGeometry Rect="0,0,16,16" />
+                        </GeometryDrawing.Geometry>
+                    </GeometryDrawing>
+                    <GeometryDrawing Brush="#26FFFFFF">
+                        <GeometryDrawing.Geometry>
+                            <GeometryGroup>
+                                <RectangleGeometry Rect="0,0,8,8" />
+                                <RectangleGeometry Rect="8,8,8,8" />
+                            </GeometryGroup>
+                        </GeometryDrawing.Geometry>
+                    </GeometryDrawing>
+                </DrawingGroup>
+            </DrawingBrush.Drawing>
+        </DrawingBrush>
 
-		<!-- The text of a cell of a table can go on several lines -->
-		<Style x:Key="WrapCell" TargetType="TextBlock">
-			<Setter Property="TextWrapping" Value="Wrap" />
-			<Setter Property="VerticalAlignment" Value="Top" />
-			<Setter Property="Margin" Value="4,3" />
-		</Style>
+        <!--  A group of lines of a sheet (a character, a prototype)  -->
+        <DataTemplate x:Key="SectionTemplate">
+            <StackPanel Margin="0,0,12,14">
+                <TextBlock
+                    Margin="0,0,0,4"
+                    FontSize="14"
+                    FontWeight="SemiBold"
+                    Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}"
+                    Text="{Binding Title}" />
+                <ItemsControl ItemsSource="{Binding Rows}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="0,1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{Binding Label}" TextTrimming="CharacterEllipsis" />
+                                <TextBlock
+                                    Grid.Column="1"
+                                    Margin="16,0,0,0"
+                                    FontWeight="SemiBold"
+                                    Text="{Binding Value}" />
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </DataTemplate>
 
-		<Style x:Key="ToolbarLabel" TargetType="TextBlock">
-			<Setter Property="VerticalAlignment" Value="Center" />
-			<Setter Property="Margin" Value="0,0,6,0" />
-		</Style>
+        <!--  The text of a cell of a table can go on several lines  -->
+        <Style x:Key="WrapCell" TargetType="TextBlock">
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="VerticalAlignment" Value="Top" />
+            <Setter Property="Margin" Value="4,3" />
+        </Style>
 
-		<Style x:Key="Notice" TargetType="TextBlock">
-			<Setter Property="Margin" Value="0,0,0,6" />
-			<Setter Property="TextWrapping" Value="Wrap" />
-			<Setter Property="Foreground" Value="#E8A200" />
-			<Style.Triggers>
-				<Trigger Property="Text" Value="">
-					<Setter Property="Visibility" Value="Collapsed" />
-				</Trigger>
-			</Style.Triggers>
-		</Style>
-	</UserControl.Resources>
+        <Style x:Key="ToolbarLabel" TargetType="TextBlock">
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Margin" Value="0,0,6,0" />
+        </Style>
 
-	<Grid>
-		<!-- Nothing to show: no file, a file that cannot be shown, an error -->
-		<TextBlock Margin="16"
-				   HorizontalAlignment="Center"
-				   VerticalAlignment="Center"
-				   Opacity="0.7"
-				   Text="{Binding Message}"
-				   TextAlignment="Center"
-				   TextWrapping="Wrap"
-				   Visibility="{Binding HasMessage, Converter={StaticResource BoolToVisibility}}" />
+        <Style x:Key="Notice" TargetType="TextBlock">
+            <Setter Property="Margin" Value="0,0,0,6" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="Foreground" Value="#E8A200" />
+            <Style.Triggers>
+                <Trigger Property="Text" Value="">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
 
-		<TextBlock Margin="16"
-				   HorizontalAlignment="Center"
-				   VerticalAlignment="Center"
-				   Opacity="0.7"
-				   Text="{DynamicResource Str.ViewerLoading}"
-				   Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibility}}" />
+    <Grid>
+        <!--  Nothing to show: no file, a file that cannot be shown, an error  -->
+        <TextBlock
+            Margin="16"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Opacity="0.7"
+            Text="{Binding Message}"
+            TextAlignment="Center"
+            TextWrapping="Wrap"
+            Visibility="{Binding HasMessage, Converter={StaticResource BoolToVisibility}}" />
 
-		<!-- Text -->
-		<Grid DataContext="{Binding Text}" Visibility="{Binding DataContext.IsText, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}}">
-			<Grid.RowDefinitions>
-				<RowDefinition Height="Auto" />
-				<RowDefinition Height="Auto" />
-				<RowDefinition Height="*" />
-				<RowDefinition Height="Auto" />
-			</Grid.RowDefinitions>
+        <TextBlock
+            Margin="16"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Opacity="0.7"
+            Text="{DynamicResource Str.ViewerLoading}"
+            Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibility}}" />
 
-			<StackPanel Margin="0,0,0,6" Orientation="Horizontal">
-				<TextBlock Style="{StaticResource ToolbarLabel}" Text="{DynamicResource Str.ViewerEncoding}" />
-				<ComboBox MinWidth="190"
-						  DisplayMemberPath="Display"
-						  ItemsSource="{Binding Options}"
-						  SelectedItem="{Binding SelectedEncoding}" />
-				<CheckBox Margin="14,0,0,0" Content="{DynamicResource Str.ViewerWrap}" IsChecked="{Binding WrapLines}" />
-				<Button Margin="14,0,0,0" Command="{Binding CopyCommand, Mode=OneTime}" Content="{DynamicResource Str.ViewerCopy}" />
-			</StackPanel>
+        <!--  Text  -->
+        <Grid DataContext="{Binding Text}" Visibility="{Binding DataContext.IsText, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-			<TextBlock Grid.Row="1" Style="{StaticResource Notice}" Text="{Binding Notice}" />
+            <StackPanel Margin="0,0,0,6" Orientation="Horizontal">
+                <TextBlock Style="{StaticResource ToolbarLabel}" Text="{DynamicResource Str.ViewerEncoding}" />
+                <ComboBox
+                    MinWidth="190"
+                    DisplayMemberPath="Display"
+                    ItemsSource="{Binding Options}"
+                    SelectedItem="{Binding SelectedEncoding}" />
+                <CheckBox
+                    Margin="14,0,0,0"
+                    Content="{DynamicResource Str.ViewerWrap}"
+                    IsChecked="{Binding WrapLines}" />
+                <Button
+                    Margin="14,0,0,0"
+                    Command="{Binding CopyCommand, Mode=OneTime}"
+                    Content="{DynamicResource Str.ViewerCopy}" />
+            </StackPanel>
 
-			<TextBox Grid.Row="2"
-					 AcceptsReturn="True"
-					 FontFamily="Consolas"
-					 HorizontalScrollBarVisibility="Auto"
-					 IsReadOnly="True"
-					 IsReadOnlyCaretVisible="True"
-					 Text="{Binding Text, Mode=OneWay}"
-					 VerticalScrollBarVisibility="Auto">
-				<TextBox.Style>
-					<Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
-						<Setter Property="TextWrapping" Value="NoWrap" />
-						<Style.Triggers>
-							<DataTrigger Binding="{Binding WrapLines}" Value="True">
-								<Setter Property="TextWrapping" Value="Wrap" />
-							</DataTrigger>
-							<DataTrigger Binding="{Binding IsHighlighted}" Value="True">
-								<Setter Property="Visibility" Value="Collapsed" />
-							</DataTrigger>
-						</Style.Triggers>
-					</Style>
-				</TextBox.Style>
-			</TextBox>
+            <TextBlock
+                Grid.Row="1"
+                Style="{StaticResource Notice}"
+                Text="{Binding Notice}" />
 
-			<!-- A text with colors (message files): the document is made by the code behind. -->
-			<RichTextBox x:Name="HighlightedBox"
-						 Grid.Row="2"
-						 FontFamily="Consolas"
-						 IsReadOnly="True"
-						 IsReadOnlyCaretVisible="True"
-						 VerticalScrollBarVisibility="Auto"
-						 Visibility="{Binding IsHighlighted, Converter={StaticResource BoolToVisibility}}" />
+            <TextBox
+                Grid.Row="2"
+                AcceptsReturn="True"
+                FontFamily="Consolas"
+                HorizontalScrollBarVisibility="Auto"
+                IsReadOnly="True"
+                IsReadOnlyCaretVisible="True"
+                Text="{Binding Text, Mode=OneWay}"
+                VerticalScrollBarVisibility="Auto">
+                <TextBox.Style>
+                    <Style BasedOn="{StaticResource {x:Type TextBox}}" TargetType="TextBox">
+                        <Setter Property="TextWrapping" Value="NoWrap" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding WrapLines}" Value="True">
+                                <Setter Property="TextWrapping" Value="Wrap" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding IsHighlighted}" Value="True">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBox.Style>
+            </TextBox>
 
-			<TextBlock Grid.Row="3" Margin="0,6,0,0" Opacity="0.7" Text="{Binding Status}" TextTrimming="CharacterEllipsis" />
-		</Grid>
+            <!--  A text with colors (message files): the document is made by the code behind.  -->
+            <RichTextBox
+                x:Name="HighlightedBox"
+                Grid.Row="2"
+                FontFamily="Consolas"
+                IsReadOnly="True"
+                IsReadOnlyCaretVisible="True"
+                VerticalScrollBarVisibility="Auto"
+                Visibility="{Binding IsHighlighted, Converter={StaticResource BoolToVisibility}}" />
 
-		<!-- Picture -->
-		<Grid DataContext="{Binding Image}" Visibility="{Binding DataContext.IsImage, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}}">
-			<Grid.RowDefinitions>
-				<RowDefinition Height="Auto" />
-				<RowDefinition Height="*" />
-				<RowDefinition Height="Auto" />
-			</Grid.RowDefinitions>
+            <TextBlock
+                Grid.Row="3"
+                Margin="0,6,0,0"
+                Opacity="0.7"
+                Text="{Binding Status}"
+                TextTrimming="CharacterEllipsis" />
+        </Grid>
 
-			<WrapPanel Margin="0,0,0,6">
-				<StackPanel Margin="0,0,14,4" Orientation="Horizontal" Visibility="{Binding HasPaletteChoices, Converter={StaticResource BoolToVisibility}}">
-					<TextBlock Style="{StaticResource ToolbarLabel}" Text="{DynamicResource Str.ViewerPalette}" />
-					<ComboBox MinWidth="150"
-							  DisplayMemberPath="Display"
-							  ItemsSource="{Binding PaletteChoices}"
-							  SelectedItem="{Binding SelectedPalette}" />
-				</StackPanel>
+        <!--  Picture  -->
+        <Grid DataContext="{Binding Image}" Visibility="{Binding DataContext.IsImage, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-				<StackPanel Margin="0,0,14,4" Orientation="Horizontal" Visibility="{Binding HasDirections, Converter={StaticResource BoolToVisibility}}">
-					<TextBlock Style="{StaticResource ToolbarLabel}" Text="{DynamicResource Str.ViewerDirection}" />
-					<ComboBox MinWidth="56" ItemsSource="{Binding Directions}" SelectedIndex="{Binding SelectedDirection}" />
-				</StackPanel>
+            <WrapPanel Margin="0,0,0,6">
+                <StackPanel
+                    Margin="0,0,14,4"
+                    Orientation="Horizontal"
+                    Visibility="{Binding HasPaletteChoices, Converter={StaticResource BoolToVisibility}}">
+                    <TextBlock Style="{StaticResource ToolbarLabel}" Text="{DynamicResource Str.ViewerPalette}" />
+                    <ComboBox
+                        MinWidth="150"
+                        DisplayMemberPath="Display"
+                        ItemsSource="{Binding PaletteChoices}"
+                        SelectedItem="{Binding SelectedPalette}" />
+                </StackPanel>
 
-				<StackPanel Margin="0,0,14,4" Orientation="Horizontal" Visibility="{Binding IsAnimated, Converter={StaticResource BoolToVisibility}}">
-					<Button Command="{Binding PreviousCommand, Mode=OneTime}" ToolTip="{DynamicResource Str.ViewerPreviousFrame}">
-						<TextBlock FontFamily="{StaticResource IconFont}" Text="&#xE892;" />
-					</Button>
-					<Button Margin="4,0,0,0" Command="{Binding PlayCommand, Mode=OneTime}" ToolTip="{DynamicResource Str.ViewerPlay}">
-						<TextBlock FontFamily="{StaticResource IconFont}">
-							<TextBlock.Style>
-								<Style TargetType="TextBlock">
-									<Setter Property="Text" Value="&#xE768;" />
-									<Style.Triggers>
-										<DataTrigger Binding="{Binding IsPlaying}" Value="True">
-											<Setter Property="Text" Value="&#xE769;" />
-										</DataTrigger>
-									</Style.Triggers>
-								</Style>
-							</TextBlock.Style>
-						</TextBlock>
-					</Button>
-					<Button Margin="4,0,0,0" Command="{Binding NextCommand, Mode=OneTime}" ToolTip="{DynamicResource Str.ViewerNextFrame}">
-						<TextBlock FontFamily="{StaticResource IconFont}" Text="&#xE893;" />
-					</Button>
-					<TextBlock Margin="8,0,0,0" VerticalAlignment="Center" Text="{Binding FrameLabel}" />
-				</StackPanel>
+                <StackPanel
+                    Margin="0,0,14,4"
+                    Orientation="Horizontal"
+                    Visibility="{Binding HasDirections, Converter={StaticResource BoolToVisibility}}">
+                    <TextBlock Style="{StaticResource ToolbarLabel}" Text="{DynamicResource Str.ViewerDirection}" />
+                    <ComboBox
+                        MinWidth="56"
+                        ItemsSource="{Binding Directions}"
+                        SelectedIndex="{Binding SelectedDirection}" />
+                </StackPanel>
 
-				<StackPanel Margin="0,0,0,4" Orientation="Horizontal">
-					<TextBlock Style="{StaticResource ToolbarLabel}" Text="{DynamicResource Str.ViewerZoom}" />
-					<ComboBox MinWidth="76"
-							  DisplayMemberPath="Display"
-							  ItemsSource="{Binding ZoomOptions}"
-							  SelectedItem="{Binding SelectedZoom}" />
-				</StackPanel>
-			</WrapPanel>
+                <StackPanel
+                    Margin="0,0,14,4"
+                    Orientation="Horizontal"
+                    Visibility="{Binding IsAnimated, Converter={StaticResource BoolToVisibility}}">
+                    <Button Command="{Binding PreviousCommand, Mode=OneTime}" ToolTip="{DynamicResource Str.ViewerPreviousFrame}">
+                        <TextBlock FontFamily="{StaticResource IconFont}" Text="&#xE892;" />
+                    </Button>
+                    <Button
+                        Margin="4,0,0,0"
+                        Command="{Binding PlayCommand, Mode=OneTime}"
+                        ToolTip="{DynamicResource Str.ViewerPlay}">
+                        <TextBlock FontFamily="{StaticResource IconFont}">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Text" Value="&#xE768;" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsPlaying}" Value="True">
+                                            <Setter Property="Text" Value="&#xE769;" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Button>
+                    <Button
+                        Margin="4,0,0,0"
+                        Command="{Binding NextCommand, Mode=OneTime}"
+                        ToolTip="{DynamicResource Str.ViewerNextFrame}">
+                        <TextBlock FontFamily="{StaticResource IconFont}" Text="&#xE893;" />
+                    </Button>
+                    <TextBlock
+                        Margin="8,0,0,0"
+                        VerticalAlignment="Center"
+                        Text="{Binding FrameLabel}" />
+                </StackPanel>
 
-			<Border Grid.Row="1" Background="{StaticResource CheckerBrush}" BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}" BorderThickness="1">
-				<Grid>
-					<Viewbox Stretch="Uniform" StretchDirection="Both" Visibility="{Binding IsFit, Converter={StaticResource BoolToVisibility}}">
-						<Image RenderOptions.BitmapScalingMode="NearestNeighbor" SnapsToDevicePixels="True" Source="{Binding Bitmap}" />
-					</Viewbox>
-					<ScrollViewer HorizontalScrollBarVisibility="Auto"
-								  VerticalScrollBarVisibility="Auto"
-								  Visibility="{Binding IsFit, Converter={StaticResource InverseBoolToVisibility}}">
-						<Image Width="{Binding DisplayWidth}"
-							   Height="{Binding DisplayHeight}"
-							   HorizontalAlignment="Center"
-							   VerticalAlignment="Center"
-							   RenderOptions.BitmapScalingMode="NearestNeighbor"
-							   SnapsToDevicePixels="True"
-							   Source="{Binding Bitmap}"
-							   Stretch="Fill" />
-					</ScrollViewer>
-				</Grid>
-			</Border>
+                <StackPanel Margin="0,0,0,4" Orientation="Horizontal">
+                    <TextBlock Style="{StaticResource ToolbarLabel}" Text="{DynamicResource Str.ViewerZoom}" />
+                    <ComboBox
+                        MinWidth="76"
+                        DisplayMemberPath="Display"
+                        ItemsSource="{Binding ZoomOptions}"
+                        SelectedItem="{Binding SelectedZoom}" />
+                </StackPanel>
+            </WrapPanel>
 
-			<TextBlock Grid.Row="2" Margin="0,6,0,0" Opacity="0.7" Text="{Binding Info}" TextTrimming="CharacterEllipsis" />
-		</Grid>
+            <Border
+                Grid.Row="1"
+                Background="{StaticResource CheckerBrush}"
+                BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1">
+                <Grid>
+                    <Viewbox
+                        Stretch="Uniform"
+                        StretchDirection="Both"
+                        Visibility="{Binding IsFit, Converter={StaticResource BoolToVisibility}}">
+                        <Image
+                            RenderOptions.BitmapScalingMode="NearestNeighbor"
+                            SnapsToDevicePixels="True"
+                            Source="{Binding Bitmap}" />
+                    </Viewbox>
+                    <ScrollViewer
+                        HorizontalScrollBarVisibility="Auto"
+                        VerticalScrollBarVisibility="Auto"
+                        Visibility="{Binding IsFit, Converter={StaticResource InverseBoolToVisibility}}">
+                        <Image
+                            Width="{Binding DisplayWidth}"
+                            Height="{Binding DisplayHeight}"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            RenderOptions.BitmapScalingMode="NearestNeighbor"
+                            SnapsToDevicePixels="True"
+                            Source="{Binding Bitmap}"
+                            Stretch="Fill" />
+                    </ScrollViewer>
+                </Grid>
+            </Border>
 
-		<!-- Sound -->
-		<Grid DataContext="{Binding Audio}" Visibility="{Binding DataContext.IsAudio, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}}">
-			<StackPanel MaxWidth="560" HorizontalAlignment="Stretch" VerticalAlignment="Center">
-				<Path Height="110"
-					  Margin="8,0,8,16"
-					  Data="{Binding Shape}"
-					  Fill="{DynamicResource AccentFillColorDefaultBrush}"
-					  Stretch="Fill" />
+            <TextBlock
+                Grid.Row="2"
+                Margin="0,6,0,0"
+                Opacity="0.7"
+                Text="{Binding Info}"
+                TextTrimming="CharacterEllipsis" />
+        </Grid>
 
-				<Button Padding="22,10"
-						HorizontalAlignment="Center"
-						Command="{Binding PlayStopCommand, Mode=OneTime}">
-					<StackPanel Orientation="Horizontal">
-						<TextBlock VerticalAlignment="Center" FontFamily="{StaticResource IconFont}" FontSize="18">
-							<TextBlock.Style>
-								<Style TargetType="TextBlock">
-									<Setter Property="Text" Value="&#xE768;" />
-									<Style.Triggers>
-										<DataTrigger Binding="{Binding IsPlaying}" Value="True">
-											<Setter Property="Text" Value="&#xE71A;" />
-										</DataTrigger>
-									</Style.Triggers>
-								</Style>
-							</TextBlock.Style>
-						</TextBlock>
-						<TextBlock Margin="10,0,0,0" VerticalAlignment="Center">
-							<TextBlock.Style>
-								<Style TargetType="TextBlock">
-									<Setter Property="Text" Value="{DynamicResource Str.ViewerPlay}" />
-									<Style.Triggers>
-										<DataTrigger Binding="{Binding IsPlaying}" Value="True">
-											<Setter Property="Text" Value="{DynamicResource Str.ViewerStop}" />
-										</DataTrigger>
-									</Style.Triggers>
-								</Style>
-							</TextBlock.Style>
-						</TextBlock>
-					</StackPanel>
-				</Button>
+        <!--  Sound  -->
+        <Grid DataContext="{Binding Audio}" Visibility="{Binding DataContext.IsAudio, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}}">
+            <StackPanel
+                MaxWidth="560"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Center">
+                <Path
+                    Height="110"
+                    Margin="8,0,8,16"
+                    Data="{Binding Shape}"
+                    Fill="{DynamicResource AccentFillColorDefaultBrush}"
+                    Stretch="Fill" />
 
-				<TextBlock Margin="0,14,0,0" HorizontalAlignment="Center" Text="{Binding Info}" />
-				<TextBlock Margin="0,8,0,0" HorizontalAlignment="Center" Style="{StaticResource Notice}" Text="{Binding Warning}" />
+                <Button
+                    Padding="22,10"
+                    HorizontalAlignment="Center"
+                    Command="{Binding PlayStopCommand, Mode=OneTime}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            FontFamily="{StaticResource IconFont}"
+                            FontSize="18">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Text" Value="&#xE768;" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsPlaying}" Value="True">
+                                            <Setter Property="Text" Value="&#xE71A;" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                        <TextBlock Margin="10,0,0,0" VerticalAlignment="Center">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Text" Value="{DynamicResource Str.ViewerPlay}" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsPlaying}" Value="True">
+                                            <Setter Property="Text" Value="{DynamicResource Str.ViewerStop}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </StackPanel>
+                </Button>
 
-				<StackPanel Margin="0,12,0,0" HorizontalAlignment="Center" Orientation="Horizontal" Visibility="{Binding CanChooseChannels, Converter={StaticResource BoolToVisibility}}">
-					<TextBlock Style="{StaticResource ToolbarLabel}" Text="{DynamicResource Str.ViewerChannels}" />
-					<ComboBox MinWidth="120"
-							  DisplayMemberPath="Display"
-							  ItemsSource="{Binding ChannelChoices}"
-							  SelectedItem="{Binding SelectedChannels}" />
-				</StackPanel>
-			</StackPanel>
-		</Grid>
+                <TextBlock
+                    Margin="0,14,0,0"
+                    HorizontalAlignment="Center"
+                    Text="{Binding Info}" />
+                <TextBlock
+                    Margin="0,8,0,0"
+                    HorizontalAlignment="Center"
+                    Style="{StaticResource Notice}"
+                    Text="{Binding Warning}" />
 
-		<!-- Movie -->
-		<Grid DataContext="{Binding Video}" Visibility="{Binding DataContext.IsVideo, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}}">
-			<Grid.RowDefinitions>
-				<RowDefinition Height="Auto" />
-				<RowDefinition Height="*" />
-				<RowDefinition Height="Auto" />
-				<RowDefinition Height="Auto" />
-			</Grid.RowDefinitions>
+                <StackPanel
+                    Margin="0,12,0,0"
+                    HorizontalAlignment="Center"
+                    Orientation="Horizontal"
+                    Visibility="{Binding CanChooseChannels, Converter={StaticResource BoolToVisibility}}">
+                    <TextBlock Style="{StaticResource ToolbarLabel}" Text="{DynamicResource Str.ViewerChannels}" />
+                    <ComboBox
+                        MinWidth="120"
+                        DisplayMemberPath="Display"
+                        ItemsSource="{Binding ChannelChoices}"
+                        SelectedItem="{Binding SelectedChannels}" />
+                </StackPanel>
+            </StackPanel>
+        </Grid>
 
-			<StackPanel Margin="0,0,0,6" Orientation="Horizontal">
-				<Button Padding="16,6" Command="{Binding PlayStopCommand, Mode=OneTime}">
-					<StackPanel Orientation="Horizontal">
-						<TextBlock VerticalAlignment="Center" FontFamily="{StaticResource IconFont}" FontSize="16">
-							<TextBlock.Style>
-								<Style TargetType="TextBlock">
-									<Setter Property="Text" Value="&#xE768;" />
-									<Style.Triggers>
-										<DataTrigger Binding="{Binding IsPlaying}" Value="True">
-											<Setter Property="Text" Value="&#xE769;" />
-										</DataTrigger>
-									</Style.Triggers>
-								</Style>
-							</TextBlock.Style>
-						</TextBlock>
-						<TextBlock Margin="8,0,0,0" VerticalAlignment="Center">
-							<TextBlock.Style>
-								<Style TargetType="TextBlock">
-									<Setter Property="Text" Value="{DynamicResource Str.ViewerPlay}" />
-									<Style.Triggers>
-										<DataTrigger Binding="{Binding IsPlaying}" Value="True">
-											<Setter Property="Text" Value="{DynamicResource Str.ViewerPause}" />
-										</DataTrigger>
-									</Style.Triggers>
-								</Style>
-							</TextBlock.Style>
-						</TextBlock>
-					</StackPanel>
-				</Button>
-				<TextBlock Margin="12,0,0,0" VerticalAlignment="Center" Style="{StaticResource Notice}" Text="{Binding Warning}" />
-			</StackPanel>
+        <!--  Movie  -->
+        <Grid DataContext="{Binding Video}" Visibility="{Binding DataContext.IsVideo, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-			<Border Grid.Row="1" Background="Black" BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}" BorderThickness="1">
-				<Grid>
-					<Viewbox Stretch="Uniform" StretchDirection="Both">
-						<Image RenderOptions.BitmapScalingMode="NearestNeighbor" SnapsToDevicePixels="True" Source="{Binding Bitmap}" />
-					</Viewbox>
+            <StackPanel Margin="0,0,0,6" Orientation="Horizontal">
+                <Button Padding="16,6" Command="{Binding PlayStopCommand, Mode=OneTime}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            FontFamily="{StaticResource IconFont}"
+                            FontSize="16">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Text" Value="&#xE768;" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsPlaying}" Value="True">
+                                            <Setter Property="Text" Value="&#xE769;" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                        <TextBlock Margin="8,0,0,0" VerticalAlignment="Center">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Text" Value="{DynamicResource Str.ViewerPlay}" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsPlaying}" Value="True">
+                                            <Setter Property="Text" Value="{DynamicResource Str.ViewerPause}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </StackPanel>
+                </Button>
+                <TextBlock
+                    Margin="12,0,0,0"
+                    VerticalAlignment="Center"
+                    Style="{StaticResource Notice}"
+                    Text="{Binding Warning}" />
+            </StackPanel>
 
-					<!-- The subtitle of the picture (the .sve file of the movie), at the bottom of the picture. -->
-					<Border Margin="24,0,24,16"
-							Padding="12,6"
-							HorizontalAlignment="Center"
-							VerticalAlignment="Bottom"
-							Background="#B0000000"
-							CornerRadius="4"
-							IsHitTestVisible="False"
-							Visibility="{Binding HasSubtitle, Converter={StaticResource BoolToVisibility}}">
-						<TextBlock FontSize="16"
-								   Foreground="White"
-								   Text="{Binding Subtitle}"
-								   TextAlignment="Center"
-								   TextWrapping="Wrap" />
-					</Border>
-				</Grid>
-			</Border>
+            <Border
+                Grid.Row="1"
+                Background="Black"
+                BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1">
+                <Grid>
+                    <Viewbox Stretch="Uniform" StretchDirection="Both">
+                        <Image
+                            RenderOptions.BitmapScalingMode="NearestNeighbor"
+                            SnapsToDevicePixels="True"
+                            Source="{Binding Bitmap}" />
+                    </Viewbox>
 
-			<Grid Grid.Row="2" Margin="0,6,0,0">
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="*" />
-					<ColumnDefinition Width="Auto" />
-				</Grid.ColumnDefinitions>
-				<Slider IsMoveToPointEnabled="True"
-						IsSnapToTickEnabled="True"
-						LargeChange="30"
-						Maximum="{Binding LastFrame}"
-						Minimum="0"
-						SmallChange="1"
-						Thumb.DragCompleted="OnSeekCompleted"
-						Thumb.DragStarted="OnSeekStarted"
-						TickFrequency="1"
-						Value="{Binding Position, Delay=30}" />
-				<TextBlock Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center" Opacity="0.8" Text="{Binding PositionText}" />
-			</Grid>
+                    <!--  The subtitle of the picture (the .sve file of the movie), at the bottom of the picture.  -->
+                    <Border
+                        Margin="24,0,24,16"
+                        Padding="12,6"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Bottom"
+                        Background="#B0000000"
+                        CornerRadius="4"
+                        IsHitTestVisible="False"
+                        Visibility="{Binding HasSubtitle, Converter={StaticResource BoolToVisibility}}">
+                        <TextBlock
+                            FontSize="16"
+                            Foreground="White"
+                            Text="{Binding Subtitle}"
+                            TextAlignment="Center"
+                            TextWrapping="Wrap" />
+                    </Border>
+                </Grid>
+            </Border>
 
-			<TextBlock Grid.Row="3" Margin="0,6,0,0" Opacity="0.7" Text="{Binding Info}" TextTrimming="CharacterEllipsis" />
-		</Grid>
+            <Grid Grid.Row="2" Margin="0,6,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Slider
+                    IsMoveToPointEnabled="True"
+                    IsSnapToTickEnabled="True"
+                    LargeChange="30"
+                    Maximum="{Binding LastFrame}"
+                    Minimum="0"
+                    SmallChange="1"
+                    Thumb.DragCompleted="OnSeekCompleted"
+                    Thumb.DragStarted="OnSeekStarted"
+                    TickFrequency="1"
+                    Value="{Binding Position, Delay=30}" />
+                <TextBlock
+                    Grid.Column="1"
+                    Margin="12,0,0,0"
+                    VerticalAlignment="Center"
+                    Opacity="0.8"
+                    Text="{Binding PositionText}" />
+            </Grid>
 
-		<!-- Character sheet -->
-		<ScrollViewer DataContext="{Binding Character}"
-					  VerticalScrollBarVisibility="Auto"
-					  Visibility="{Binding DataContext.IsCharacter, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}}">
-			<ItemsControl ItemsSource="{Binding Sections}" ItemTemplate="{StaticResource SectionTemplate}" />
-		</ScrollViewer>
+            <TextBlock
+                Grid.Row="3"
+                Margin="0,6,0,0"
+                Opacity="0.7"
+                Text="{Binding Info}"
+                TextTrimming="CharacterEllipsis" />
+        </Grid>
 
-		<!-- Prototype of an object -->
-		<ScrollViewer DataContext="{Binding Prototype}"
-					  VerticalScrollBarVisibility="Auto"
-					  Visibility="{Binding DataContext.IsPrototype, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}}">
-			<ItemsControl ItemsSource="{Binding Sections}" ItemTemplate="{StaticResource SectionTemplate}" />
-		</ScrollViewer>
+        <!--  Character sheet  -->
+        <ScrollViewer
+            DataContext="{Binding Character}"
+            VerticalScrollBarVisibility="Auto"
+            Visibility="{Binding DataContext.IsCharacter, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}}">
+            <ItemsControl ItemTemplate="{StaticResource SectionTemplate}" ItemsSource="{Binding Sections}" />
+        </ScrollViewer>
 
-		<!-- What a map holds -->
-		<ScrollViewer DataContext="{Binding Map}"
-					  VerticalScrollBarVisibility="Auto"
-					  Visibility="{Binding DataContext.IsMap, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}}">
-			<ItemsControl ItemsSource="{Binding Sections}" ItemTemplate="{StaticResource SectionTemplate}" />
-		</ScrollViewer>
+        <!--  Prototype of an object  -->
+        <ScrollViewer
+            DataContext="{Binding Prototype}"
+            VerticalScrollBarVisibility="Auto"
+            Visibility="{Binding DataContext.IsPrototype, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}}">
+            <ItemsControl ItemTemplate="{StaticResource SectionTemplate}" ItemsSource="{Binding Sections}" />
+        </ScrollViewer>
 
-		<!-- Messages and dialogs -->
-		<Grid DataContext="{Binding Table}" Visibility="{Binding DataContext.IsTable, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}}">
-			<Grid.RowDefinitions>
-				<RowDefinition Height="Auto" />
-				<RowDefinition Height="*" />
-				<RowDefinition Height="Auto" />
-			</Grid.RowDefinitions>
+        <!--  What a map holds  -->
+        <ScrollViewer
+            DataContext="{Binding Map}"
+            VerticalScrollBarVisibility="Auto"
+            Visibility="{Binding DataContext.IsMap, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}}">
+            <ItemsControl ItemTemplate="{StaticResource SectionTemplate}" ItemsSource="{Binding Sections}" />
+        </ScrollViewer>
 
-			<TextBlock Style="{StaticResource Notice}" Text="{Binding Notice}" />
+        <!--  Messages and dialogs  -->
+        <Grid DataContext="{Binding Table}" Visibility="{Binding DataContext.IsTable, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-			<DataGrid Grid.Row="1"
-					  AutoGenerateColumns="True"
-					  AutoGeneratingColumn="OnAutoGeneratingColumn"
-					  CanUserAddRows="False"
-					  CanUserDeleteRows="False"
-					  GridLinesVisibility="Horizontal"
-					  HeadersVisibility="Column"
-					  IsReadOnly="True"
-					  ItemsSource="{Binding Rows}"
-					  SelectionUnit="FullRow" />
+            <TextBlock Style="{StaticResource Notice}" Text="{Binding Notice}" />
 
-			<TextBlock Grid.Row="2" Margin="0,6,0,0" Opacity="0.7" Text="{Binding Status}" TextTrimming="CharacterEllipsis" />
-		</Grid>
-	</Grid>
+            <DataGrid
+                Grid.Row="1"
+                AutoGenerateColumns="True"
+                AutoGeneratingColumn="OnAutoGeneratingColumn"
+                CanUserAddRows="False"
+                CanUserDeleteRows="False"
+                GridLinesVisibility="Horizontal"
+                HeadersVisibility="Column"
+                IsReadOnly="True"
+                ItemsSource="{Binding Rows}"
+                SelectionUnit="FullRow" />
+
+            <TextBlock
+                Grid.Row="2"
+                Margin="0,6,0,0"
+                Opacity="0.7"
+                Text="{Binding Status}"
+                TextTrimming="CharacterEllipsis" />
+        </Grid>
+    </Grid>
+
 </UserControl>
