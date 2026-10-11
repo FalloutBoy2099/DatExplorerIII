@@ -256,7 +256,7 @@ namespace DatExplorerIII.Tests
 			Byte[] data = BuildLip();
 			DatArchive archive = DatArchive.OpenFolder(Folder(("sound\\speech\\test", "abc.lip", data)));
 			using (archive)
-			using (ViewerViewModel viewer = new())
+			using (ViewerViewModel viewer = new(new ManualUiThread()))
 			{
 				await viewer.LoadAsync(archive, archive.Find("sound\\speech\\test\\abc.lip")!);
 
@@ -376,7 +376,7 @@ namespace DatExplorerIII.Tests
 			Byte[] sve = Encoding.ASCII.GetBytes("20:Hello\r\n70:Bye\r\n");
 			DatArchive archive = DatArchive.OpenFolder(Folder(("data", "vault13.gam", gam), ("text\\english\\cuts", "boil1.sve", sve)));
 			using (archive)
-			using (ViewerViewModel viewer = new())
+			using (ViewerViewModel viewer = new(new ManualUiThread()))
 			{
 				await viewer.LoadAsync(archive, archive.Find("data\\vault13.gam")!);
 				Assert.True(viewer.IsTable);
@@ -395,7 +395,7 @@ namespace DatExplorerIII.Tests
 		{
 			DatArchive archive = DatArchive.OpenFolder(Folder(("data", "font0.aaf", BuildAaf())));
 			using (archive)
-			using (ViewerViewModel viewer = new())
+			using (ViewerViewModel viewer = new(new ManualUiThread()))
 			{
 				await viewer.LoadAsync(archive, archive.Find("data\\font0.aaf")!);
 

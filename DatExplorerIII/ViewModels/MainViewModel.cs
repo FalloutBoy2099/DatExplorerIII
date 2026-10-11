@@ -23,6 +23,7 @@ namespace DatExplorerIII.ViewModels
 		private readonly IDialogService _dialogs;
 		private readonly SettingsService _settings;
 		private readonly TempFolder _temp;
+		private readonly IUiThread _uiThread;
 
 		private FolderNode? _selectedFolder;
 		private IReadOnlyList<ListEntry> _items = Array.Empty<ListEntry>();
@@ -37,9 +38,10 @@ namespace DatExplorerIII.ViewModels
 		private String _totalText = String.Empty;
 		private String _pathText = String.Empty;
 
-		public MainViewModel(IDialogService dialogs, SettingsService settings, TempFolder temp)
+		public MainViewModel(IDialogService dialogs, SettingsService settings, TempFolder temp, IUiThread uiThread)
 		{
 			_dialogs = dialogs;
+			_uiThread = uiThread;
 			_settings = settings;
 			_temp = temp;
 			Busy = new BusyState(dialogs);
@@ -89,6 +91,7 @@ namespace DatExplorerIII.ViewModels
 			AboutCommand = new RelayCommand(_dialogs.ShowAbout);
 			SettingsCommand = new AsyncRelayCommand(OpenSettingsAsync, () => !Busy.IsBusy);
 			CreateComparisonCommands();
+			CreateInputCommands();
 		}
 
 		/// <summary>Raised when a list entry should be selected and scrolled into view.</summary>

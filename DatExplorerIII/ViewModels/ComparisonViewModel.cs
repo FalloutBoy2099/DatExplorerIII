@@ -181,15 +181,15 @@ namespace DatExplorerIII.ViewModels
 
 		private readonly Func<IEnumerable<DatArchive>> _archives;
 
-		public ComparisonViewModel(DatDocument left, DatDocument right, IEnumerable<DatCompareItem> items, Func<IEnumerable<DatArchive>> archives, ComparisonOptions? options = null)
+		public ComparisonViewModel(DatDocument left, DatDocument right, IEnumerable<DatCompareItem> items, Func<IEnumerable<DatArchive>> archives, IUiThread uiThread, ComparisonOptions? options = null)
 		{
 			_archives = archives;
 			Options = options ?? new ComparisonOptions();
 			Left = left;
 			Right = right;
 			AllRows = items.Select(item => new ComparisonRow(item)).ToList();
-			LeftViewer = new ViewerViewModel { OtherArchives = archives };
-			RightViewer = new ViewerViewModel { OtherArchives = archives };
+			LeftViewer = new ViewerViewModel(uiThread) { OtherArchives = archives };
+			RightViewer = new ViewerViewModel(uiThread) { OtherArchives = archives };
 
 			Diff = new DiffViewModel();
 			Root = BuildFolders();

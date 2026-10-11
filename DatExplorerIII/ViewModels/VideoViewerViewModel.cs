@@ -10,7 +10,6 @@ namespace DatExplorerIII.ViewModels
 	using System.Windows.Input;
 	using System.Windows.Media;
 	using System.Windows.Media.Imaging;
-	using System.Windows.Threading;
 	using Formats;
 	using Infrastructure;
 	using Models;
@@ -23,7 +22,7 @@ namespace DatExplorerIII.ViewModels
 	public sealed class VideoViewerViewModel : ObservableObject, IDisposable
 	{
 		private readonly WavPlayer _player = new();
-		private readonly DispatcherTimer _timer = new() { Interval = TimeSpan.FromMilliseconds(10) };
+		private readonly IUiTimer _timer;
 		private readonly Stopwatch _clock = new();
 
 		private CancellationTokenSource? _building;
@@ -42,8 +41,10 @@ namespace DatExplorerIII.ViewModels
 		private Boolean _showSubtitles = true;
 		private String _subtitle = String.Empty;
 
-		public VideoViewerViewModel()
+		public VideoViewerViewModel(IUiThread uiThread)
 		{
+			_timer = uiThread.CreateTimer();
+			_timer.Interval = TimeSpan.FromMilliseconds(10);
 			_timer.Tick += (_, _) => OnTick();
 			PlayStopCommand = new RelayCommand(PlayOrPause, () => _movie != null);
 		}

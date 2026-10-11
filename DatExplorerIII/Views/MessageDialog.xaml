@@ -9,6 +9,7 @@
 		ShowInTaskbar="False"
 		WindowStartupLocation="CenterOwner"
 		FontSize="12">
+	
 	<Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="*" />
@@ -40,4 +41,5 @@
 			<StackPanel x:Name="ButtonsPanel" HorizontalAlignment="Right" Orientation="Horizontal" />
 		</Border>
 	</Grid>
+	
 </Window>

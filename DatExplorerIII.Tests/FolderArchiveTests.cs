@@ -332,7 +332,7 @@ namespace DatExplorerIII.Tests
 		private MainViewModel CreateViewModel(FakeDialogs dialogs)
 		{
 			SettingsService settings = new(Path.Combine(_root, "settings"), null);
-			MainViewModel viewModel = new(dialogs, settings, new TempFolder());
+			MainViewModel viewModel = new(dialogs, settings, new TempFolder(), new ManualUiThread());
 			_viewModels.Add(viewModel);
 			return viewModel;
 		}
@@ -563,6 +563,85 @@ namespace DatExplorerIII.Tests
 
 			Assert.Empty(viewModel.RecentFiles);
 			Assert.Empty(new SettingsService(Path.Combine(_root, "settings"), null).Data.RecentFiles);
+		}
+
+		#endregion
+
+		#region Shortcuts and drag and drop
+
+		[Fact]
+		public void DropCommands_AcceptOnlyWhatTheyCanUse()
+		{
+			MainViewModel viewModel = CreateViewModel(new FakeDialogs());
+
+			// The tree takes archives; the list takes anything that is a file or a folder.
+			Assert.False(viewModel.OpenDroppedCommand.CanExecute(null));
+			Assert.False(viewModel.OpenDroppedCommand.CanExecute(new[] { "notes.txt" }));
+			Assert.True(viewModel.OpenDroppedCommand.CanExecute(new[] { "notes.txt", "master.dat" }));
+			Assert.True(viewModel.OpenDroppedCommand.CanExecute(new[] { "arcanum.patch3" }));
+
+			Assert.False(viewModel.ImportDroppedCommand.CanExecute(null));
+			Assert.False(viewModel.ImportDroppedCommand.CanExecute(Array.Empty<String>()));
+			Assert.True(viewModel.ImportDroppedCommand.CanExecute(new[] { "notes.txt" }));
+		}
+
+		[Fact]
+		public async Task DragSources_ExtractWhatIsDragged_AndRefuseWhatCannotBe()
+		{
+			// The files of a folder opened like an archive are not in a DAT yet: they are saved as one first.
+			String target = Path.Combine(_root, "dragged.dat");
+			MainViewModel source = CreateViewModel(new FakeDialogs { Choice = new SaveAsChoice(target, DatFormat.Fallout2) });
+			await source.OpenFilesAsync([MakeFolder()]);
+			await source.SaveAsAsync();
+			MainViewModel viewModel = CreateViewModel(new FakeDialogs());
+			await viewModel.OpenFilesAsync([target]);
+
+			// Nothing selected: nothing to drag.
+			Assert.Null(viewModel.ListDragSource.PrepareDragOut(null));
+
+			ListEntry file = viewModel.Items.First(item => item.Name == "readme.txt");
+			viewModel.SetSelectedItems([file]);
+			String path = Assert.Single(viewModel.ListDragSource.PrepareDragOut(null)!);
+			Assert.Equal("root file", File.ReadAllText(path));
+			Assert.Equal("readme.txt", Path.GetFileName(path));
+
+			// A folder of the tree is dragged with what it holds; the root of an archive is not dragged, nor is something that is not a folder.
+			FolderNode root = Assert.Single(viewModel.Roots);
+			FolderNode art = root.Document.FindNode("art")!;
+			String folderPath = Assert.Single(viewModel.FolderDragSource.PrepareDragOut(art)!);
+			Assert.True(File.Exists(Path.Combine(folderPath, "critters", "hero.frm")));
+			Assert.Null(viewModel.FolderDragSource.PrepareDragOut(root));
+			Assert.Null(viewModel.FolderDragSource.PrepareDragOut("art"));
+		}
+
+		[Fact]
+		public async Task Shortcuts_AreCommands()
+		{
+			MainViewModel viewModel = CreateViewModel(new FakeDialogs());
+			await viewModel.OpenFilesAsync([MakeFolder()]);
+
+			Boolean preview = viewModel.IsPreviewVisible;
+			viewModel.TogglePreviewCommand.Execute(null);
+			Assert.NotEqual(preview, viewModel.IsPreviewVisible);
+			viewModel.TogglePreviewCommand.Execute(null);
+			Assert.Equal(preview, viewModel.IsPreviewVisible);
+
+			List<String?> changes = new();
+			viewModel.PropertyChanged += (_, e) => changes.Add(e.PropertyName);
+			Int32 requests = viewModel.SearchFocusRequests;
+			viewModel.FocusSearchCommand.Execute(null);
+			Assert.Equal(requests + 1, viewModel.SearchFocusRequests);
+			Assert.Contains(nameof(MainViewModel.SearchFocusRequests), changes);
+
+			// Enter goes to the next entry that matches, Shift+Enter to the previous one; the list is told to show it.
+			List<ListEntry> revealed = new();
+			viewModel.RevealRequested += revealed.Add;
+			viewModel.SearchText = "e";
+			viewModel.FindNextCommand.Execute(null);
+			viewModel.FindNextCommand.Execute(null);
+			viewModel.FindPreviousCommand.Execute(null);
+			Assert.Equal(3, revealed.Count);
+			Assert.All(revealed, item => Assert.Contains("e", item.Name));
 		}
 
 		#endregion

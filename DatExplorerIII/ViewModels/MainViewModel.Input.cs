@@ -1,0 +1,75 @@
+namespace DatExplorerIII.ViewModels
+{
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
+	using System.Windows.Input;
+	using Infrastructure;
+	using Services;
+
+	/// <summary>What the keyboard and the mouse ask for, as commands: the shortcuts and the drag and drop of files.</summary>
+	public sealed partial class MainViewModel
+	{
+		private Int32 _searchFocusRequests;
+
+		/// <summary>Opens the DAT archives dropped on the tree; the parameter is the list of paths.</summary>
+		public ICommand OpenDroppedCommand { get; private set; } = null!;
+
+		/// <summary>Imports the files and folders dropped on the list (or opens them when no archive is open); the parameter is the list of paths.</summary>
+		public ICommand ImportDroppedCommand { get; private set; } = null!;
+
+		/// <summary>Makes real files of a folder of the tree dragged to the file explorer.</summary>
+		public IDragOutSource FolderDragSource { get; private set; } = null!;
+
+		/// <summary>Makes real files of the selected entries of the list dragged to the file explorer.</summary>
+		public IDragOutSource ListDragSource { get; private set; } = null!;
+
+		public ICommand TogglePreviewCommand { get; private set; } = null!;
+
+		/// <summary>Asks for the search box to take the focus.</summary>
+		public ICommand FocusSearchCommand { get; private set; } = null!;
+
+		/// <summary>Goes to the next entry of the folder whose name contains the search text.</summary>
+		public ICommand FindNextCommand { get; private set; } = null!;
+
+		public ICommand FindPreviousCommand { get; private set; } = null!;
+
+		/// <summary>Changes each time <see cref="FocusSearchCommand"/> runs; the search box takes the focus when it changes.</summary>
+		public Int32 SearchFocusRequests
+		{
+			get => _searchFocusRequests;
+			private set => SetProperty(ref _searchFocusRequests, value);
+		}
+
+		private void CreateInputCommands()
+		{
+			OpenDroppedCommand = new AsyncRelayCommand(
+				parameter => OpenDroppedAsync(PathsOf(parameter).Where(DatFiles.IsDatFile).ToList()),
+				parameter => PathsOf(parameter).Any(DatFiles.IsDatFile));
+			ImportDroppedCommand = new AsyncRelayCommand(
+				parameter => ImportDroppedAsync(PathsOf(parameter)),
+				parameter => PathsOf(parameter).Count > 0);
+			FolderDragSource = new DelegateDragOutSource(item => item is FolderNode node ? PrepareDragOut(node) : null);
+			ListDragSource = new DelegateDragOutSource(_ => SelectedItems.Count > 0 ? PrepareDragOut(SelectedItems.ToList()) : null);
+
+			TogglePreviewCommand = new RelayCommand(() => IsPreviewVisible = !IsPreviewVisible);
+			FocusSearchCommand = new RelayCommand(() => SearchFocusRequests++);
+			FindNextCommand = new RelayCommand(() => Find(true));
+			FindPreviousCommand = new RelayCommand(() => Find(false));
+		}
+
+		private static IReadOnlyList<String> PathsOf(Object? parameter)
+		{
+			return parameter as IReadOnlyList<String> ?? Array.Empty<String>();
+		}
+
+		private void Find(Boolean forward)
+		{
+			ListEntry? found = FindInFolder(forward);
+			if (found != null)
+			{
+				RevealRequested?.Invoke(found);
+			}
+		}
+	}
+}

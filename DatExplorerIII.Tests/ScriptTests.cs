@@ -280,7 +280,7 @@ namespace DatExplorerIII.Tests
 		{
 			DatArchive archive = DatArchive.OpenFolder(Folder(("scripts", "cath2mv.int", LoadMapScript), ("scripts", "broken.int", [1, 2, 3, 4])));
 			using (archive)
-			using (ViewerViewModel viewer = new())
+			using (ViewerViewModel viewer = new(new ManualUiThread()))
 			{
 				await viewer.LoadAsync(archive, archive.Find("scripts\\cath2mv.int")!);
 
@@ -344,7 +344,7 @@ namespace DatExplorerIII.Tests
 		{
 			DatArchive archive = DatArchive.OpenFolder(Folder(("scripts", "first.int", LoadMapScript), ("data", "second.txt", Encoding.ASCII.GetBytes("the second file")), ("scripts", "third.int", LoadMapScript)));
 			using (archive)
-			using (ViewerViewModel viewer = new())
+			using (ViewerViewModel viewer = new(new ManualUiThread()))
 			{
 				DatEntry script = archive.Find("scripts\\first.int")!;
 				DatEntry text = archive.Find("data\\second.txt")!;

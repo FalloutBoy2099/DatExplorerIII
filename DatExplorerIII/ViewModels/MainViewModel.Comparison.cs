@@ -233,7 +233,7 @@ namespace DatExplorerIII.ViewModels
 			}
 
 			_comparison?.Dispose();
-			ComparisonViewModel comparison = new(left, right, items, OpenArchives, options);
+			ComparisonViewModel comparison = new(left, right, items, OpenArchives, _uiThread, options);
 			comparison.PropertyChanged += (_, args) =>
 			{
 				if (args.PropertyName == nameof(ComparisonViewModel.ShowDifferences))

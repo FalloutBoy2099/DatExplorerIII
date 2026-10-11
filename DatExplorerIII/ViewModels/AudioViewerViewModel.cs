@@ -9,7 +9,6 @@ namespace DatExplorerIII.ViewModels
 	using System.Windows;
 	using System.Windows.Input;
 	using System.Windows.Media;
-	using System.Windows.Threading;
 	using Formats;
 	using Infrastructure;
 	using Models;
@@ -27,7 +26,7 @@ namespace DatExplorerIII.ViewModels
 	public sealed class AudioViewerViewModel : ObservableObject, IDisposable
 	{
 		private readonly WavPlayer _player = new();
-		private readonly DispatcherTimer _endTimer = new();
+		private readonly IUiTimer _endTimer;
 
 		private Byte[] _source = Array.Empty<Byte>();
 		private String _extension = String.Empty;
@@ -40,8 +39,9 @@ namespace DatExplorerIII.ViewModels
 		private ChannelChoice _selectedChannels;
 		private Int32 _generation;
 
-		public AudioViewerViewModel()
+		public AudioViewerViewModel(IUiThread uiThread)
 		{
+			_endTimer = uiThread.CreateTimer();
 			_channelChoices = CreateChannelChoices();
 			_selectedChannels = _channelChoices[0];
 			_endTimer.Tick += (_, _) => Stop();

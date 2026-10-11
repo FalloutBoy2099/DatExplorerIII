@@ -1,0 +1,58 @@
+name: Release
+
+# A tag that starts with "v" (git tag -a v2026.10.9.6 -m "..." ; git push origin --tags) tests the program, builds the two
+# executables with Publish.ps1 and creates the release on GitHub with them (the notes are made by GitHub from the commits and
+# the pull requests since the previous tag).
+# "Run workflow" (manual) does the same without the release: the executables are kept as an artifact of the run.
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - name: Get the code
+        uses: actions/checkout@v4
+
+      - name: Install .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Tests
+        run: dotnet test DatExplorerIII.sln --configuration Release
+
+      - name: Executables
+        shell: pwsh
+        run: ./Publish.ps1
+
+      - name: Zip files
+        shell: pwsh
+        run: |
+          $version = '${{ github.ref_name }}'
+          if (-not $version.StartsWith('v')) { $version = 'test' }
+          Compress-Archive publish/DatExplorerIII.exe "publish/DatExplorerIII-$version.zip"
+          Compress-Archive publish/DatExplorerIII-NET.exe "publish/DatExplorerIII-NET-$version.zip"
+
+      - name: Create the release
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = '${{ github.ref_name }}'
+          gh release create $tag publish/DatExplorerIII-$tag.zip publish/DatExplorerIII-NET-$tag.zip `
+            --title "DatExplorerIII $tag" --generate-notes --verify-tag
+
+      - name: Keep the executables (manual run)
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: DatExplorerIII
+          path: publish/*.zip

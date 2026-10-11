@@ -13,6 +13,7 @@ namespace DatExplorerIII.Tests
 	using DatExplorerIII.ViewModels;
 
 	/// <summary>The comparison of two archives (DAT files or folders) and the copy or move of files between them.</summary>
+	[Collection("ScrollBarSizes")] // Opening the settings applies the sizes of the scroll bars, which the other tests of that collection measure.
 	public sealed class ComparisonTests : IDisposable
 	{
 		private readonly String _root = Path.Combine(Path.GetTempPath(), "DatExplorerIII.Tests", Path.GetRandomFileName());
@@ -361,7 +362,7 @@ namespace DatExplorerIII.Tests
 
 		private MainViewModel CreateViewModel(Dialogs dialogs)
 		{
-			MainViewModel viewModel = new(dialogs, new SettingsService(Path.Combine(_root, "settings"), null), new TempFolder());
+			MainViewModel viewModel = new(dialogs, new SettingsService(Path.Combine(_root, "settings"), null), new TempFolder(), new ManualUiThread());
 			_viewModels.Add(viewModel);
 			return viewModel;
 		}
@@ -476,7 +477,7 @@ namespace DatExplorerIII.Tests
 		public void Layout_TheChoicesAreKeptInTheSettings_AndSideAndStackedAreTheTwoFacesOfOneChoice()
 		{
 			SettingsService settings = new(Path.Combine(_root, "layout-settings"), null);
-			MainViewModel viewModel = new(new Dialogs(), settings, new TempFolder());
+			MainViewModel viewModel = new(new Dialogs(), settings, new TempFolder(), new ManualUiThread());
 			_viewModels.Add(viewModel);
 
 			// By default: the folders above the files, the two archives side by side, the two groups side by side, the tree shown.
@@ -629,7 +630,7 @@ namespace DatExplorerIII.Tests
 			settings.Data.CompareLastLeft = missing;
 			settings.Data.CompareLastRight = right;
 			settings.Data.RecentFiles.AddRange([left, right.ToUpperInvariant(), missing]);
-			MainViewModel fresh = new(dialogs, settings, new TempFolder());
+			MainViewModel fresh = new(dialogs, settings, new TempFolder(), new ManualUiThread());
 			_viewModels.Add(fresh);
 
 			IReadOnlyList<String> suggestions = fresh.ComparisonSuggestions();

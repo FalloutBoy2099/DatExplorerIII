@@ -271,7 +271,7 @@ namespace DatExplorerIII.Tests
 			Byte[] ammo = Build(ArcanumObjectType.Ammo, 7058);
 			Byte[] broken = ammo[..(ammo.Length - 10)];
 			using DatArchive archive = CreateArchive(("proto", "07058 - Ammo.pro", ammo), ("proto", "broken.pro", broken), ("data", "a.txt", Encoding.ASCII.GetBytes("text")));
-			using ViewerViewModel viewer = new();
+			using ViewerViewModel viewer = new(new ManualUiThread());
 
 			await viewer.LoadAsync(archive, archive.Find("proto\\07058 - Ammo.pro")!);
 			Assert.True(viewer.IsPrototype);

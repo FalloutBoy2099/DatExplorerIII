@@ -28,7 +28,7 @@ namespace DatExplorerIII.ViewModels
 		/// <summary>A viewer for a file, set as the user wants (the other archives, the subtitles of the movies).</summary>
 		private ViewerViewModel CreateViewer()
 		{
-			return new ViewerViewModel { OtherArchives = OpenArchives, ShowSubtitles = _settings.Data.ShowSubtitles };
+			return new ViewerViewModel(_uiThread) { OtherArchives = OpenArchives, ShowSubtitles = _settings.Data.ShowSubtitles };
 		}
 
 		/// <summary>Gives the option of the subtitles to the viewers that are open (the preview and those of a comparison).</summary>

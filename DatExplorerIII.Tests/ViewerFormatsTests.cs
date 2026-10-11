@@ -268,6 +268,38 @@ namespace DatExplorerIII.Tests
 		}
 
 		[Fact]
+		public void Image_Animation_AdvancesOnTheTicksOfTheTimerService_AndStopsWhenPaused()
+		{
+			RunOnUiThread(() =>
+			{
+				ManualUiThread uiThread = new();
+				ImageViewerViewModel viewer = new(uiThread);
+				ManualTimer timer = Assert.Single(uiThread.Created);
+				viewer.ShowAnimation(FrmReader.Read(BuildFrm(1, 3, 4, 4)), [new PaletteChoice("Gray", Palette.Grayscale())]);
+				Assert.Equal(0, viewer.CurrentFrame);
+
+				// A tick before the play button is pressed does nothing; then each tick shows the next frame, and the frames come round.
+				timer.Raise();
+				Assert.Equal(0, viewer.CurrentFrame);
+				viewer.PlayCommand.Execute(null);
+				Assert.True(viewer.IsPlaying);
+				Assert.True(timer.IsRunning);
+				Assert.Equal(TimeSpan.FromMilliseconds(100), timer.Interval);
+				timer.Raise();
+				Assert.Equal(1, viewer.CurrentFrame);
+				timer.Raise();
+				timer.Raise();
+				Assert.Equal(0, viewer.CurrentFrame);
+
+				viewer.PlayCommand.Execute(null);
+				Assert.False(viewer.IsPlaying);
+				Assert.False(timer.IsRunning);
+				viewer.Dispose();
+				return Task.CompletedTask;
+			});
+		}
+
+		[Fact]
 		public void Frm_WithOneDirection_HasOnlyOne()
 		{
 			FrmImage image = FrmReader.Read(BuildFrm(1, 1, 8, 8));
@@ -523,7 +555,7 @@ namespace DatExplorerIII.Tests
 		{
 			Byte[] polish = Encode("{0}{}{** Auto-łupienie gracza WYŁ. **}\r\n{100}{}{Zażółć gęślą jaźń.}", 1250);
 			using DatArchive archive = CreateArchive(("text\\polish\\game", "p_party_orders.msg", polish));
-			using ViewerViewModel viewer = new();
+			using ViewerViewModel viewer = new(new ManualUiThread());
 
 			await viewer.LoadAsync(archive, archive.Find("text\\polish\\game\\p_party_orders.msg")!);
 
@@ -540,7 +572,7 @@ namespace DatExplorerIII.Tests
 		{
 			Byte[] big = Encoding.ASCII.GetBytes(String.Concat(Enumerable.Repeat("art\\items\\knife.frm\r\n", 300_000)));
 			using DatArchive archive = CreateArchive(("art\\items", "items.lst", big));
-			using ViewerViewModel viewer = new();
+			using ViewerViewModel viewer = new(new ManualUiThread());
 
 			await viewer.LoadAsync(archive, archive.Find("art\\items\\items.lst")!);
 
@@ -553,7 +585,7 @@ namespace DatExplorerIII.Tests
 		public async Task Viewer_SaysSoWhenAFileCannotBeShown()
 		{
 			using DatArchive archive = CreateArchive(("proto", "critter.pro", new Byte[] { 1, 2, 3 }), ("art", "broken.frm", new Byte[] { 1, 2, 3, 4 }), ("data", "empty.txt", Array.Empty<Byte>()));
-			using ViewerViewModel viewer = new();
+			using ViewerViewModel viewer = new(new ManualUiThread());
 
 			await viewer.LoadAsync(archive, archive.Find("proto\\critter.pro")!);
 			Assert.True(viewer.HasMessage);
@@ -584,7 +616,7 @@ namespace DatExplorerIII.Tests
 				("art\\critters", "hero.pal", red),
 				("art\\critters", "other.frm", BuildFrm(1, 1, 4, 4)),
 				(String.Empty, "color.pal", gray));
-			using ViewerViewModel viewer = new();
+			using ViewerViewModel viewer = new(new ManualUiThread());
 
 			await viewer.LoadAsync(archive, archive.Find("art\\critters\\hero.frm")!);
 			Assert.True(viewer.IsImage);
@@ -912,7 +944,7 @@ namespace DatExplorerIII.Tests
 			RunOnUiThread(async () =>
 			{
 				using DatArchive archive = CreateArchive(("art\\cuts", "long.mve", BuildLongMovie(250)));
-				using ViewerViewModel viewer = new();
+				using ViewerViewModel viewer = new(new ManualUiThread());
 				await viewer.LoadAsync(archive, archive.Find("art\\cuts\\long.mve")!);
 
 				Assert.True(viewer.IsVideo);
@@ -947,7 +979,7 @@ namespace DatExplorerIII.Tests
 				Byte[] english = Encoding.ASCII.GetBytes("10:First\r\n100:Second\r\n");
 				Byte[] french = Encoding.ASCII.GetBytes("10:Premier\r\n");
 				using DatArchive archive = CreateArchive(("art\\cuts", "long.mve", BuildLongMovie(250)), ("text\\french\\cuts", "long.sve", french), ("text\\english\\cuts", "long.sve", english));
-				using ViewerViewModel viewer = new();
+				using ViewerViewModel viewer = new(new ManualUiThread());
 				await viewer.LoadAsync(archive, archive.Find("art\\cuts\\long.mve")!);
 
 				// Nothing is said before the first subtitle; then each one stays until the next.
@@ -979,7 +1011,7 @@ namespace DatExplorerIII.Tests
 			RunOnUiThread(async () =>
 			{
 				using DatArchive archive = CreateArchive(("art\\cuts", "long.mve", BuildLongMovie(250)), ("text\\english\\cuts", "other.sve", Encoding.ASCII.GetBytes("0:Not mine")));
-				using ViewerViewModel viewer = new();
+				using ViewerViewModel viewer = new(new ManualUiThread());
 				await viewer.LoadAsync(archive, archive.Find("art\\cuts\\long.mve")!);
 
 				viewer.Video.Position = 100;
@@ -1057,7 +1089,7 @@ namespace DatExplorerIII.Tests
 		public async Task Viewer_ShowsACharacter_AndAMovie()
 		{
 			using DatArchive archive = CreateArchive(("premade", "combat.gcd", BuildCharacter()), ("art\\cuts", "test.mve", BuildMovie()));
-			using ViewerViewModel viewer = new();
+			using ViewerViewModel viewer = new(new ManualUiThread());
 
 			await viewer.LoadAsync(archive, archive.Find("premade\\combat.gcd")!);
 			Assert.True(viewer.IsCharacter);
@@ -1328,7 +1360,7 @@ namespace DatExplorerIII.Tests
 		{
 			Byte[] weapon = ReadItemBytes(ItemType.Weapon, b => b.Int(6, 5, 12, 0, 25, 20, -1, 4, 5, 6, 2, -1, 10, 8, 29, 30).Byte('D'));
 			using DatArchive archive = CreateArchive(("proto\\items", "00000008.pro", weapon), ("proto\\critters", "00000001.pro", BuildCritter(true)), ("proto\\tiles", "00000001.pro", ProBuilder.Start(4, 1).Int(1).ToArray()));
-			using ViewerViewModel viewer = new();
+			using ViewerViewModel viewer = new(new ManualUiThread());
 
 			await viewer.LoadAsync(archive, archive.Find("proto\\items\\00000008.pro")!);
 			Assert.True(viewer.IsPrototype);
@@ -1455,7 +1487,7 @@ namespace DatExplorerIII.Tests
 		{
 			// No palette in the archive at all: the palette of the game that the program holds is used.
 			using DatArchive archive = CreateArchive(("art\\critters", "hero.frm", BuildFrm(1, 1, 4, 4)));
-			using ViewerViewModel viewer = new();
+			using ViewerViewModel viewer = new(new ManualUiThread());
 
 			await viewer.LoadAsync(archive, archive.Find("art\\critters\\hero.frm")!);
 

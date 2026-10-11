@@ -4,11 +4,13 @@ DAT archive explorer for Fallout 1, Fallout 2 and Arcanum: browse, extract, impo
 
 A rewrite in **.NET 10 / WPF (Fluent theme)** of *DAT Explorer II* by Mr.STALIN, which itself replaced DatExpl 1.43 by Dims.
 
-French version: [README.FR.md](README.FR.md)
+![DatExplorerIII: the folder tree, the files of a folder and the preview of a .frm picture](_screenshots/datex3_1.jpg)
 
 ## Features
 
 - **Comparison of two DATs** (*Tools* menu, files and/or folders): state of each file (identical, different, only on the left or on the right), filters, a preview of the two versions side by side, copy or move of the selected files to the left or to the right, then saving of each side. What the comparison ignores is set in *Tools > Settings > Comparison*: white space characters, blank lines, case, line endings (Windows/Unix/Mac), code page, numbers, comments, a missing line break at the end of the file; *text content* method (text files are compared line by line with these tolerances) or *binary content* method (byte for byte); synchronized scrolling of the two versions of a file. The folder tree, the file list (with a drop-down list to choose the folder) and the two DATs are arranged side by side or one above the other, as you like; the tool bar only has icons.
+
+  ![Comparison of two DATs: the state of each file and the two versions of a text side by side](_screenshots/datex3_4.JPG)
 - **Folder opened as a DAT** (*File > Open a folder as a DAT…*, or a folder path on the command line): a folder that holds the files of a DAT (an unpacked `master.dat`, for instance) can be browsed, edited and viewed like an archive (`[DIR]` in the tree). **Save as…** turns it into a real `.dat` file (Fallout 2, Fallout 1 or Arcanum, as you choose) without touching the folder; it also works for any archive, to write a copy of it under another name.
 - **File association** (*Help* menu): "Associate .dat files" and, separately, "Associate .patch files" for the `.patch0` to `.patch9` files of Arcanum; for the current user, without administrator rights.
 - **Lower-casing** of a folder, its sub folders and their files (context menu of the tree, *Edit* menu); the whole archive from the root.
@@ -34,6 +36,8 @@ French version: [README.FR.md](README.FR.md)
   - `.map` maps of Fallout 1 and 2: header, starting point, script of the map, variables, tiles used, objects by level and by type, scripts with the name of the programs, exits to the other maps (the prototypes of the game are needed to read the objects: they are looked for in the archive of the map then in the other open archives);
   - **scripts**: the compiled `.int` scripts of Fallout 1 and 2 are **decompiled** and shown as `.ssl` source (names of the procedures and of the shared variables, strings, conditions, `while` and `for` loops, `break` and `continue`; the comments, the macros and the names of the local variables are not in the compiled file), with the functions of the game and of sfall recognized; the `.ssl` scripts and the `.h` headers are shown with **syntax coloring** (words of the language, functions of the game, numbers, texts, comments, preprocessor lines `#define` / `#include`), the same as for a decompiled `.int`;
   - `.mve` movies (Interplay MVE: picture decoded on the fly, DPCM sound, play, pause and a position bar to go anywhere), with their **subtitles**: the `.sve` file with the same name (in the language of the interface if the archive has several, else English) is shown over the picture, synchronized with the pictures of the movie (can be turned off in *Tools > Settings > General*);
+
+    ![An .mve movie with its subtitles shown over the picture](_screenshots/datex3_3.jpg)
   - `.aaf` fonts (Fallout 1 and 2, nine levels of gray) and `.fon` fonts (Fallout 1, one bit per pixel), drawn as a table of their characters with their measures;
   - `.lip` lip synchronization: version, sound file, phonemes (code, sound in the phonetic alphabet, picture of the talking head) and markers;
   - `.gam` variables (game and maps) and `.sve` subtitles as tables: number of the variable (the one the scripts use), name, initial value and comment; picture number and text for the subtitles;
@@ -43,6 +47,8 @@ French version: [README.FR.md](README.FR.md)
   - Arcanum files: `.art` images (rotations, pictures, up to four palettes), tables for the `.mes` messages and the `.dlg` dialogs (sortable, with the detected encoding);
   - common `.png`, `.bmp`, `.jpg`, `.gif` images and `.mp3` sounds (NLayer decoder, MIT license: no Windows codec needed);
   - `.acm` sounds (built-in decoder, playback, waveform, mono/stereo detected from the sound because the header is wrong for speech and sound effects, with a manual choice) and `.wav`.
+
+    ![An .acm sound: waveform, play button and choice of the channels](_screenshots/datex3_2.jpg)
 - Custom title bar with two buttons: theme (automatic, light or dark) and language of the interface. The choice is remembered and applied at once, dialog boxes included.
 - Interface in English, French, Russian, Spanish, German, Italian, Portuguese, Swedish, Polish, Czech and Simplified Chinese (the language of Windows by default, English otherwise). All the texts are translated, error messages and keyboard shortcuts included.
 - The position of the window is remembered.
@@ -53,7 +59,6 @@ French version: [README.FR.md](README.FR.md)
 - The repair cannot rebuild what has disappeared: an archive whose end is lost (missing footer) cannot be recovered, and a damaged file is removed, not fixed.
 - A Fallout DAT does not remember empty folders: they disappear when it is closed (those of Arcanum keep them).
 - Drag and drop to Explorer first extracts the selection to a temporary folder (limited to 512 MB; use "Extract" beyond that).
-- Programs and scripts (`.exe`, `.bat`, `.ps1`, ...) are never launched from a DAT: they have to be extracted.
 
 ## Build
 

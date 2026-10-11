@@ -32,7 +32,7 @@ namespace DatExplorerIII
 			DispatcherUnhandledException += OnUnhandledException;
 			TempFolder.CleanStaleSessions();
 
-			MainViewModel viewModel = new(new DialogService(), settings, new TempFolder());
+			MainViewModel viewModel = new(new DialogService(), settings, new TempFolder(), new DispatcherUiThread());
 			_mainViewModel = viewModel;
 			Views.MainWindow window = new(viewModel);
 			MainWindow = window;

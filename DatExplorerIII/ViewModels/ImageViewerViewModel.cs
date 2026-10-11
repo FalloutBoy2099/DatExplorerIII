@@ -7,7 +7,6 @@ namespace DatExplorerIII.ViewModels
 	using System.Windows.Input;
 	using System.Windows.Media;
 	using System.Windows.Media.Imaging;
-	using System.Windows.Threading;
 	using Infrastructure;
 	using Models;
 	using Services;
@@ -31,7 +30,7 @@ namespace DatExplorerIII.ViewModels
 	public sealed class ImageViewerViewModel : ObservableObject, IDisposable
 	{
 		private readonly Dictionary<(Int32 Direction, Int32 Frame, Int32 Palette), BitmapSource> _cache = new();
-		private readonly DispatcherTimer _timer = new();
+		private readonly IUiTimer _timer;
 
 		private FrmImage? _animation;
 		private Int32 _canvasWidth;
@@ -45,8 +44,9 @@ namespace DatExplorerIII.ViewModels
 		private ZoomOption _selectedZoom;
 		private String _info = String.Empty;
 
-		public ImageViewerViewModel()
+		public ImageViewerViewModel(IUiThread uiThread)
 		{
+			_timer = uiThread.CreateTimer();
 			ZoomOptions =
 			[
 				new ZoomOption(Loc.Get("Str.ZoomFit"), 0),

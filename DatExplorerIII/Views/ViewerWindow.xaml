@@ -11,5 +11,7 @@
 		ShowInTaskbar="True"
 		WindowStartupLocation="CenterOwner"
 		FontSize="12">
+	
 	<views:ViewerControl Margin="12" />
+	
 </Window>

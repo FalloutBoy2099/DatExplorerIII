@@ -4,6 +4,7 @@
 		xmlns:sys="clr-namespace:System;assembly=System.Runtime"
 		xmlns:views="clr-namespace:DatExplorerIII.Views"
 		xmlns:infrastructure="clr-namespace:DatExplorerIII.Infrastructure"
+		xmlns:behaviors="clr-namespace:DatExplorerIII.Views.Behaviors"
 		xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
 		Title="{Binding Title}"
 		Width="1020"
@@ -13,8 +14,17 @@
 		FontSize="12"
 		Icon="pack://application:,,,/Resources/zippedFile.ico"
 		Closing="OnClosing"
-		StateChanged="OnStateChanged"
-		PreviewKeyDown="OnWindowPreviewKeyDown">
+		StateChanged="OnStateChanged">
+
+	<Window.InputBindings>
+		<KeyBinding Modifiers="Ctrl" Key="O" Command="{Binding OpenCommand}" />
+		<KeyBinding Modifiers="Ctrl" Key="S" Command="{Binding SaveCommand}" />
+		<KeyBinding Modifiers="Ctrl+Shift" Key="S" Command="{Binding QuickSaveCommand}" />
+		<KeyBinding Modifiers="Ctrl" Key="F" Command="{Binding FocusSearchCommand}" />
+		<KeyBinding Modifiers="Ctrl" Key="P" Command="{Binding TogglePreviewCommand}" />
+		<KeyBinding Key="F3" Command="{Binding ViewItemCommand}" />
+		<KeyBinding Key="F5" Command="{Binding RefreshCommand}" />
+	</Window.InputBindings>
 
 	<Window.Resources>
 		<BooleanToVisibilityConverter x:Key="BoolToVisibility" />
@@ -314,7 +324,7 @@
 
 	<!-- The optional frame of the window: a line of the accent color around everything (not when maximized) -->
 	<Border x:Name="WindowBorder" BorderBrush="{DynamicResource AccentFillColorDefaultBrush}" BorderThickness="0">
-	<Grid x:Name="Frame">
+		<Grid x:Name="Frame">
 		<Grid.RowDefinitions>
 			<RowDefinition Height="32" />
 			<RowDefinition Height="*" />
@@ -336,7 +346,7 @@
 			<StackPanel Grid.Column="2" Orientation="Horizontal">
 				<Button x:Name="ThemeButton"
 					Style="{StaticResource CaptionButtonStyle}"
-					Content="&#xE790;"
+					Content="&#xE793;"
 					FontSize="14"
 					Click="OnThemeButtonClick"
 					ToolTip="{DynamicResource Str.Theme}" />
@@ -460,69 +470,69 @@
 				</Grid.ColumnDefinitions>
 
 				<StackPanel Grid.Column="0" Orientation="Horizontal">
-					<Button Style="{StaticResource ToolButton}" Command="{Binding OpenCommand}" ToolTip="{DynamicResource Str.OpenTip}">
+					<Button Style="{StaticResource ToolButton}" Command="{Binding OpenCommand, Mode=OneTime}" ToolTip="{DynamicResource Str.OpenTip}">
 						<StackPanel>
 							<TextBlock Style="{StaticResource ToolIcon}" Text="&#xE8E5;" />
 							<TextBlock Style="{StaticResource ToolLabel}" Text="{DynamicResource Str.OpenShort}" />
 						</StackPanel>
 					</Button>
-					<Button Style="{StaticResource ToolButton}" Command="{Binding NewFallout2Command}" ToolTip="{DynamicResource Str.NewFallout2}">
+					<Button Style="{StaticResource ToolButton}" Command="{Binding NewFallout2Command, Mode=OneTime}" ToolTip="{DynamicResource Str.NewFallout2}">
 						<StackPanel>
 							<TextBlock Style="{StaticResource ToolIcon}" Text="&#xE710;" />
 							<TextBlock Style="{StaticResource ToolLabel}" Text="{DynamicResource Str.NewShort2}" />
 						</StackPanel>
 					</Button>
-					<Button Style="{StaticResource ToolButton}" Command="{Binding NewFallout1Command}" ToolTip="{DynamicResource Str.NewFallout1}">
+					<Button Style="{StaticResource ToolButton}" Command="{Binding NewFallout1Command, Mode=OneTime}" ToolTip="{DynamicResource Str.NewFallout1}">
 						<StackPanel>
 							<TextBlock Style="{StaticResource ToolIcon}" Text="&#xE710;" />
 							<TextBlock Style="{StaticResource ToolLabel}" Text="{DynamicResource Str.NewShort1}" />
 						</StackPanel>
 					</Button>
-					<Button Style="{StaticResource ToolButton}" Command="{Binding NewArcanumCommand}" ToolTip="{DynamicResource Str.NewArcanum}">
+					<Button Style="{StaticResource ToolButton}" Command="{Binding NewArcanumCommand, Mode=OneTime}" ToolTip="{DynamicResource Str.NewArcanum}">
 						<StackPanel>
 							<TextBlock Style="{StaticResource ToolIcon}" Text="&#xE710;" />
 							<TextBlock Style="{StaticResource ToolLabel}" Text="{DynamicResource Str.NewShortArcanum}" />
 						</StackPanel>
 					</Button>
 					<Separator Margin="2,4" />
-					<Button Style="{StaticResource ToolButton}" Command="{Binding SaveCommand}" ToolTip="{DynamicResource Str.SaveTip}">
+					<Button Style="{StaticResource ToolButton}" Command="{Binding SaveCommand, Mode=OneTime}" ToolTip="{DynamicResource Str.SaveTip}">
 						<StackPanel>
 							<TextBlock Style="{StaticResource ToolIcon}" Text="&#xE74E;" />
 							<TextBlock Style="{StaticResource ToolLabel}" Text="{DynamicResource Str.Save}" />
 						</StackPanel>
 					</Button>
-					<Button Style="{StaticResource ToolButton}" Command="{Binding QuickSaveCommand}" ToolTip="{DynamicResource Str.QuickSaveTip}">
+					<Button Style="{StaticResource ToolButton}" Command="{Binding QuickSaveCommand, Mode=OneTime}" ToolTip="{DynamicResource Str.QuickSaveTip}">
 						<StackPanel>
 							<TextBlock Style="{StaticResource ToolIcon}" Text="&#xE945;" />
 							<TextBlock Style="{StaticResource ToolLabel}" Text="{DynamicResource Str.QuickSaveShort}" />
 						</StackPanel>
 					</Button>
-					<Button Style="{StaticResource ToolButton}" Command="{Binding CloseDatCommand}" ToolTip="{DynamicResource Str.CloseDatTip}">
+					<Button Style="{StaticResource ToolButton}" Command="{Binding CloseDatCommand, Mode=OneTime}" ToolTip="{DynamicResource Str.CloseDatTip}">
 						<StackPanel>
 							<TextBlock Style="{StaticResource ToolIcon}" Text="&#xE711;" />
 							<TextBlock Style="{StaticResource ToolLabel}" Text="{DynamicResource Str.CloseShort}" />
 						</StackPanel>
 					</Button>
 					<Separator Margin="2,4" />
-					<Button Style="{StaticResource ToolButton}" Command="{Binding UpCommand}" ToolTip="{DynamicResource Str.UpTip}">
+					<Button Style="{StaticResource ToolButton}" Command="{Binding UpCommand, Mode=OneTime}" ToolTip="{DynamicResource Str.UpTip}">
 						<StackPanel>
 							<TextBlock Style="{StaticResource ToolIcon}" Text="&#xE74A;" />
 							<TextBlock Style="{StaticResource ToolLabel}" Text="{DynamicResource Str.Up}" />
 						</StackPanel>
 					</Button>
-					<Button Style="{StaticResource ToolButton}" Command="{Binding ExtractItemsCommand}" ToolTip="{DynamicResource Str.ExtractFilesTip}">
+					<Button Style="{StaticResource ToolButton}" Command="{Binding ExtractItemsCommand, Mode=OneTime}" ToolTip="{DynamicResource Str.ExtractFilesTip}">
 						<StackPanel>
 							<TextBlock Style="{StaticResource ToolIcon}" Text="&#xE896;" />
 							<TextBlock Style="{StaticResource ToolLabel}" Text="{DynamicResource Str.ExtractShort}" />
 						</StackPanel>
 					</Button>
-					<Button Style="{StaticResource ToolButton}" Command="{Binding ImportFilesCommand}" ToolTip="{DynamicResource Str.ImportFilesTip}">
+					<Button Style="{StaticResource ToolButton}" Command="{Binding ImportFilesCommand, Mode=OneTime}" ToolTip="{DynamicResource Str.ImportFilesTip}">
 						<StackPanel>
 							<TextBlock Style="{StaticResource ToolIcon}" Text="&#xE898;" />
 							<TextBlock Style="{StaticResource ToolLabel}" Text="{DynamicResource Str.ImportShort}" />
 						</StackPanel>
 					</Button>
-					<Button Style="{StaticResource ToolButton}" Command="{Binding NewFolderCommand}" ToolTip="{DynamicResource Str.NewFolder}">
+					<Button Style="{StaticResource ToolButton}" Command="{Binding NewFolderCommand, Mode=OneTime}" ToolTip="{DynamicResource Str.NewFolder}">
 						<StackPanel>
 							<TextBlock Style="{StaticResource ToolIcon}" Text="&#xE8F4;" />
 							<TextBlock Style="{StaticResource ToolLabel}" Text="{DynamicResource Str.NewFolderShort}" />
@@ -538,11 +548,16 @@
 							 Style="{StaticResource SearchBoxStyle}"
 							 Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
 							 ToolTip="{DynamicResource Str.SearchTip}"
-							 KeyDown="OnSearchKeyDown" />
+							 behaviors:FocusBehavior.Trigger="{Binding SearchFocusRequests}">
+						<TextBox.InputBindings>
+							<KeyBinding Key="Return" Command="{Binding FindNextCommand}" />
+							<KeyBinding Modifiers="Shift" Key="Return" Command="{Binding FindPreviousCommand}" />
+						</TextBox.InputBindings>
+					</TextBox>
 					<Button Margin="4,0,0,0"
 							Height="24"
 							Padding="8,0"
-							Command="{Binding GlobalSearchCommand}"
+							Command="{Binding GlobalSearchCommand, Mode=OneTime}"
 							ToolTip="{DynamicResource Str.SearchAll}">
 						<TextBlock Style="{StaticResource ToolIcon}" FontSize="12" Text="&#xE721;" />
 					</Button>
@@ -560,17 +575,17 @@
 
 				<TreeView x:Name="FolderTree"
 						  Grid.Column="0"
-						  AllowDrop="True"
+						  behaviors:FileDrop.Command="{Binding OpenDroppedCommand, Mode=OneTime}"
+						  behaviors:FileDrag.Source="{Binding FolderDragSource, Mode=OneTime}"
 						  ItemContainerStyle="{StaticResource FolderItemStyle}"
 						  ItemTemplate="{StaticResource FolderTemplate}"
 						  ItemsSource="{Binding Roots}"
-						  DragOver="OnTreeDragOver"
-						  Drop="OnTreeDrop"
-						  PreviewMouseLeftButtonDown="OnTreePreviewMouseDown"
 						  PreviewMouseRightButtonDown="OnTreePreviewRightMouseDown"
-						  PreviewMouseMove="OnTreePreviewMouseMove"
-						  SelectedItemChanged="OnTreeSelectedItemChanged"
-						  PreviewKeyDown="OnTreeKeyDown">
+						  SelectedItemChanged="OnTreeSelectedItemChanged">
+					<TreeView.InputBindings>
+						<KeyBinding Key="Delete" Command="{Binding DeleteFolderCommand}" />
+						<KeyBinding Key="F2" Command="{Binding RenameFolderCommand}" />
+					</TreeView.InputBindings>
 					<TreeView.ContextMenu>
 						<ContextMenu>
 							<MenuItem Header="{DynamicResource Str.ExtractFolder}" Command="{Binding ExtractFolderCommand}" />
@@ -591,18 +606,20 @@
 
 				<ListView x:Name="FilesList"
 						  Grid.Column="2"
-						  AllowDrop="True"
+						  behaviors:FileDrop.Command="{Binding ImportDroppedCommand, Mode=OneTime}"
+						  behaviors:FileDrag.Source="{Binding ListDragSource, Mode=OneTime}"
 						  ItemsSource="{Binding Items}"
 						  SelectionMode="Extended"
 						  Style="{StaticResource FileListStyle}"
-						  DragOver="OnListDragOver"
-						  Drop="OnListDrop"
 						  GridViewColumnHeader.Click="OnColumnHeaderClick"
-						  KeyDown="OnListKeyDown"
 						  MouseDoubleClick="OnListDoubleClick"
-						  PreviewMouseLeftButtonDown="OnListPreviewMouseDown"
-						  PreviewMouseMove="OnListPreviewMouseMove"
 						  SelectionChanged="OnListSelectionChanged">
+					<ListView.InputBindings>
+						<KeyBinding Key="Return" Command="{Binding OpenItemCommand}" />
+						<KeyBinding Key="Delete" Command="{Binding DeleteItemsCommand}" />
+						<KeyBinding Key="F2" Command="{Binding RenameItemCommand}" />
+						<KeyBinding Key="Back" Command="{Binding UpCommand}" />
+					</ListView.InputBindings>
 					<ListView.ContextMenu>
 						<ContextMenu>
 							<MenuItem Header="{DynamicResource Str.OpenItem}" Command="{Binding OpenItemCommand}" />
@@ -676,25 +693,25 @@
 
 					<Rectangle Width="1" Margin="8,6" Fill="{DynamicResource ControlStrongStrokeColorDefaultBrush}" Opacity="0.5" />
 
-					<Button Style="{StaticResource IconButton}" Command="{Binding CopyToLeftCommand}" ToolTip="{DynamicResource Str.CompareCopyLeft}" AutomationProperties.Name="{DynamicResource Str.CompareCopyLeft}">
+					<Button Style="{StaticResource IconButton}" Command="{Binding CopyToLeftCommand, Mode=OneTime}" ToolTip="{DynamicResource Str.CompareCopyLeft}" AutomationProperties.Name="{DynamicResource Str.CompareCopyLeft}">
 						<StackPanel Orientation="Horizontal">
 							<TextBlock FontFamily="{StaticResource IconFont}" FontSize="12" Text="&#xE72B;" />
 							<TextBlock Margin="2,0,0,0" FontFamily="{StaticResource IconFont}" FontSize="16" Text="&#xE8C8;" />
 						</StackPanel>
 					</Button>
-					<Button Style="{StaticResource IconButton}" Command="{Binding CopyToRightCommand}" ToolTip="{DynamicResource Str.CompareCopyRight}" AutomationProperties.Name="{DynamicResource Str.CompareCopyRight}">
+					<Button Style="{StaticResource IconButton}" Command="{Binding CopyToRightCommand, Mode=OneTime}" ToolTip="{DynamicResource Str.CompareCopyRight}" AutomationProperties.Name="{DynamicResource Str.CompareCopyRight}">
 						<StackPanel Orientation="Horizontal">
 							<TextBlock FontFamily="{StaticResource IconFont}" FontSize="16" Text="&#xE8C8;" />
 							<TextBlock Margin="2,0,0,0" FontFamily="{StaticResource IconFont}" FontSize="12" Text="&#xE72A;" />
 						</StackPanel>
 					</Button>
-					<Button Style="{StaticResource IconButton}" Command="{Binding MoveToLeftCommand}" ToolTip="{DynamicResource Str.CompareMoveLeft}" AutomationProperties.Name="{DynamicResource Str.CompareMoveLeft}">
+					<Button Style="{StaticResource IconButton}" Command="{Binding MoveToLeftCommand, Mode=OneTime}" ToolTip="{DynamicResource Str.CompareMoveLeft}" AutomationProperties.Name="{DynamicResource Str.CompareMoveLeft}">
 						<StackPanel Orientation="Horizontal">
 							<TextBlock FontFamily="{StaticResource IconFont}" FontSize="12" Text="&#xE72B;" />
 							<TextBlock Margin="2,0,0,0" FontFamily="{StaticResource IconFont}" FontSize="16" Text="&#xE8C6;" />
 						</StackPanel>
 					</Button>
-					<Button Style="{StaticResource IconButton}" Command="{Binding MoveToRightCommand}" ToolTip="{DynamicResource Str.CompareMoveRight}" AutomationProperties.Name="{DynamicResource Str.CompareMoveRight}">
+					<Button Style="{StaticResource IconButton}" Command="{Binding MoveToRightCommand, Mode=OneTime}" ToolTip="{DynamicResource Str.CompareMoveRight}" AutomationProperties.Name="{DynamicResource Str.CompareMoveRight}">
 						<StackPanel Orientation="Horizontal">
 							<TextBlock FontFamily="{StaticResource IconFont}" FontSize="16" Text="&#xE8C6;" />
 							<TextBlock Margin="2,0,0,0" FontFamily="{StaticResource IconFont}" FontSize="12" Text="&#xE72A;" />
@@ -704,12 +721,12 @@
 					<Rectangle Width="1" Margin="8,6" Fill="{DynamicResource ControlStrongStrokeColorDefaultBrush}" Opacity="0.5" />
 
 					<!-- The bar at the side of the disk tells which archive is saved. -->
-					<Button Style="{StaticResource IconButton}" Command="{Binding SaveLeftCommand}" ToolTip="{DynamicResource Str.CompareSaveLeft}" AutomationProperties.Name="{DynamicResource Str.CompareSaveLeft}">
+					<Button Style="{StaticResource IconButton}" Command="{Binding SaveLeftCommand, Mode=OneTime}" ToolTip="{DynamicResource Str.CompareSaveLeft}" AutomationProperties.Name="{DynamicResource Str.CompareSaveLeft}">
 						<Border BorderBrush="{DynamicResource AccentFillColorDefaultBrush}" BorderThickness="3,0,0,0" Padding="5,0,0,0">
 							<TextBlock Style="{StaticResource ToolIcon}" Text="&#xE74E;" />
 						</Border>
 					</Button>
-					<Button Style="{StaticResource IconButton}" Command="{Binding SaveRightCommand}" ToolTip="{DynamicResource Str.CompareSaveRight}" AutomationProperties.Name="{DynamicResource Str.CompareSaveRight}">
+					<Button Style="{StaticResource IconButton}" Command="{Binding SaveRightCommand, Mode=OneTime}" ToolTip="{DynamicResource Str.CompareSaveRight}" AutomationProperties.Name="{DynamicResource Str.CompareSaveRight}">
 						<Border BorderBrush="{DynamicResource AccentFillColorDefaultBrush}" BorderThickness="0,0,3,0" Padding="0,0,5,0">
 							<TextBlock Style="{StaticResource ToolIcon}" Text="&#xE74E;" />
 						</Border>
@@ -717,10 +734,10 @@
 
 					<Rectangle Width="1" Margin="8,6" Fill="{DynamicResource ControlStrongStrokeColorDefaultBrush}" Opacity="0.5" />
 
-					<Button Style="{StaticResource IconButton}" Command="{Binding CompareAgainCommand}" ToolTip="{DynamicResource Str.CompareAgain}" AutomationProperties.Name="{DynamicResource Str.CompareAgain}">
+					<Button Style="{StaticResource IconButton}" Command="{Binding CompareAgainCommand, Mode=OneTime}" ToolTip="{DynamicResource Str.CompareAgain}" AutomationProperties.Name="{DynamicResource Str.CompareAgain}">
 						<TextBlock Style="{StaticResource ToolIcon}" Text="&#xE72C;" />
 					</Button>
-					<Button Style="{StaticResource IconButton}" Command="{Binding CloseComparisonCommand}" ToolTip="{DynamicResource Str.CompareClose}" AutomationProperties.Name="{DynamicResource Str.CompareClose}">
+					<Button Style="{StaticResource IconButton}" Command="{Binding CloseComparisonCommand, Mode=OneTime}" ToolTip="{DynamicResource Str.CompareClose}" AutomationProperties.Name="{DynamicResource Str.CompareClose}">
 						<TextBlock Style="{StaticResource ToolIcon}" Text="&#xE711;" />
 					</Button>
 				</StackPanel>
@@ -971,7 +988,7 @@
 						<Button Margin="0,16,0,0"
 								MinWidth="88"
 								HorizontalAlignment="Right"
-								Command="{Binding Busy.CancelCommand}"
+								Command="{Binding Busy.CancelCommand, Mode=OneTime}"
 								Content="{DynamicResource Str.Cancel}"
 								Visibility="{Binding Busy.CanCancel, Converter={StaticResource BoolToVisibility}}" />
 					</StackPanel>
@@ -980,4 +997,5 @@
 		</Grid>
 	</Grid>
 	</Border>
+	
 </Window>

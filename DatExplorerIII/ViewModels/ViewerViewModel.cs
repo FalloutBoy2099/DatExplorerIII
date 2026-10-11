@@ -35,12 +35,15 @@ namespace DatExplorerIII.ViewModels
 		private Boolean _isLoading;
 		private FileViewerKind? _kind;
 
-		public ViewerViewModel()
+		private readonly IUiThread _uiThread;
+
+		public ViewerViewModel(IUiThread uiThread)
 		{
+			_uiThread = uiThread;
 			Text = new TextViewerViewModel();
-			Image = new ImageViewerViewModel();
-			Audio = new AudioViewerViewModel();
-			Video = new VideoViewerViewModel();
+			Image = new ImageViewerViewModel(uiThread);
+			Audio = new AudioViewerViewModel(uiThread);
+			Video = new VideoViewerViewModel(uiThread);
 			Character = new CharacterViewerViewModel();
 			Prototype = new PrototypeViewerViewModel();
 			Table = new TableViewerViewModel();
@@ -512,7 +515,7 @@ namespace DatExplorerIII.ViewModels
 		private void ShowImage(String fileName, Byte[] data, List<PaletteChoice> palettes, CancellationToken token)
 		{
 			// What is shown on the interface thread is not shown when another file was chosen meanwhile.
-			void OnUi(Action action) => InvokeOnUi(() =>
+			void OnUi(Action action) => _uiThread.Invoke(() =>
 			{
 				token.ThrowIfCancellationRequested();
 				action();
@@ -556,19 +559,6 @@ namespace DatExplorerIII.ViewModels
 			}
 
 			OnUi(() => Show(FileViewerKind.Image, String.Empty));
-		}
-
-		private static void InvokeOnUi(Action action)
-		{
-			System.Windows.Threading.Dispatcher? dispatcher = System.Windows.Application.Current?.Dispatcher;
-			if (dispatcher == null || dispatcher.CheckAccess())
-			{
-				action();
-			}
-			else
-			{
-				dispatcher.Invoke(action);
-			}
 		}
 
 		/// <summary>

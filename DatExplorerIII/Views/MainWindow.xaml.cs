@@ -15,7 +15,8 @@ namespace DatExplorerIII.Views
 
 	/// <summary>
 	/// The main window: the folder tree on the left, the files of the selected folder on the right.
-	/// Only user interface plumbing lives here (selection, drag and drop, keyboard); the behavior is in the view model.
+	/// Only user interface plumbing lives here (selection, window frame, placement); the behavior is in the view model, and the keyboard
+	/// shortcuts and the drag and drop of files are key bindings and attached behaviors (<c>Views/Behaviors</c>) in the XAML.
 	/// </summary>
 	public partial class MainWindow : Window
 	{
@@ -25,9 +26,6 @@ namespace DatExplorerIII.Views
 
 		/// <summary>The width of the preview pane compared with the one of the file list (both follow the window).</summary>
 		private Double _previewShare = 0.6;
-		private Point _dragOrigin;
-		private Boolean _dragCandidate;
-		private Boolean _isDraggingOut;
 
 		public MainWindow(MainViewModel viewModel)
 		{
@@ -274,35 +272,6 @@ namespace DatExplorerIII.Views
 			return null;
 		}
 
-		private Boolean IsDragStarted(MouseEventArgs e)
-		{
-			Point position = e.GetPosition(null);
-			return Math.Abs(position.X - _dragOrigin.X) > SystemParameters.MinimumHorizontalDragDistance
-				|| Math.Abs(position.Y - _dragOrigin.Y) > SystemParameters.MinimumVerticalDragDistance;
-		}
-
-		/// <summary>
-		/// Drags files out of the application. The files are extracted first, because the file explorer needs real files.
-		/// </summary>
-		private void DragOut(DependencyObject source, IReadOnlyList<String> paths)
-		{
-			DataObject data = new(DataFormats.FileDrop, paths.ToArray());
-			_isDraggingOut = true;
-			try
-			{
-				DragDrop.DoDragDrop(source, data, DragDropEffects.Copy);
-			}
-			finally
-			{
-				_isDraggingOut = false;
-			}
-		}
-
-		private static String[] GetDroppedPaths(DragEventArgs e)
-		{
-			return e.Data.GetData(DataFormats.FileDrop) as String[] ?? Array.Empty<String>();
-		}
-
 		#region Window
 
 		private void OnClosing(Object? sender, CancelEventArgs e)
@@ -402,47 +371,6 @@ namespace DatExplorerIII.Views
 			};
 		}
 
-		private void OnWindowPreviewKeyDown(Object sender, KeyEventArgs e)
-		{
-			ModifierKeys modifiers = Keyboard.Modifiers;
-
-			if (modifiers == ModifierKeys.Control && e.Key == Key.O)
-			{
-				Execute(_viewModel.OpenCommand);
-			}
-			else if (modifiers == ModifierKeys.Control && e.Key == Key.S)
-			{
-				Execute(_viewModel.SaveCommand);
-			}
-			else if (modifiers == (ModifierKeys.Control | ModifierKeys.Shift) && e.Key == Key.S)
-			{
-				Execute(_viewModel.QuickSaveCommand);
-			}
-			else if (modifiers == ModifierKeys.Control && e.Key == Key.F)
-			{
-				SearchBox.Focus();
-				SearchBox.SelectAll();
-			}
-			else if (modifiers == ModifierKeys.None && e.Key == Key.F3)
-			{
-				Execute(_viewModel.ViewItemCommand);
-			}
-			else if (modifiers == ModifierKeys.Control && e.Key == Key.P)
-			{
-				_viewModel.IsPreviewVisible = !_viewModel.IsPreviewVisible;
-			}
-			else if (modifiers == ModifierKeys.None && e.Key == Key.F5)
-			{
-				Execute(_viewModel.RefreshCommand);
-			}
-			else
-			{
-				return;
-			}
-
-			e.Handled = true;
-		}
-
 		private void Execute(ICommand command)
 		{
 			if (command.CanExecute(null))
@@ -456,26 +384,6 @@ namespace DatExplorerIII.Views
 			FilesList.SelectedItems.Clear();
 			FilesList.SelectedItem = item;
 			FilesList.ScrollIntoView(item);
-		}
-
-		#endregion
-
-		#region Search
-
-		private void OnSearchKeyDown(Object sender, KeyEventArgs e)
-		{
-			if (e.Key != Key.Enter)
-			{
-				return;
-			}
-
-			e.Handled = true;
-			Boolean forward = (Keyboard.Modifiers & ModifierKeys.Shift) == 0;
-			ListEntry? found = _viewModel.FindInFolder(forward);
-			if (found != null)
-			{
-				OnRevealRequested(found);
-			}
 		}
 
 		#endregion
@@ -496,67 +404,6 @@ namespace DatExplorerIII.Views
 			}
 		}
 
-		private void OnTreeKeyDown(Object sender, KeyEventArgs e)
-		{
-			if (e.Key == Key.Delete)
-			{
-				Execute(_viewModel.DeleteFolderCommand);
-				e.Handled = true;
-			}
-			else if (e.Key == Key.F2)
-			{
-				Execute(_viewModel.RenameFolderCommand);
-				e.Handled = true;
-			}
-		}
-
-		private void OnTreeDragOver(Object sender, DragEventArgs e)
-		{
-			// Only DAT archives (.dat, .patch0 to .patch9) dropped from the file explorer are accepted here.
-			Boolean accept = !_isDraggingOut
-				&& e.Data.GetDataPresent(DataFormats.FileDrop)
-				&& GetDroppedPaths(e).Any(DatFiles.IsDatFile);
-
-			e.Effects = accept ? DragDropEffects.Copy : DragDropEffects.None;
-			e.Handled = true;
-		}
-
-		private async void OnTreeDrop(Object sender, DragEventArgs e)
-		{
-			if (_isDraggingOut)
-			{
-				return;
-			}
-
-			await _viewModel.OpenDroppedAsync(GetDroppedPaths(e).Where(DatFiles.IsDatFile).ToList());
-		}
-
-		private void OnTreePreviewMouseDown(Object sender, MouseButtonEventArgs e)
-		{
-			_dragOrigin = e.GetPosition(null);
-			_dragCandidate = FindAncestor<TreeViewItem>(e.OriginalSource as DependencyObject) != null;
-		}
-
-		private void OnTreePreviewMouseMove(Object sender, MouseEventArgs e)
-		{
-			if (e.LeftButton != MouseButtonState.Pressed || !_dragCandidate || !IsDragStarted(e))
-			{
-				return;
-			}
-
-			_dragCandidate = false;
-			if (FindAncestor<TreeViewItem>(e.OriginalSource as DependencyObject) is not { DataContext: FolderNode node } item)
-			{
-				return;
-			}
-
-			IReadOnlyList<String>? paths = PrepareDrag(() => _viewModel.PrepareDragOut(node));
-			if (paths != null)
-			{
-				DragOut(item, paths);
-			}
-		}
-
 		#endregion
 
 		#region File list
@@ -574,24 +421,6 @@ namespace DatExplorerIII.Views
 			}
 		}
 
-		private void OnListKeyDown(Object sender, KeyEventArgs e)
-		{
-			ICommand? command = e.Key switch
-			{
-				Key.Enter => _viewModel.OpenItemCommand,
-				Key.Delete => _viewModel.DeleteItemsCommand,
-				Key.F2 => _viewModel.RenameItemCommand,
-				Key.Back => _viewModel.UpCommand,
-				_ => null,
-			};
-
-			if (command != null)
-			{
-				Execute(command);
-				e.Handled = true;
-			}
-		}
-
 		private void OnColumnHeaderClick(Object sender, RoutedEventArgs e)
 		{
 			if (e.OriginalSource is GridViewColumnHeader { Column: { } column } && FilesList.View is GridView view)
@@ -605,60 +434,6 @@ namespace DatExplorerIII.Views
 				};
 
 				_viewModel.SortBy(sortColumn);
-			}
-		}
-
-		private void OnListDragOver(Object sender, DragEventArgs e)
-		{
-			e.Effects = !_isDraggingOut && e.Data.GetDataPresent(DataFormats.FileDrop) ? DragDropEffects.Copy : DragDropEffects.None;
-			e.Handled = true;
-		}
-
-		private async void OnListDrop(Object sender, DragEventArgs e)
-		{
-			if (!_isDraggingOut)
-			{
-				await _viewModel.ImportDroppedAsync(GetDroppedPaths(e));
-			}
-		}
-
-		private void OnListPreviewMouseDown(Object sender, MouseButtonEventArgs e)
-		{
-			_dragOrigin = e.GetPosition(null);
-			_dragCandidate = FindAncestor<ListViewItem>(e.OriginalSource as DependencyObject) != null;
-		}
-
-		private void OnListPreviewMouseMove(Object sender, MouseEventArgs e)
-		{
-			if (e.LeftButton != MouseButtonState.Pressed || !_dragCandidate || !IsDragStarted(e))
-			{
-				return;
-			}
-
-			_dragCandidate = false;
-			List<ListEntry> items = FilesList.SelectedItems.Cast<ListEntry>().ToList();
-			if (items.Count == 0)
-			{
-				return;
-			}
-
-			IReadOnlyList<String>? paths = PrepareDrag(() => _viewModel.PrepareDragOut(items));
-			if (paths != null)
-			{
-				DragOut(FilesList, paths);
-			}
-		}
-
-		private IReadOnlyList<String>? PrepareDrag(Func<IReadOnlyList<String>?> extract)
-		{
-			Mouse.OverrideCursor = Cursors.Wait;
-			try
-			{
-				return extract();
-			}
-			finally
-			{
-				Mouse.OverrideCursor = null;
 			}
 		}
 

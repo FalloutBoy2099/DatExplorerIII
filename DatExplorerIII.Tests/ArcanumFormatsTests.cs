@@ -449,7 +449,7 @@ namespace DatExplorerIII.Tests
 			Byte[] mes = Encoding.GetEncoding(1252).GetBytes("// c\r\n{1}{un}\r\n{2}{deux}\r\n{3}{trois}\r\n");
 			Byte[] dlg = Encoding.GetEncoding(1252).GetBytes("{1}{Bonjour}{}{}{}{}{}\r\n{2}{Salut}{}{5}{}{1}{}\r\n");
 			using DatArchive archive = CreateArchive(("mes", "game.mes", mes), ("dlg", "01.dlg", dlg));
-			using ViewerViewModel viewer = new();
+			using ViewerViewModel viewer = new(new ManualUiThread());
 
 			await viewer.LoadAsync(archive, archive.Find("mes\\game.mes")!);
 			Assert.True(viewer.IsTable);
@@ -474,7 +474,7 @@ namespace DatExplorerIII.Tests
 			Byte[] art = BuildArt(1, 2, 1, 1, (_, _) => (4, 3, new Byte[12]));
 			Byte[] png = EncodePicture(new PngBitmapEncoder());
 			using DatArchive archive = CreateArchive(("art", "level.art", art), ("pictures", "photo.png", png));
-			using ViewerViewModel viewer = new();
+			using ViewerViewModel viewer = new(new ManualUiThread());
 
 			await viewer.LoadAsync(archive, archive.Find("art\\level.art")!);
 			Assert.True(viewer.IsImage);
@@ -492,7 +492,7 @@ namespace DatExplorerIII.Tests
 		public async Task Viewer_PlaysAnMp3_AndExplainsABrokenOne()
 		{
 			using DatArchive archive = CreateArchive(("sound", "speech.mp3", BuildSilentMp3(40)), ("sound", "broken.mp3", new Byte[] { 1, 2, 3, 4 }));
-			using ViewerViewModel viewer = new();
+			using ViewerViewModel viewer = new(new ManualUiThread());
 
 			await viewer.LoadAsync(archive, archive.Find("sound\\speech.mp3")!);
 			Assert.True(viewer.IsAudio);

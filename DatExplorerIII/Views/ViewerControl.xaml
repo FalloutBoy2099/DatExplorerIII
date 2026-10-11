@@ -112,7 +112,7 @@
 						  ItemsSource="{Binding Options}"
 						  SelectedItem="{Binding SelectedEncoding}" />
 				<CheckBox Margin="14,0,0,0" Content="{DynamicResource Str.ViewerWrap}" IsChecked="{Binding WrapLines}" />
-				<Button Margin="14,0,0,0" Command="{Binding CopyCommand}" Content="{DynamicResource Str.ViewerCopy}" />
+				<Button Margin="14,0,0,0" Command="{Binding CopyCommand, Mode=OneTime}" Content="{DynamicResource Str.ViewerCopy}" />
 			</StackPanel>
 
 			<TextBlock Grid.Row="1" Style="{StaticResource Notice}" Text="{Binding Notice}" />
@@ -175,10 +175,10 @@
 				</StackPanel>
 
 				<StackPanel Margin="0,0,14,4" Orientation="Horizontal" Visibility="{Binding IsAnimated, Converter={StaticResource BoolToVisibility}}">
-					<Button Command="{Binding PreviousCommand}" ToolTip="{DynamicResource Str.ViewerPreviousFrame}">
+					<Button Command="{Binding PreviousCommand, Mode=OneTime}" ToolTip="{DynamicResource Str.ViewerPreviousFrame}">
 						<TextBlock FontFamily="{StaticResource IconFont}" Text="&#xE892;" />
 					</Button>
-					<Button Margin="4,0,0,0" Command="{Binding PlayCommand}" ToolTip="{DynamicResource Str.ViewerPlay}">
+					<Button Margin="4,0,0,0" Command="{Binding PlayCommand, Mode=OneTime}" ToolTip="{DynamicResource Str.ViewerPlay}">
 						<TextBlock FontFamily="{StaticResource IconFont}">
 							<TextBlock.Style>
 								<Style TargetType="TextBlock">
@@ -192,7 +192,7 @@
 							</TextBlock.Style>
 						</TextBlock>
 					</Button>
-					<Button Margin="4,0,0,0" Command="{Binding NextCommand}" ToolTip="{DynamicResource Str.ViewerNextFrame}">
+					<Button Margin="4,0,0,0" Command="{Binding NextCommand, Mode=OneTime}" ToolTip="{DynamicResource Str.ViewerNextFrame}">
 						<TextBlock FontFamily="{StaticResource IconFont}" Text="&#xE893;" />
 					</Button>
 					<TextBlock Margin="8,0,0,0" VerticalAlignment="Center" Text="{Binding FrameLabel}" />
@@ -241,7 +241,7 @@
 
 				<Button Padding="22,10"
 						HorizontalAlignment="Center"
-						Command="{Binding PlayStopCommand}">
+						Command="{Binding PlayStopCommand, Mode=OneTime}">
 					<StackPanel Orientation="Horizontal">
 						<TextBlock VerticalAlignment="Center" FontFamily="{StaticResource IconFont}" FontSize="18">
 							<TextBlock.Style>
@@ -293,7 +293,7 @@
 			</Grid.RowDefinitions>
 
 			<StackPanel Margin="0,0,0,6" Orientation="Horizontal">
-				<Button Padding="16,6" Command="{Binding PlayStopCommand}">
+				<Button Padding="16,6" Command="{Binding PlayStopCommand, Mode=OneTime}">
 					<StackPanel Orientation="Horizontal">
 						<TextBlock VerticalAlignment="Center" FontFamily="{StaticResource IconFont}" FontSize="16">
 							<TextBlock.Style>

@@ -267,7 +267,7 @@ namespace DatExplorerIII.Tests
 		public async Task Viewer_ShowsWhatAMapHolds()
 		{
 			using DatArchive archive = CreateArchive(("maps", "testmap.map", BuildMap()), ("maps", "broken.map", BuildMap()[..5000]), ("data", "a.txt", Encoding.ASCII.GetBytes("text")));
-			using ViewerViewModel viewer = new();
+			using ViewerViewModel viewer = new(new ManualUiThread());
 
 			await viewer.LoadAsync(archive, archive.Find("maps\\testmap.map")!);
 			Assert.True(viewer.IsMap);
@@ -556,7 +556,7 @@ namespace DatExplorerIII.Tests
 		[Fact]
 		public void AudioViewer_ChangingTheLanguage_SurvivesTheBoxThatEmptiesItsSelection()
 		{
-			using AudioViewerViewModel viewer = new();
+			using AudioViewerViewModel viewer = new(new ManualUiThread());
 			ChannelChoice before = viewer.SelectedChannels;
 
 			viewer.PropertyChanged += (_, args) =>

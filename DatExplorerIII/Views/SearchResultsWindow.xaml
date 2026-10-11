@@ -8,6 +8,7 @@
 		MinHeight="240"
 		ShowInTaskbar="False"
 		WindowStartupLocation="CenterOwner">
+	
 	<Grid Margin="12">
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto" />
@@ -27,4 +28,5 @@
 			</ListView.View>
 		</ListView>
 	</Grid>
+
 </Window>
