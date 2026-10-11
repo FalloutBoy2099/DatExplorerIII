@@ -1,0 +1,8 @@
+<Project>
+
+	<PropertyGroup>
+		<!-- A warning is a problem found early: none is left in the code, and none is let in. -->
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+	</PropertyGroup>
+
+</Project>

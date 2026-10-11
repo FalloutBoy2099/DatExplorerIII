@@ -1,0 +1,197 @@
+<Application x:Class="DatExplorerIII.App"
+			 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 ThemeMode="System"
+			 ShutdownMode="OnMainWindowClose">
+	<Application.Resources>
+		<ResourceDictionary>
+		<ResourceDictionary.MergedDictionaries>
+			<ResourceDictionary Source="Resources/ScrollBars.xaml" />
+		</ResourceDictionary.MergedDictionaries>
+
+		<FontFamily x:Key="IconFont">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
+
+		<!-- Flat button of the tool bar: an icon above a short label. -->
+		<Style x:Key="ToolButton" TargetType="Button">
+			<Setter Property="Background" Value="Transparent" />
+			<Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
+			<Setter Property="Padding" Value="8,3" />
+			<Setter Property="Margin" Value="1,0" />
+			<Setter Property="Focusable" Value="False" />
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="Button">
+						<Border x:Name="Root"
+								Padding="{TemplateBinding Padding}"
+								Background="{TemplateBinding Background}"
+								CornerRadius="4">
+							<ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+						</Border>
+						<ControlTemplate.Triggers>
+							<Trigger Property="IsMouseOver" Value="True">
+								<Setter TargetName="Root" Property="Background" Value="{DynamicResource SubtleFillColorSecondaryBrush}" />
+							</Trigger>
+							<Trigger Property="IsPressed" Value="True">
+								<Setter TargetName="Root" Property="Background" Value="{DynamicResource SubtleFillColorTertiaryBrush}" />
+							</Trigger>
+							<Trigger Property="IsEnabled" Value="False">
+								<Setter Property="Opacity" Value="0.4" />
+							</Trigger>
+						</ControlTemplate.Triggers>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
+
+		<Style x:Key="ToolIcon" TargetType="TextBlock">
+			<Setter Property="FontFamily" Value="{StaticResource IconFont}" />
+			<Setter Property="FontSize" Value="16" />
+			<Setter Property="HorizontalAlignment" Value="Center" />
+		</Style>
+
+		<Style x:Key="ToolLabel" TargetType="TextBlock">
+			<Setter Property="FontSize" Value="11" />
+			<Setter Property="Margin" Value="0,1,0,0" />
+			<Setter Property="HorizontalAlignment" Value="Center" />
+		</Style>
+
+		<!-- The bar between two blocks that are side by side: invisible, unless the user asked to see the limits (a thin line in the middle of the bar). -->
+		<Style x:Key="BlockSplitterStyle" TargetType="GridSplitter">
+			<Setter Property="Width" Value="5" />
+			<Setter Property="HorizontalAlignment" Value="Stretch" />
+			<Setter Property="ResizeDirection" Value="Columns" />
+			<Setter Property="Background" Value="Transparent" />
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="GridSplitter">
+						<Border Background="{TemplateBinding Background}">
+							<Rectangle x:Name="Line" Width="1" HorizontalAlignment="Center" Fill="Transparent" />
+						</Border>
+						<ControlTemplate.Triggers>
+							<DataTrigger Binding="{Binding IsBlockSeparatorsVisible}" Value="True">
+								<Setter TargetName="Line" Property="Fill" Value="{DynamicResource ControlStrongStrokeColorDefaultBrush}" />
+							</DataTrigger>
+						</ControlTemplate.Triggers>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
+
+		<!-- The same bar between two blocks that are one above the other. -->
+		<Style x:Key="BlockSplitterRowStyle" TargetType="GridSplitter">
+			<Setter Property="Height" Value="5" />
+			<Setter Property="HorizontalAlignment" Value="Stretch" />
+			<Setter Property="VerticalAlignment" Value="Center" />
+			<Setter Property="ResizeDirection" Value="Rows" />
+			<Setter Property="Background" Value="Transparent" />
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="GridSplitter">
+						<Border Background="{TemplateBinding Background}">
+							<Rectangle x:Name="Line" Height="1" VerticalAlignment="Center" Fill="Transparent" />
+						</Border>
+						<ControlTemplate.Triggers>
+							<DataTrigger Binding="{Binding IsBlockSeparatorsVisible}" Value="True">
+								<Setter TargetName="Line" Property="Fill" Value="{DynamicResource ControlStrongStrokeColorDefaultBrush}" />
+							</DataTrigger>
+						</ControlTemplate.Triggers>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
+
+		<!-- A button that is only an icon (the text is its tool tip). -->
+		<Style x:Key="IconButton" TargetType="Button">
+			<Setter Property="Background" Value="Transparent" />
+			<Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
+			<Setter Property="Width" Value="36" />
+			<Setter Property="Height" Value="32" />
+			<Setter Property="Margin" Value="1,0" />
+			<Setter Property="Focusable" Value="False" />
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="Button">
+						<Border x:Name="Root" Background="{TemplateBinding Background}" CornerRadius="4">
+							<ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+						</Border>
+						<ControlTemplate.Triggers>
+							<Trigger Property="IsMouseOver" Value="True">
+								<Setter TargetName="Root" Property="Background" Value="{DynamicResource SubtleFillColorSecondaryBrush}" />
+							</Trigger>
+							<Trigger Property="IsPressed" Value="True">
+								<Setter TargetName="Root" Property="Background" Value="{DynamicResource SubtleFillColorTertiaryBrush}" />
+							</Trigger>
+							<Trigger Property="IsEnabled" Value="False">
+								<Setter Property="Opacity" Value="0.35" />
+							</Trigger>
+						</ControlTemplate.Triggers>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
+
+		<!-- The icon of a layout choice: two blocks side by side, or one above the other when the toggle button that holds it is on. -->
+		<Style x:Key="LayoutIconList" TargetType="Path">
+			<Setter Property="Stroke" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ToggleButton}}" />
+			<Setter Property="StrokeThickness" Value="1.4" />
+			<Setter Property="Width" Value="20" />
+			<Setter Property="Height" Value="16" />
+			<Setter Property="Data" Value="M1,2 H6 V14 H1 Z M8,2 H19 V14 H8 Z" />
+			<Style.Triggers>
+				<DataTrigger Binding="{Binding IsChecked, RelativeSource={RelativeSource AncestorType=ToggleButton}}" Value="True">
+					<Setter Property="Data" Value="M2,1 H18 V5 H2 Z M2,7 H18 V15 H2 Z" />
+				</DataTrigger>
+			</Style.Triggers>
+		</Style>
+
+		<Style x:Key="LayoutIconViewers" TargetType="Path" BasedOn="{StaticResource LayoutIconList}">
+			<Setter Property="Data" Value="M1,2 H9 V14 H1 Z M11,2 H19 V14 H11 Z M1,5 H9 M11,5 H19" />
+			<Style.Triggers>
+				<DataTrigger Binding="{Binding IsChecked, RelativeSource={RelativeSource AncestorType=ToggleButton}}" Value="True">
+					<Setter Property="Data" Value="M2,1 H18 V7 H2 Z M2,9 H18 V15 H2 Z M2,3 H18 M2,11 H18" />
+				</DataTrigger>
+			</Style.Triggers>
+		</Style>
+
+		<Style x:Key="LayoutIconGroups" TargetType="Path" BasedOn="{StaticResource LayoutIconList}">
+			<Setter Property="Data" Value="M1,2 H9 V14 H1 Z M11,2 H19 V14 H11 Z M3,5 H7 M3,8 H7 M13,5 H17 M13,8 H17" />
+			<Style.Triggers>
+				<DataTrigger Binding="{Binding IsChecked, RelativeSource={RelativeSource AncestorType=ToggleButton}}" Value="True">
+					<Setter Property="Data" Value="M2,1 H18 V7 H2 Z M2,9 H18 V15 H2 Z M5,3 H15 M5,11 H15" />
+				</DataTrigger>
+			</Style.Triggers>
+		</Style>
+
+		<!-- The same, for a choice that is on or off: it has a background when it is on. -->
+		<Style x:Key="IconToggle" TargetType="ToggleButton">
+			<Setter Property="Background" Value="Transparent" />
+			<Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
+			<Setter Property="Width" Value="36" />
+			<Setter Property="Height" Value="32" />
+			<Setter Property="Margin" Value="1,0" />
+			<Setter Property="Focusable" Value="False" />
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="ToggleButton">
+						<Border x:Name="Root" Background="{TemplateBinding Background}" BorderBrush="Transparent" BorderThickness="0,0,0,2" CornerRadius="4">
+							<ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+						</Border>
+						<ControlTemplate.Triggers>
+							<Trigger Property="IsMouseOver" Value="True">
+								<Setter TargetName="Root" Property="Background" Value="{DynamicResource SubtleFillColorSecondaryBrush}" />
+							</Trigger>
+							<Trigger Property="IsChecked" Value="True">
+								<Setter TargetName="Root" Property="Background" Value="{DynamicResource SubtleFillColorTertiaryBrush}" />
+								<Setter TargetName="Root" Property="BorderBrush" Value="{DynamicResource AccentFillColorDefaultBrush}" />
+							</Trigger>
+							<Trigger Property="IsEnabled" Value="False">
+								<Setter Property="Opacity" Value="0.35" />
+							</Trigger>
+						</ControlTemplate.Triggers>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
+		</ResourceDictionary>
+	</Application.Resources>
+</Application>

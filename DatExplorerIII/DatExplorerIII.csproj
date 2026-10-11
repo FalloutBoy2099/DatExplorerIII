@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net10.0-windows</TargetFramework>
+		<UseWPF>true</UseWPF>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<LangVersion>latest</LangVersion>
+		<RootNamespace>DatExplorerIII</RootNamespace>
+		<AssemblyName>DatExplorerIII</AssemblyName>
+		<ApplicationIcon>Resources\zippedFile.ico</ApplicationIcon>
+		<ApplicationManifest>app.manifest</ApplicationManifest>
+		<Product>DatExplorerIII</Product>
+		<Company>Kain</Company>
+		<Authors>Kain</Authors>
+		<Version>2.0.0</Version>
+		<Description>Fallout 1/2 and Arcanum DAT archive explorer - by Kain</Description>
+		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+		<AnalysisLevel>latest</AnalysisLevel>
+		<!-- The built-in Fluent theme (ThemeMode) is still flagged as experimental. -->
+		<NoWarn>$(NoWarn);WPF0001</NoWarn>
+		<AssemblyVersion>2026.10.9.6</AssemblyVersion>
+		<FileVersion>2026.10.9.6</FileVersion>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Resource Include="Resources\zippedFile.ico" />
+		<!-- The icon of the .dat files is inside the program, so that a single executable is enough. -->
+		<EmbeddedResource Include="Resources\dat.ico" LogicalName="DatExplorerIII.dat.ico" />
+		<EmbeddedResource Include="Resources\Fallout.pal" LogicalName="DatExplorerIII.Fallout.pal" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<InternalsVisibleTo Include="DatExplorerIII.Tests" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="NLayer" Version="1.16.0" />
+	</ItemGroup>
+
+</Project>
