@@ -5,6 +5,7 @@ namespace DatExplorerIII.ViewModels
 	using System.Globalization;
 	using System.Linq;
 	using System.Windows.Input;
+	using Formats;
 	using Infrastructure;
 	using Models;
 	using Services;
@@ -29,12 +30,16 @@ namespace DatExplorerIII.ViewModels
 		private String _notice = String.Empty;
 		private Boolean _wrapLines = true;
 		private Boolean _isMessageFile;
+		private Action<MsgFileReport>? _problemsRequested;
 		private Boolean _isScript;
 		private Boolean _isBiography;
 		private Boolean _isList;
 		private readonly IUiThread _uiThread;
 		private Boolean _tooLongForColors;
 		private String _note = String.Empty;
+		private String? _noteTip;
+		private IReadOnlySet<Int32>? _missingLines;
+		private String? _noticeTip;
 
 		/// <summary>True while the list of encodings is replaced: the box that shows it then empties its selection, which must not be taken for a choice.</summary>
 		private Boolean _refreshingLanguage;
@@ -46,6 +51,9 @@ namespace DatExplorerIII.ViewModels
 			_options = TextEncodings.CreateOptions();
 			_selectedEncoding = _options[0];
 			CopyCommand = new RelayCommand(Copy, () => _text.Length > 0);
+			ShowProblemsCommand = new RelayCommand(
+				() => _problemsRequested?.Invoke(new MsgFileReport(SourcePath, MsgValidator.Validate(_text))),
+				() => CanShowProblems);
 		}
 
 		public ICommand CopyCommand { get; }
@@ -87,11 +95,43 @@ namespace DatExplorerIII.ViewModels
 			private set => SetProperty(ref _status, value);
 		}
 
+		/// <summary>The kinds of problems of a message file that its notice does not mention (the next text that is shown).</summary>
+		public IReadOnlyCollection<MsgIssueKind> DisabledMessageChecks { get; set; } = Array.Empty<MsgIssueKind>();
+
+		/// <summary>Where the text comes from (a path of an archive): the name of the file in the report of its problems.</summary>
+		public String SourcePath { get; set; } = String.Empty;
+
+		/// <summary>What the button of the problems does with the report of the message file that is shown (nothing: no button).</summary>
+		public Action<MsgFileReport>? ProblemsRequested
+		{
+			get => _problemsRequested;
+			set
+			{
+				if (SetProperty(ref _problemsRequested, value))
+				{
+					OnPropertyChanged(nameof(CanShowProblems));
+				}
+			}
+		}
+
+		/// <summary>The viewer shows a message file and can list its problems: the button is there.</summary>
+		public Boolean CanShowProblems => _isMessageFile && _problemsRequested != null;
+
+		/// <summary>Lists the problems of the message file that is shown.</summary>
+		public ICommand ShowProblemsCommand { get; }
+
 		/// <summary>A remark about the text: it is cut, it looks binary, it is empty.</summary>
 		public String Notice
 		{
 			get => _notice;
 			private set => SetProperty(ref _notice, value);
+		}
+
+		/// <summary>More about the remark (the files that a list does not find...); null when there is nothing more.</summary>
+		public String? NoticeTip
+		{
+			get => _noticeTip;
+			private set => SetProperty(ref _noticeTip, value);
 		}
 
 		public Boolean WrapLines
@@ -122,16 +162,72 @@ namespace DatExplorerIII.ViewModels
 		/// <param name="fullSize">The size of the whole file.</param>
 		/// <param name="extension">The extension of the file (with the dot): it tells if the text gets colors.</param>
 		/// <param name="note">Something to say about the text when there is nothing else to say (where it comes from).</param>
-		public void Show(Byte[] data, Int64 fullSize, String? extension = null, String? note = null)
+		/// <param name="list">The check of a list of files (.lst): its notice says what is wrong, and the lines that name a missing file are marked.</param>
+		public void Show(Byte[] data, Int64 fullSize, String? extension = null, String? note = null, LstReport? list = null)
 		{
 			_data = data;
 			_fullSize = fullSize;
 			_isMessageFile = String.Equals(extension, ".msg", StringComparison.OrdinalIgnoreCase);
+			OnPropertyChanged(nameof(CanShowProblems));
 			_isScript = String.Equals(extension, ".ssl", StringComparison.OrdinalIgnoreCase) || String.Equals(extension, ".h", StringComparison.OrdinalIgnoreCase);
 			_isBiography = String.Equals(extension, ".bio", StringComparison.OrdinalIgnoreCase);
 			_isList = String.Equals(extension, ".lst", StringComparison.OrdinalIgnoreCase);
 			_note = note ?? String.Empty;
+			_noteTip = null;
+			_missingLines = null;
+			if (list is { HasProblems: true })
+			{
+				_note = ListNotice(list);
+				_noteTip = ListTip(list);
+				_missingLines = list.MissingLines;
+			}
+
 			Decode();
+		}
+
+		/// <summary>"2 missing files, 5 files not listed".</summary>
+		private static String ListNotice(LstReport list)
+		{
+			List<String> parts = new();
+			if (list.Missing.Count > 0)
+			{
+				parts.Add(Loc.Plural("Str.PluralLstMissing", list.Missing.Count));
+			}
+
+			if (list.Unlisted.Count > 0)
+			{
+				parts.Add(Loc.Plural("Str.PluralLstUnlisted", list.Unlisted.Count));
+			}
+
+			return String.Join(Loc.Get("Str.MsgListSeparator"), parts);
+		}
+
+		/// <summary>The names of the files, a few lines of each kind.</summary>
+		private static String ListTip(LstReport list)
+		{
+			const Int32 limit = 25;
+			List<String> lines = new();
+			if (list.Missing.Count > 0)
+			{
+				lines.Add(Loc.Get("Str.LstTipMissing"));
+				lines.AddRange(list.Missing.Take(limit).Select(file => "  " + file.Name + " (" + file.Line + ")"));
+				if (list.Missing.Count > limit)
+				{
+					lines.Add("  …");
+				}
+			}
+
+			if (list.Unlisted.Count > 0)
+			{
+				lines.Add(Loc.Get("Str.LstTipUnlisted"));
+				lines.AddRange(list.Unlisted.Take(limit).Select(file => "  " + file));
+				if (list.Unlisted.Count > limit)
+				{
+					lines.Add("  …");
+				}
+			}
+
+			return String.Join(Environment.NewLine, lines);
 		}
 
 		public void Clear()
@@ -139,14 +235,18 @@ namespace DatExplorerIII.ViewModels
 			_data = Array.Empty<Byte>();
 			_fullSize = 0;
 			_isMessageFile = false;
+			OnPropertyChanged(nameof(CanShowProblems));
 			_isScript = false;
 			_isBiography = false;
 			_isList = false;
 			_note = String.Empty;
+			_noteTip = null;
+			_missingLines = null;
 			SyntaxSpans = null;
 			Text = String.Empty;
 			Status = String.Empty;
 			Notice = String.Empty;
+			NoticeTip = null;
 		}
 
 		/// <summary>Names the encodings again after the language of the interface changed.</summary>
@@ -185,6 +285,7 @@ namespace DatExplorerIII.ViewModels
 			Int32 lines = 1 + decoded.Text.Count(character => character == '\n');
 			Status = Loc.Format("Str.ViewerTextStatus", encoding, SizeFormatter.Format(_fullSize), lines.ToString("N0", CultureInfo.CurrentCulture));
 
+			NoticeTip = null;
 			if (decoded.LooksBinary)
 			{
 				Notice = Loc.Get("Str.ViewerBinary");
@@ -199,8 +300,21 @@ namespace DatExplorerIII.ViewModels
 			}
 			else
 			{
-				Notice = _tooLongForColors ? Loc.Get("Str.ViewerNotColored") : _note;
+				Notice = _tooLongForColors ? Loc.Get("Str.ViewerNotColored") : _isMessageFile ? MessageNotice(decoded.Text) : _note;
+				NoticeTip = _isList && !_tooLongForColors ? _noteTip : null;
 			}
+		}
+
+		/// <summary>What the notice of a message file says: how many problems it has, when it has some.</summary>
+		private String MessageNotice(String text)
+		{
+			List<MsgIssue> issues = MsgValidator.Validate(text).Where(issue => !DisabledMessageChecks.Contains(issue.Kind)).ToList();
+			if (issues.Count == 0)
+			{
+				return _note;
+			}
+
+			return MsgIssueSummary.Describe(issues);
 		}
 
 		/// <summary>
@@ -210,7 +324,7 @@ namespace DatExplorerIII.ViewModels
 		private IReadOnlyList<SyntaxSpan>? Colorize(DecodedText decoded)
 		{
 			_tooLongForColors = false;
-			Func<String, IReadOnlyList<SyntaxSpan>>? tokenize = _isMessageFile ? MsgSyntax.Tokenize : _isScript ? SslSyntax.Tokenize : _isBiography ? BioSyntax.Tokenize : _isList ? LstSyntax.Tokenize : null;
+			Func<String, IReadOnlyList<SyntaxSpan>>? tokenize = _isMessageFile ? MsgSyntax.Tokenize : _isScript ? SslSyntax.Tokenize : _isBiography ? BioSyntax.Tokenize : _isList ? (text => LstSyntax.Tokenize(text, _missingLines)) : null;
 			if (decoded.LooksBinary || tokenize == null)
 			{
 				return null;

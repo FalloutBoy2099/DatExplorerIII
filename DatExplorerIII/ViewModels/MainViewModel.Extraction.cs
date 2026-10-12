@@ -13,6 +13,12 @@ namespace DatExplorerIII.ViewModels
 
 	public sealed partial class MainViewModel
 	{
+		/// <summary>More than one item is selected: the menu of the list only offers what is made of many files (extract, import, new folder).</summary>
+		public Boolean IsMultiSelection => SelectedItems.Count > 1;
+
+		/// <summary>"Extract file to..." for one file, "Extract files to..." for more (or for a folder): only what is selected is extracted.</summary>
+		public String ExtractItemsText => Loc.Get(SelectedItems is [{ Entry: not null }] ? "Str.ExtractFile" : "Str.ExtractFiles");
+
 		private async Task ExtractSelectedItemsAsync(Object? parameter)
 		{
 			DatDocument? document = CurrentDocument;
@@ -150,7 +156,7 @@ namespace DatExplorerIII.ViewModels
 			_dialogs.ShowMessage(Title, title + Environment.NewLine + Environment.NewLine + list, DialogIcon.Warning);
 		}
 
-		private async Task OpenItemAsync(ListEntry? item)
+		internal async Task OpenItemAsync(ListEntry? item)
 		{
 			if (item == null)
 			{
@@ -165,6 +171,11 @@ namespace DatExplorerIII.ViewModels
 
 			// A folder always opens; a file opens only when the user wants a double click (or Enter) to do something.
 			if (_settings.Data.DoubleClickDisabled)
+			{
+				return;
+			}
+
+			if (await OpenMessageProblemsInsteadAsync(item))
 			{
 				return;
 			}

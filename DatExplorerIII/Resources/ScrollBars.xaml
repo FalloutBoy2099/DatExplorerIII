@@ -201,6 +201,8 @@
     </ControlTemplate>
 
     <Style TargetType="ScrollBar">
+        <!--  A text box (a message file, a text) sets the pointer of a text on all it holds, its scroll bars too.  -->
+        <Setter Property="Cursor" Value="Arrow" />
         <Setter Property="Width" Value="{Binding Width, Source={StaticResource ScrollBarMetrics}}" />
         <Setter Property="Template" Value="{StaticResource VerticalScrollBarTemplate}" />
         <Style.Triggers>

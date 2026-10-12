@@ -45,6 +45,9 @@ namespace DatExplorerIII.Services
 
 		void ShowSearchResults(String title, IReadOnlyList<DatEntry> results, Action<DatEntry> goTo);
 
+		/// <summary>Shows the problems found in message files. The window is not modal.</summary>
+		void ShowMessageIssues(MsgIssuesViewModel issues);
+
 		/// <summary>Opens a window that shows a file. The window loads what the viewer model is given.</summary>
 		void ShowViewer(ViewerViewModel viewer);
 

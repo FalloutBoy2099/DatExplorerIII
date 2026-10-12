@@ -585,6 +585,23 @@ namespace DatExplorerIII.Tests
 			Assert.Equal(5, document.Blocks.Count);
 		}
 
+		[Fact]
+		public void TheParagraphs_AreMadeOneAtATime_AndAreTheSameAsTheWholeDocument()
+		{
+			const String text = "# comment\r\n{1}{snd}{Hello %s}\r\n{2}{}{two\r\nlines}\r\n";
+			IReadOnlyList<SyntaxSpan> spans = MsgSyntax.Tokenize(text);
+
+			// The first paragraph is there without the others being made (the viewer shows a screen at once).
+			using IEnumerator<System.Windows.Documents.Paragraph> paragraphs = HighlightedDocument.Paragraphs(text, spans).GetEnumerator();
+			Assert.True(paragraphs.MoveNext());
+			Assert.Equal("# comment", new System.Windows.Documents.TextRange(paragraphs.Current.ContentStart, paragraphs.Current.ContentEnd).Text);
+
+			List<String> all = HighlightedDocument.Paragraphs(text, spans).Select(paragraph => new System.Windows.Documents.TextRange(paragraph.ContentStart, paragraph.ContentEnd).Text).ToList();
+			System.Windows.Documents.FlowDocument document = HighlightedDocument.Build(text, spans);
+			Assert.Equal(document.Blocks.Count, all.Count);
+			Assert.Equal("{2}{}{two", all[2]);
+		}
+
 		#endregion
 	}
 }

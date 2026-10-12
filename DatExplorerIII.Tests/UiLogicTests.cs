@@ -76,6 +76,8 @@ namespace DatExplorerIII.Tests
 
 			public Boolean ShowSettings(SettingsDialogViewModel settings) => throw new NotSupportedException();
 
+			public void ShowMessageIssues(MsgIssuesViewModel issues) => throw new NotSupportedException();
+
 			public void ShowAbout() => throw new NotSupportedException();
 		}
 
@@ -444,7 +446,7 @@ namespace DatExplorerIII.Tests
 			}
 
 			HashSet<String> keys = EnglishKeys();
-			HashSet<String> prefixes = new() { "Str.Err", "Str.Issue", "Str.Theme", "Str.Stat", "Str.Damage", "Str.Skill", "Str.Trait", "Str.ProItem", "Str.ProScenery", "Str.ProBody", "Str.ArcProType", "Str.MapScriptType", "Str.MapExitKind", "Str.CompareState" };
+			HashSet<String> prefixes = new() { "Str.Err", "Str.Issue", "Str.Theme", "Str.Stat", "Str.Damage", "Str.Skill", "Str.Trait", "Str.ProItem", "Str.ProScenery", "Str.ProBody", "Str.ArcProType", "Str.MapScriptType", "Str.MapExitKind", "Str.CompareState", "Str.MsgIssue", "Str.MsgSeverity", "Str.MsgCheck" };
 			Regex usage = new(@"Str\.[A-Za-z0-9]+(\.[A-Za-z0-9]+)?", RegexOptions.Compiled);
 			List<String> missing = new();
 

@@ -21,7 +21,12 @@ def load(code):
 
 
 def placeholders(text):
-    return sorted(re.findall(r"\{(\d+)[^}]*\}", text))
+    return sorted(set(re.findall(r"\{(\d+)[^}]*\}", text)))
+
+
+# The number of forms of the texts of a plural (Str.Plural...): "one form|other form", written in the order of the rule of the
+# language (see Loc.PluralIndex): two forms for most, three for the Slavic languages, one for Chinese.
+PLURAL_FORMS = {"en": 2, "fr": 2, "de": 2, "es": 2, "it": 2, "pt": 2, "sv": 2, "ru": 3, "pl": 3, "cs": 3, "zh": 1}
 
 
 def main():
@@ -39,6 +44,12 @@ def main():
             problems.append("empty: " + key)
         if key in english and placeholders(text) != placeholders(english[key]):
             problems.append("placeholders differ: %s  en=%r  %s=%r" % (key, english[key], code, text))
+        if key.startswith("Str.Plural"):
+            forms = text.split("|")
+            if len(forms) != PLURAL_FORMS[code]:
+                problems.append("plural forms: %s has %d form(s), %s needs %d" % (key, len(forms), code, PLURAL_FORMS[code]))
+            if any("{0}" not in form for form in forms):
+                problems.append("plural forms without {0}: " + key)
         if key in english and "|" in english[key] and "*." in english[key]:
             en_patterns = english[key].split("|")[1::2]
             if text.split("|")[1::2] != en_patterns:

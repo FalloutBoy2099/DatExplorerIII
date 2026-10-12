@@ -66,11 +66,11 @@ namespace DatExplorerIII.Tests
 		}
 
 		[Fact]
-		public void TheToolsMenu_OffersTheComparison_AfterTheRepairs_AndTheSettingsAtTheEnd()
+		public void TheToolsMenu_OffersTheMessageCheckAndTheComparison_AfterTheRepairs_AndTheSettingsAtTheEnd()
 		{
 			Assert.Equal(
 				[
-					"VerifyIntegrity", "ShowProblems", "RemoveDamaged", "-", "Compare", "CompareClose", "-", "Settings",
+					"VerifyIntegrity", "ShowProblems", "RemoveDamaged", "MsgScanCommand", "-", "Compare", "CompareClose", "-", "Settings",
 				],
 				Lines("Str.Tools"));
 		}

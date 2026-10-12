@@ -22,6 +22,8 @@ namespace DatExplorerIII.ViewModels
 		{
 			_selectedItems = items;
 			OnPropertyChanged(nameof(SelectedItems));
+			OnPropertyChanged(nameof(ExtractItemsText));
+			OnPropertyChanged(nameof(IsMultiSelection));
 			UpdatePreview();
 		}
 
@@ -85,6 +87,7 @@ namespace DatExplorerIII.ViewModels
 			FolderNode? folder = _selectedFolder;
 			if (folder == null)
 			{
+				CancelMessageScan();
 				Items = Array.Empty<ListEntry>();
 				FolderSummary = String.Empty;
 				TotalText = String.Empty;
@@ -99,6 +102,7 @@ namespace DatExplorerIII.ViewModels
 			list.Sort(Compare);
 
 			Items = list;
+			StartMessageScan(archive, list);
 			FolderSummary = Loc.Format("Str.StatusFolders", folderCount, list.Count - folderCount);
 			TotalText = Loc.Format("Str.StatusTotal", archive.Count);
 			PathText = Loc.Format("Str.StatusPath", "\\" + folder.Path);

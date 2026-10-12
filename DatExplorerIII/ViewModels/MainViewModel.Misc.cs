@@ -22,6 +22,7 @@ namespace DatExplorerIII.ViewModels
 
 			// The texts of the XAML follow by themselves; the ones built by the view model are made again.
 			StatusText = Loc.Get("Str.Ready");
+			OnPropertyChanged(nameof(ExtractItemsText));
 			RefreshItems();
 			Preview.RefreshLanguage();
 			Comparison.Current?.RefreshLanguage();

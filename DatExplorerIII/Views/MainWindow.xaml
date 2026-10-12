@@ -133,6 +133,37 @@
         </Style>
 
         <!--  Name column: icon and text.  -->
+        <!--  The warning of a message file that has problems: after its name, of the color of its worst problem.  -->
+        <Style x:Key="MessageWarning" TargetType="TextBlock">
+            <Setter Property="Margin" Value="6,0,0,0" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="FontFamily" Value="{StaticResource IconFont}" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Text" Value="&#xE7BA;" />
+            <Setter Property="ToolTip" Value="{Binding MessageTip}" />
+            <Setter Property="Visibility" Value="Collapsed" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding HasMessageIssues}" Value="True">
+                    <Setter Property="Visibility" Value="Visible" />
+                    <Setter Property="Foreground" Value="#C9B458" />
+                </DataTrigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding HasMessageIssues}" Value="True" />
+                        <Condition Binding="{Binding MessageSeverity}" Value="High" />
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Foreground" Value="#E8A200" />
+                </MultiDataTrigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding HasMessageIssues}" Value="True" />
+                        <Condition Binding="{Binding MessageSeverity}" Value="Critical" />
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Foreground" Value="#E5484D" />
+                </MultiDataTrigger>
+            </Style.Triggers>
+        </Style>
+
         <DataTemplate x:Key="NameCellTemplate">
             <StackPanel Orientation="Horizontal">
                 <TextBlock
@@ -143,6 +174,7 @@
                     Style="{StaticResource GlyphStyle}"
                     Text="{Binding Glyph}" />
                 <TextBlock VerticalAlignment="Center" Text="{Binding Name}" />
+                <TextBlock Style="{StaticResource MessageWarning}" />
             </StackPanel>
         </DataTemplate>
 
@@ -157,17 +189,24 @@
                     Style="{StaticResource GlyphStyle}"
                     Text="{Binding Glyph}" />
                 <TextBlock VerticalAlignment="Center" Text="{Binding Name}" />
+                <TextBlock Style="{StaticResource MessageWarning}" />
             </StackPanel>
         </DataTemplate>
 
         <DataTemplate x:Key="IconItemTemplate">
             <StackPanel Width="84" Margin="1">
-                <TextBlock
-                    HorizontalAlignment="Center"
-                    FontFamily="{StaticResource IconFont}"
-                    FontSize="28"
-                    Style="{StaticResource GlyphStyle}"
-                    Text="{Binding Glyph}" />
+                <Grid HorizontalAlignment="Center">
+                    <TextBlock
+                        FontFamily="{StaticResource IconFont}"
+                        FontSize="28"
+                        Style="{StaticResource GlyphStyle}"
+                        Text="{Binding Glyph}" />
+                    <TextBlock
+                        Margin="0,-2,-10,0"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        Style="{StaticResource MessageWarning}" />
+                </Grid>
                 <TextBlock
                     MaxHeight="34"
                     Margin="0,6,0,0"
@@ -544,7 +583,7 @@
                             ToolTip="{DynamicResource Str.ViewFileTip}" />
                         <MenuItem Command="{Binding OpenExternalCommand}" Header="{DynamicResource Str.OpenExternal}" />
                         <Separator />
-                        <MenuItem Command="{Binding ExtractItemsCommand}" Header="{DynamicResource Str.ExtractFiles}" />
+                        <MenuItem Command="{Binding ExtractItemsCommand}" Header="{Binding ExtractItemsText}" />
                         <MenuItem Command="{Binding ExtractFolderCommand}" Header="{DynamicResource Str.ExtractFolder}" />
                         <MenuItem Command="{Binding ExtractAllCommand}" Header="{DynamicResource Str.ExtractAll}" />
                         <Separator />
@@ -676,6 +715,10 @@
                             Command="{Binding RemoveDamagedCommand}"
                             Header="{DynamicResource Str.RemoveDamaged}"
                             ToolTip="{DynamicResource Str.RemoveDamagedTip}" />
+                        <MenuItem
+                            Command="{Binding ScanMessagesCommand}"
+                            Header="{DynamicResource Str.MsgScanCommand}"
+                            ToolTip="{DynamicResource Str.MsgScanTip}" />
                         <Separator />
                         <MenuItem Command="{Binding Comparison.CompareCommand}" Header="{DynamicResource Str.Compare}" />
                         <MenuItem Command="{Binding Comparison.CloseComparisonCommand}" Header="{DynamicResource Str.CompareClose}" />
@@ -848,7 +891,10 @@
                     IsEnabled="{Binding Busy.IsBusy, Converter={StaticResource InverseBool}}"
                     Visibility="{Binding Comparison.IsComparing, Converter={StaticResource InverseBoolToVisibility}}">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="280" MinWidth="160" />
+                        <ColumnDefinition
+                            x:Name="TreeColumn"
+                            Width="280"
+                            MinWidth="160" />
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition
                             x:Name="ListColumn"
@@ -913,15 +959,27 @@
                         </ListView.InputBindings>
                         <ListView.ContextMenu>
                             <ContextMenu>
-                                <MenuItem Command="{Binding OpenItemCommand}" Header="{DynamicResource Str.OpenItem}" />
+                                <!--  With several files selected, the menu only offers what makes sense for all of them.  -->
+                                <MenuItem
+                                    Command="{Binding OpenItemCommand}"
+                                    Header="{DynamicResource Str.OpenItem}"
+                                    Visibility="{Binding IsMultiSelection, Converter={StaticResource InverseBoolToVisibility}}" />
                                 <MenuItem
                                     Command="{Binding ViewItemCommand}"
                                     Header="{DynamicResource Str.ViewFile}"
-                                    ToolTip="{DynamicResource Str.ViewFileTip}" />
-                                <MenuItem Command="{Binding OpenExternalCommand}" Header="{DynamicResource Str.OpenExternal}" />
+                                    ToolTip="{DynamicResource Str.ViewFileTip}"
+                                    Visibility="{Binding IsMultiSelection, Converter={StaticResource InverseBoolToVisibility}}" />
+                                <MenuItem
+                                    Command="{Binding OpenExternalCommand}"
+                                    Header="{DynamicResource Str.OpenExternal}"
+                                    Visibility="{Binding IsMultiSelection, Converter={StaticResource InverseBoolToVisibility}}" />
+                                <MenuItem
+                                    Command="{Binding ShowMessageProblemsCommand}"
+                                    Header="{DynamicResource Str.MsgProblemsCommand}"
+                                    Visibility="{Binding IsMultiSelection, Converter={StaticResource InverseBoolToVisibility}}" />
                                 <MenuItem
                                     Command="{Binding ExtractItemsCommand}"
-                                    Header="{DynamicResource Str.ExtractFiles}"
+                                    Header="{Binding ExtractItemsText}"
                                     ToolTip="{DynamicResource Str.ExtractFilesTip}" />
                                 <Separator />
                                 <MenuItem
@@ -933,12 +991,16 @@
                                     Header="{DynamicResource Str.ImportFolder}"
                                     ToolTip="{DynamicResource Str.ImportFolderTip}" />
                                 <MenuItem Command="{Binding NewFolderCommand}" Header="{DynamicResource Str.NewFolder}" />
-                                <Separator />
-                                <MenuItem Command="{Binding RenameItemCommand}" Header="{DynamicResource Str.Rename}" />
+                                <Separator Visibility="{Binding IsMultiSelection, Converter={StaticResource InverseBoolToVisibility}}" />
+                                <MenuItem
+                                    Command="{Binding RenameItemCommand}"
+                                    Header="{DynamicResource Str.Rename}"
+                                    Visibility="{Binding IsMultiSelection, Converter={StaticResource InverseBoolToVisibility}}" />
                                 <MenuItem
                                     Command="{Binding DeleteItemsCommand}"
                                     Header="{DynamicResource Str.Delete}"
-                                    ToolTip="{DynamicResource Str.DeleteTip}" />
+                                    ToolTip="{DynamicResource Str.DeleteTip}"
+                                    Visibility="{Binding IsMultiSelection, Converter={StaticResource InverseBoolToVisibility}}" />
                             </ContextMenu>
                         </ListView.ContextMenu>
                     </ListView>

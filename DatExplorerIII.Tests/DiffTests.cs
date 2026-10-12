@@ -284,6 +284,11 @@ namespace DatExplorerIII.Tests
 
 			public Boolean ShowSettings(SettingsDialogViewModel settings) => SettingsScript?.Invoke(settings) ?? false;
 
+			/// <summary>The problems of message files that were shown.</summary>
+			public List<MsgIssuesViewModel> ShownIssues { get; } = new();
+
+			public void ShowMessageIssues(MsgIssuesViewModel issues) => ShownIssues.Add(issues);
+
 			public void ShowAbout()
 			{
 			}

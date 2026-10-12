@@ -1,8 +1,37 @@
 namespace DatExplorerIII.ViewModels
 {
 	using System;
+	using System.Collections.Generic;
+	using System.Linq;
 	using Infrastructure;
 	using Models;
+	using Services;
+
+	/// <summary>A kind of problem of the message files, which the user can turn off.</summary>
+	public sealed class MsgCheckOption : ObservableObject
+	{
+		private Boolean _isEnabled;
+
+		public MsgCheckOption(MsgIssueKind kind, String name, Boolean isEnabled)
+		{
+			Kind = kind;
+			Name = name;
+			_isEnabled = isEnabled;
+		}
+
+		public MsgIssueKind Kind { get; }
+
+		public String Name { get; }
+
+		public Boolean IsEnabled
+		{
+			get => _isEnabled;
+			set => SetProperty(ref _isEnabled, value);
+		}
+	}
+
+	/// <summary>The kinds of problems of a severity.</summary>
+	public sealed record MsgCheckGroup(String Title, IReadOnlyList<MsgCheckOption> Items);
 
 	/// <summary>
 	/// The values shown by the settings window while it is open: a copy of the settings, which the program takes when the
@@ -19,6 +48,15 @@ namespace DatExplorerIII.ViewModels
 			BlockSeparatorsVisible = data.BlockSeparatorsVisible;
 			SaveWindowSize = data.SaveWindowSize;
 			SaveWindowPosition = data.SaveWindowPosition;
+			SaveBlockWidths = data.SaveBlockWidths;
+			DoubleClickMessageProblems = data.DoubleClickMessageProblems;
+			MessageChecks = Enum.GetValues<MsgIssueKind>()
+				.GroupBy(MsgIssue.SeverityOf)
+				.OrderBy(group => group.Key)
+				.Select(group => new MsgCheckGroup(
+					Loc.Get("Str.MsgSeverity" + group.Key),
+					group.Select(kind => new MsgCheckOption(kind, Loc.Get("Str.MsgCheck" + kind), !data.DisabledMessageChecks.Contains(kind))).ToList()))
+				.ToList();
 			ShowSubtitles = data.ShowSubtitles;
 			ScrollBarWidth = data.ScrollBarWidth;
 			ScrollBarMinimumThumb = data.ScrollBarMinimumThumb;
@@ -45,6 +83,19 @@ namespace DatExplorerIII.ViewModels
 		public Boolean SaveWindowSize { get; set; }
 
 		public Boolean SaveWindowPosition { get; set; }
+
+		public Boolean SaveBlockWidths { get; set; }
+
+		public Boolean DoubleClickMessageProblems { get; set; }
+
+		/// <summary>The kinds of problems of the message files, by severity, each with its box.</summary>
+		public IReadOnlyList<MsgCheckGroup> MessageChecks { get; }
+
+		/// <summary>The kinds of problems that are not looked for in the message files.</summary>
+		public List<MsgIssueKind> DisabledMessageChecks()
+		{
+			return MessageChecks.SelectMany(group => group.Items).Where(option => !option.IsEnabled).Select(option => option.Kind).ToList();
+		}
 
 		public Boolean ShowSubtitles { get; set; }
 

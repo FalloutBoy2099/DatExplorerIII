@@ -41,6 +41,10 @@ namespace DatExplorerIII.ViewModels
 		private Boolean _isPlaying;
 		private ZoomOption _selectedZoom;
 		private String _info = String.Empty;
+		private EndingImageCheck? _ending;
+		private Func<Boolean, String?>? _endingTextSource;
+		private Boolean _showEndingText;
+		private String _endingText = String.Empty;
 
 		public ImageViewerViewModel(IUiThread uiThread)
 		{
@@ -61,7 +65,11 @@ namespace DatExplorerIII.ViewModels
 			PlayCommand = new RelayCommand(TogglePlay, () => IsAnimated);
 			PreviousCommand = new RelayCommand(() => NextFrame(false, -1), () => IsAnimated);
 			NextCommand = new RelayCommand(() => NextFrame(false, 1), () => IsAnimated);
+			NewEndingTextCommand = new RelayCommand(PickEndingText, () => EndingTextVisible);
 		}
+
+		/// <summary>Picks another text of the endings to show over the picture.</summary>
+		public ICommand NewEndingTextCommand { get; }
 
 		public ICommand PlayCommand { get; }
 
@@ -186,11 +194,76 @@ namespace DatExplorerIII.ViewModels
 			private set => SetProperty(ref _info, value);
 		}
 
+		/// <summary>The check of a picture that has its own palette: whether the game can use it as an image of the ending (null: not checked).</summary>
+		public EndingImageCheck? Ending => _ending;
+
+		public Boolean HasEnding => _ending != null;
+
+		/// <summary>The picture can be an image of the ending: the text of the endings can be shown over it.</summary>
+		public Boolean IsEndingUsable => _ending is { IsUsable: true };
+
+		/// <summary>The name of the check ("Ending image"): a tick says that the picture can be one, a cross that it cannot (<see cref="EndingTip"/> says why).</summary>
+		public String EndingStatus => _ending == null ? String.Empty : Loc.Get("Str.ViewerEnding");
+
+		/// <summary>Why: what the game needs and what the picture is.</summary>
+		public String EndingTip
+		{
+			get
+			{
+				return _ending?.Kind switch
+				{
+					EndingKind.Standard => Loc.Get("Str.ViewerEndingTipYes"),
+					EndingKind.Panning => Loc.Get("Str.ViewerEndingTipPan"),
+					EndingKind.WrongFolder => Loc.Format("Str.ViewerEndingTipFolder", _ending.Folder),
+					EndingKind.WrongSize => Loc.Format("Str.ViewerEndingTipSize", _ending.Width, _ending.Height),
+					_ => String.Empty,
+				};
+			}
+		}
+
+		/// <summary>Whether a random text of the endings is shown over the picture (to see how it fits); it only shows on a picture that can be an image of the ending.</summary>
+		public Boolean ShowEndingText
+		{
+			get => _showEndingText;
+			set
+			{
+				if (SetProperty(ref _showEndingText, value))
+				{
+					if (value && IsEndingUsable)
+					{
+						PickEndingText();
+					}
+
+					OnEndingTextChanged();
+				}
+			}
+		}
+
+		public Boolean EndingTextVisible => _showEndingText && IsEndingUsable && _endingText.Length > 0;
+
+		public String EndingText => _endingText;
+
+		/// <summary>The width the text is wrapped to, in the pixels of the picture.</summary>
+		public Double EndingTextWidth => _ending?.TextWidth ?? EndingImages.SlideTextWidth;
+
+		/// <summary>The distance of the text from the left of the picture: centered on the screen of 640 pixels (the left of a wider picture).</summary>
+		public Double EndingTextLeft => (EndingImages.ScreenWidth - EndingTextWidth) / 2;
+
 		/// <summary>Shows an animation or a sprite.</summary>
 		/// <param name="choices">The palettes it can be shown with; the first one is used.</param>
-		public void ShowAnimation(FrmImage image, IReadOnlyList<PaletteChoice> choices)
+		/// <param name="ending">The check of the picture as an image of the ending (when it has its own palette).</param>
+		/// <param name="endingText">Gives a text of the endings (the parameter tells the death screen from a slide).</param>
+		public void ShowAnimation(FrmImage image, IReadOnlyList<PaletteChoice> choices, EndingImageCheck? ending = null, Func<Boolean, String?>? endingText = null)
 		{
 			Reset();
+			_ending = ending;
+			_endingTextSource = endingText;
+			if (_showEndingText && IsEndingUsable)
+			{
+				PickEndingText();
+			}
+
+			OnEndingTextChanged();
 			_animation = image;
 			_canvasWidth = image.Directions.SelectMany(direction => direction.Frames).Max(frame => frame.Width);
 			_canvasHeight = image.Directions.SelectMany(direction => direction.Frames).Max(frame => frame.Height);
@@ -244,9 +317,32 @@ namespace DatExplorerIII.ViewModels
 			Stop();
 		}
 
+		private void PickEndingText()
+		{
+			_endingText = (_ending == null ? null : _endingTextSource?.Invoke(_ending.IsDeathScreen)) ?? String.Empty;
+			OnEndingTextChanged();
+		}
+
+		private void OnEndingTextChanged()
+		{
+			OnPropertyChanged(nameof(Ending));
+			OnPropertyChanged(nameof(HasEnding));
+			OnPropertyChanged(nameof(IsEndingUsable));
+			OnPropertyChanged(nameof(EndingStatus));
+			OnPropertyChanged(nameof(EndingTip));
+			OnPropertyChanged(nameof(EndingText));
+			OnPropertyChanged(nameof(EndingTextVisible));
+			OnPropertyChanged(nameof(EndingTextWidth));
+			OnPropertyChanged(nameof(EndingTextLeft));
+		}
+
 		private void Reset()
 		{
 			Stop();
+			_ending = null;
+			_endingTextSource = null;
+			_endingText = String.Empty;
+			OnEndingTextChanged();
 			_cache.Clear();
 			_animation = null;
 			_direction = 0;

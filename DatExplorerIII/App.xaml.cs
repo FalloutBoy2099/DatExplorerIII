@@ -18,6 +18,13 @@ namespace DatExplorerIII
 		{
 			base.OnStartup(e);
 
+			// "--scan-msg": the check of message files from a command line, without any window.
+			if (MsgCommandLine.IsCommand(e.Args))
+			{
+				Shutdown(RunMessageCheck(e.Args));
+				return;
+			}
+
 			SettingsService settings = new();
 			if (settings.Data.SingleInstance && SingleInstance.TrySend(SingleInstance.DefaultPipeName, FullPaths(e.Args)))
 			{
@@ -84,6 +91,15 @@ namespace DatExplorerIII
 		}
 
 		/// <summary>The files are given to the running program with their full path: the folder of the new launch is not the same.</summary>
+		/// <summary>Checks the message files that the command line names; the report goes to the console it was started from and to a log.</summary>
+		private Int32 RunMessageCheck(String[] args)
+		{
+			// The report is in English, whatever the language of the interface.
+			Loc.Initialize("en");
+			using TextWriter? console = ConsoleHost.OpenOutput();
+			return MsgCommandLine.Run(args, console, MsgReportText.FromResources(), Environment.CurrentDirectory);
+		}
+
 		private static List<String> FullPaths(IEnumerable<String> arguments)
 		{
 			List<String> paths = new();

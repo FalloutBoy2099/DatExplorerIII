@@ -14,9 +14,27 @@ namespace DatExplorerIII.Views
 	/// </summary>
 	public static class HighlightedDocument
 	{
+		/// <summary>An empty document with the font and the margins of the viewer.</summary>
+		public static FlowDocument NewDocument()
+		{
+			return new FlowDocument { PagePadding = new Thickness(0), FontFamily = new FontFamily("Consolas"), TextAlignment = TextAlignment.Left };
+		}
+
+		/// <summary>The whole document, at once.</summary>
 		public static FlowDocument Build(String text, IReadOnlyList<SyntaxSpan> spans)
 		{
-			FlowDocument document = new() { PagePadding = new Thickness(0), FontFamily = new FontFamily("Consolas"), TextAlignment = TextAlignment.Left };
+			FlowDocument document = NewDocument();
+			document.Blocks.AddRange(Paragraphs(text, spans));
+			return document;
+		}
+
+		/// <summary>
+		/// The paragraphs of the document, a line each, made as they are asked for: the viewer shows the first ones at once and adds
+		/// the others a few at a time (a whole file of 170 KB takes seconds to build and to lay out, a screen takes a few
+		/// milliseconds).
+		/// </summary>
+		public static IEnumerable<Paragraph> Paragraphs(String text, IReadOnlyList<SyntaxSpan> spans)
+		{
 			Paragraph paragraph = NewParagraph();
 			Dictionary<SyntaxKind, Style?> styles = new();
 
@@ -47,15 +65,14 @@ namespace DatExplorerIII.Views
 					}
 					else
 					{
-						document.Blocks.Add(paragraph);
+						yield return paragraph;
 						paragraph = NewParagraph();
 						position = lineBreak + 1;
 					}
 				}
 			}
 
-			document.Blocks.Add(paragraph);
-			return document;
+			yield return paragraph;
 		}
 
 		private static Paragraph NewParagraph() => new() { Margin = new Thickness(0) };
@@ -96,6 +113,7 @@ namespace DatExplorerIII.Views
 				SyntaxKind.Number => "SystemFillColorCautionBrush",
 				SyntaxKind.Function => "AccentTextFillColorSecondaryBrush",
 				SyntaxKind.Overflow => "SystemFillColorCriticalBrush",
+				SyntaxKind.Missing => "SystemFillColorCriticalBrush",
 				_ => null,
 			};
 
@@ -109,6 +127,10 @@ namespace DatExplorerIII.Views
 			if (kind == SyntaxKind.Keyword)
 			{
 				style.Setters.Add(new Setter(TextElement.FontWeightProperty, FontWeights.SemiBold));
+			}
+			else if (kind == SyntaxKind.Missing)
+			{
+				style.Setters.Add(new Setter(Inline.TextDecorationsProperty, TextDecorations.Underline));
 			}
 			else if (kind == SyntaxKind.Overflow)
 			{

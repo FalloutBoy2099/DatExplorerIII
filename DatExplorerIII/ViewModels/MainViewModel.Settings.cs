@@ -1,6 +1,7 @@
 namespace DatExplorerIII.ViewModels
 {
 	using System;
+	using System.Collections.Generic;
 	using System.Threading.Tasks;
 	using Models;
 	using Services;
@@ -16,6 +17,31 @@ namespace DatExplorerIII.ViewModels
 		/// <summary>Whether the window comes back where it was.</summary>
 		public Boolean SaveWindowPosition => _settings.Data.SaveWindowPosition;
 
+		/// <summary>Whether the width of the blocks of the window (the folders, the preview) comes back as it was.</summary>
+		public Boolean SaveBlockWidths => _settings.Data.SaveBlockWidths;
+
+		/// <summary>The width of the block of the folders that was kept (0: the width of the design, or nothing is kept).</summary>
+		public Double TreeWidth => _settings.Data.SaveBlockWidths ? _settings.Data.TreeWidth : 0;
+
+		/// <summary>The width of the preview compared with the list of the files that was kept (0: the design, or nothing is kept).</summary>
+		public Double PreviewShare => _settings.Data.SaveBlockWidths ? _settings.Data.PreviewShare : 0;
+
+		/// <summary>The kinds of problems of the message files that are not looked for.</summary>
+		public IReadOnlyCollection<MsgIssueKind> DisabledMessageChecks => _settings.Data.DisabledMessageChecks;
+
+		/// <summary>True when the user turned off every kind of problem: nothing is looked for in the message files.</summary>
+		private Boolean AllMessageChecksOff => _settings.Data.DisabledMessageChecks.Count >= Enum.GetValues<MsgIssueKind>().Length;
+
+		/// <summary>Keeps the width of the blocks of the window when it closes (nothing when the user does not want them kept).</summary>
+		public void SaveBlocks(Double treeWidth, Double previewShare)
+		{
+			if (_settings.Data.SaveBlockWidths)
+			{
+				_settings.Data.TreeWidth = treeWidth;
+				_settings.Data.PreviewShare = previewShare;
+			}
+		}
+
 		/// <summary>Whether the movies are shown with their subtitles.</summary>
 		public Boolean IsShowSubtitles => _settings.Data.ShowSubtitles;
 
@@ -28,7 +54,7 @@ namespace DatExplorerIII.ViewModels
 		/// <summary>A viewer for a file, set as the user wants (the other archives, the subtitles of the movies).</summary>
 		private ViewerViewModel CreateViewer()
 		{
-			ViewerViewModel viewer = new(_uiThread) { OtherArchives = OpenArchives, ShowSubtitles = _settings.Data.ShowSubtitles };
+			ViewerViewModel viewer = new(_uiThread) { OtherArchives = OpenArchives, ShowSubtitles = _settings.Data.ShowSubtitles, DisabledMessageChecks = _settings.Data.DisabledMessageChecks, ProblemsRequested = ShowMessageReport };
 
 			// The volume and the repeat are kept for the next sound, and for the next run.
 			viewer.Audio.Volume = _settings.Data.AudioVolume;
@@ -75,12 +101,22 @@ namespace DatExplorerIII.ViewModels
 			IsBlockSeparatorsVisible = model.BlockSeparatorsVisible;
 			_settings.Data.SaveWindowSize = model.SaveWindowSize;
 			_settings.Data.SaveWindowPosition = model.SaveWindowPosition;
+			_settings.Data.SaveBlockWidths = model.SaveBlockWidths;
+			if (!model.SaveBlockWidths)
+			{
+				_settings.Data.TreeWidth = 0;
+				_settings.Data.PreviewShare = 0;
+			}
+
+			_settings.Data.DisabledMessageChecks = model.DisabledMessageChecks();
+			_settings.Data.DoubleClickMessageProblems = model.DoubleClickMessageProblems;
 			_settings.Data.CompareSyncScroll = model.CompareSyncScroll;
 			_settings.Data.ShowSubtitles = model.ShowSubtitles;
 			_settings.Data.ScrollBarWidth = ScrollBarMetrics.Clamp((Int32)Math.Round(model.ScrollBarWidth), ScrollBarMetrics.MinimumWidth, ScrollBarMetrics.MaximumWidth);
 			_settings.Data.ScrollBarMinimumThumb = ScrollBarMetrics.Clamp((Int32)Math.Round(model.ScrollBarMinimumThumb), ScrollBarMetrics.MinimumThumbLength, ScrollBarMetrics.MaximumThumbLength);
 			_scrollBars.Update(_settings.Data.ScrollBarWidth, _settings.Data.ScrollBarMinimumThumb);
 			ApplySubtitlesOption();
+			ApplyMessageChecks();
 
 			ComparisonOptions options = model.ToComparisonOptions();
 			Boolean optionsChanged = options != _settings.Data.ComparisonOptions;
@@ -89,6 +125,8 @@ namespace DatExplorerIII.ViewModels
 
 			OnPropertyChanged(nameof(SaveWindowSize));
 			OnPropertyChanged(nameof(SaveWindowPosition));
+			OnPropertyChanged(nameof(SaveBlockWidths));
+			OnPropertyChanged(nameof(DisabledMessageChecks));
 			OnPropertyChanged(nameof(IsCompareSyncScroll));
 			OnPropertyChanged(nameof(IsShowSubtitles));
 			OnPropertyChanged(nameof(ComparisonOptions));

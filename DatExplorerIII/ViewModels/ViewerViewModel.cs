@@ -105,6 +105,20 @@ namespace DatExplorerIII.ViewModels
 			set => Video.ShowSubtitles = value;
 		}
 
+		/// <summary>The kinds of problems of a message file that its notice does not mention.</summary>
+		public IReadOnlyCollection<MsgIssueKind> DisabledMessageChecks
+		{
+			get => Text.DisabledMessageChecks;
+			set => Text.DisabledMessageChecks = value;
+		}
+
+		/// <summary>What the button of the problems of a message file does with the report of the file that is shown.</summary>
+		public Action<MsgFileReport>? ProblemsRequested
+		{
+			get => Text.ProblemsRequested;
+			set => Text.ProblemsRequested = value;
+		}
+
 		public Boolean IsText => _kind == FileViewerKind.Text;
 
 		public Boolean IsImage => _kind == FileViewerKind.Image;
@@ -328,12 +342,24 @@ namespace DatExplorerIII.ViewModels
 					}
 
 					Byte[] shown = data.Length > MaxTextBytes ? data.AsSpan(0, MaxTextBytes).ToArray() : data;
-					Text.Show(shown, data.Length, Path.GetExtension(entry.Name));
+					Text.SourcePath = entry.FullPath;
+
+					// A list of files says which files it names that are not in its folder (the other open archives count: the game reads
+					// all its archives as one).
+					LstReport? list = null;
+					if (Path.GetExtension(entry.Name).Equals(".lst", StringComparison.OrdinalIgnoreCase) && data.Length <= MaxTextBytes)
+					{
+						IEnumerable<DatArchive> archives = new[] { archive }.Concat(OtherArchives?.Invoke() ?? Array.Empty<DatArchive>()).Distinct().ToList();
+						list = await Task.Run(() => LstChecker.Check(entry.Directory, entry.Name, TextDecoder.Decode(data).Text, archives), token);
+						token.ThrowIfCancellationRequested();
+					}
+
+					Text.Show(shown, data.Length, Path.GetExtension(entry.Name), null, list);
 					Show(kind, String.Empty);
 					break;
 
 				case FileViewerKind.Image:
-					await Task.Run(() => ShowImage(entry.Name, data, palettes, token), token);
+					await Task.Run(() => ShowImage(archive, entry, data, palettes, token), token);
 					break;
 
 				case FileViewerKind.Audio:
@@ -512,8 +538,9 @@ namespace DatExplorerIII.ViewModels
 			return null;
 		}
 
-		private void ShowImage(String fileName, Byte[] data, List<PaletteChoice> palettes, CancellationToken token)
+		private void ShowImage(DatArchive archive, DatEntry entry, Byte[] data, List<PaletteChoice> palettes, CancellationToken token)
 		{
+			String fileName = entry.Name;
 			// What is shown on the interface thread is not shown when another file was chosen meanwhile.
 			void OnUi(Action action) => _uiThread.Invoke(() =>
 			{
@@ -555,10 +582,41 @@ namespace DatExplorerIII.ViewModels
 			else
 			{
 				FrmImage animation = FrmReader.Read(data);
-				OnUi(() => Image.ShowAnimation(animation, palettes.Count > 0 ? palettes : new List<PaletteChoice> { new(Loc.Get("Str.PaletteBuiltIn"), DefaultPalette.Palette), new(Loc.Get("Str.PaletteGray"), Palette.Grayscale()) }));
+				IReadOnlyList<PaletteChoice> shownPalettes = palettes.Count > 0 ? palettes : new List<PaletteChoice> { new(Loc.Get("Str.PaletteBuiltIn"), DefaultPalette.Palette), new(Loc.Get("Str.PaletteGray"), Palette.Grayscale()) };
+
+				// A picture with a palette of its own may be an image of the ending: say so, and give the text to try on it.
+				EndingImageCheck? ending = null;
+				if (extension == ".frm" && HasOwnPalette(archive, entry))
+				{
+					FrmFrame first = animation.Directions[0].Frames[0];
+					ending = EndingImages.Check(entry.Directory, entry.Name, first.Width, first.Height);
+				}
+
+				OnUi(() => Image.ShowAnimation(animation, shownPalettes, ending, ending == null ? null : death => PickEndingText(archive, death)));
 			}
 
 			OnUi(() => Show(FileViewerKind.Image, String.Empty));
+		}
+
+		/// <summary>A palette that has the name of the picture is next to it (hero.pal beside hero.frm).</summary>
+		private static Boolean HasOwnPalette(DatArchive archive, DatEntry picture)
+		{
+			String ownName = Path.Combine(picture.Directory, Path.GetFileNameWithoutExtension(picture.Name));
+			return archive.Find(ownName + ".pal") is { IsDamaged: false };
+		}
+
+		/// <summary>A text of the endings from the archives (this one, then the others that are open), or the sample when they have none.</summary>
+		private String PickEndingText(DatArchive archive, Boolean death)
+		{
+			IEnumerable<DatArchive> archives = new[] { archive }.Concat(OtherArchives?.Invoke() ?? Array.Empty<DatArchive>()).Distinct();
+			try
+			{
+				return EndingImages.Pick(archives, Loc.Language, death, Random.Shared) ?? EndingImages.SampleText;
+			}
+			catch (Exception exception) when (exception is DatException or IOException or InvalidDataException)
+			{
+				return EndingImages.SampleText;
+			}
 		}
 
 		/// <summary>

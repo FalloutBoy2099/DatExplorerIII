@@ -109,6 +109,20 @@ namespace DatExplorerIII.Tests
 		}
 
 		[Fact]
+		public void TheScrollBars_HaveTheArrowPointer_EvenInATextBox()
+		{
+			RunOnStaThread(() =>
+			{
+				ResourceDictionary resources = LoadScrollBars();
+				foreach (Orientation orientation in new[] { Orientation.Vertical, Orientation.Horizontal })
+				{
+					(ScrollBar bar, _) = CreateScrollBar(resources, orientation, 500);
+					Assert.Equal(System.Windows.Input.Cursors.Arrow, bar.Cursor);
+				}
+			});
+		}
+
+		[Fact]
 		public void TheScrollBar_OfAShortList_KeepsTheSliderTheTrackGives()
 		{
 			RunOnStaThread(() =>
@@ -162,6 +176,9 @@ namespace DatExplorerIII.Tests
 				Assert.NotNull(window.FindName("GeneralTab"));
 				Assert.NotNull(window.FindName("CompareTab"));
 				Assert.NotNull(window.FindName("SubtitlesBox"));
+				Assert.NotNull(window.FindName("SaveBlocksBox"));
+				Assert.NotNull(window.FindName("MessagesTab"));
+				Assert.Equal(3, ((ItemsControl)window.FindName("MessageChecksList")).Items.Count);
 				Assert.NotNull(window.FindName("MethodBinaryButton"));
 			}
 		}

@@ -95,6 +95,7 @@ namespace DatExplorerIII.ViewModels
 			AboutCommand = new RelayCommand(_dialogs.ShowAbout);
 			SettingsCommand = new AsyncRelayCommand(OpenSettingsAsync, () => !Busy.IsBusy);
 			Comparison = new ComparisonController(this, dialogs, settings, temp, uiThread);
+			CreateMessageCommands();
 			CreateInputCommands();
 		}
 
@@ -354,6 +355,7 @@ namespace DatExplorerIII.ViewModels
 
 		public void Shutdown()
 		{
+			CancelMessageScan();
 			Preview.Dispose();
 			foreach (FolderNode root in Roots)
 			{

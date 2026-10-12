@@ -628,6 +628,151 @@ namespace DatExplorerIII.Tests
 			Assert.Equal(0, viewer.Image.SelectedPalette!.Palette.GetRed(1));
 		}
 
+		#region Ending images
+
+		[Theory]
+		[InlineData("art\\intrface\\", "eg_den01.frm", 640, 480, EndingKind.Standard)]
+		[InlineData("ART\\INTRFACE", "eg_den01.frm", 640, 480, EndingKind.Standard)]
+		[InlineData("art\\intrface\\", "dp.frm", 1500, 480, EndingKind.Panning)]
+		[InlineData("art\\intrface\\", "x.frm", 640, 479, EndingKind.WrongSize)]
+		[InlineData("art\\intrface\\", "x.frm", 639, 480, EndingKind.WrongSize)]
+		[InlineData("art\\intrface\\", "x.frm", 640, 600, EndingKind.WrongSize)]
+		[InlineData("art\\critters\\", "x.frm", 640, 480, EndingKind.WrongFolder)]
+		[InlineData("", "x.frm", 640, 480, EndingKind.WrongFolder)]
+		public void APicture_CanBeAnImageOfTheEnding_WhenItIsInTheInterfaceFolderAndHasTheSizeOfTheScreen(String directory, String name, Int32 width, Int32 height, EndingKind expected)
+		{
+			EndingImageCheck check = EndingImages.Check(directory, name, width, height);
+
+			Assert.Equal(expected, check.Kind);
+			Assert.Equal(expected is EndingKind.Standard or EndingKind.Panning, check.IsUsable);
+			Assert.Equal(width, check.Width);
+			Assert.Equal(height, check.Height);
+		}
+
+		[Fact]
+		public void TheDeathScreen_HasAWiderText()
+		{
+			Assert.True(EndingImages.Check("art\\intrface\\", "death.frm", 640, 480).IsDeathScreen);
+			Assert.Equal(EndingImages.DeathTextWidth, EndingImages.Check("art\\intrface\\", "DEATH.FRM", 640, 480).TextWidth);
+			Assert.False(EndingImages.Check("art\\intrface\\", "eg_den01.frm", 640, 480).IsDeathScreen);
+			Assert.Equal(EndingImages.SlideTextWidth, EndingImages.Check("art\\intrface\\", "eg_den01.frm", 640, 480).TextWidth);
+		}
+
+		[Fact]
+		public void TheLinesOfTheSubtitles_LoseWhatComesBeforeTheFirstColon()
+		{
+			Assert.Equal(["War.", "War never changes: ever.", "No colon here"], EndingImages.Records("1:War.\r\n2:War never changes: ever.\r\n\r\nNo colon here\r\n"));
+			Assert.Empty(EndingImages.Records(String.Empty));
+			Assert.Equal("french", EndingImages.LanguageFolder("fr"));
+			Assert.Equal("english", EndingImages.LanguageFolder("zh"));
+		}
+
+		private DatArchive CreateEndingArchive()
+		{
+			return CreateArchive(
+				("text\\english\\cuts", "nar_1.txt", Encoding.ASCII.GetBytes("1:English one\r\n2:English two\r\n")),
+				("text\\english\\cuts", "nar_dth1.txt", Encoding.ASCII.GetBytes("1:You died.\r\n2:Sadly.\r\n")),
+				("text\\english\\cuts", "artimer1.txt", Encoding.ASCII.GetBytes("1:Not an ending")),
+				("text\\french\\cuts", "nar_1.txt", Encoding.ASCII.GetBytes("1:Un francais\r\n")),
+				("text\\english\\game", "nar_2.txt", Encoding.ASCII.GetBytes("1:Not in the folder of the cuts")));
+		}
+
+		[Fact]
+		public void TheTextOfTheEndings_IsPickedInTheLanguage_AndASlideHasOneLineWhereTheDeathScreenHasAWholeFile()
+		{
+			using DatArchive archive = CreateEndingArchive();
+			Random random = new(7);
+
+			Assert.Contains(EndingImages.Pick([archive], "en", false, random), new[] { "English one", "English two" });
+			Assert.Equal("Un francais", EndingImages.Pick([archive], "fr", false, random));
+
+			// A language that the archives do not have: English.
+			Assert.Contains(EndingImages.Pick([archive], "de", false, random), new[] { "English one", "English two" });
+			Assert.Equal("You died. Sadly.", EndingImages.Pick([archive], "en", true, random));
+
+			Assert.Single(EndingImages.TextFiles([archive], "en", false));
+			Assert.Single(EndingImages.TextFiles([archive], "en", true));
+		}
+
+		[Fact]
+		public void WithoutTextOfTheEndings_NothingIsPicked()
+		{
+			using DatArchive archive = CreateArchive(("art\\intrface", "x.frm", BuildFrm(1, 1, 4, 4)));
+
+			Assert.Null(EndingImages.Pick([archive], "en", false, new Random(1)));
+			Assert.Null(EndingImages.Pick([archive], "en", true, new Random(1)));
+		}
+
+		[Fact]
+		public async Task Viewer_SaysWhetherAPictureWithAPaletteCanBeAnImageOfTheEnding_AndShowsATextOnIt()
+		{
+			Byte[] palette = new Byte[768];
+			Byte[] slide = BuildFrm(1, 1, 640, 480);
+			using DatArchive archive = CreateArchive(
+				("art\\intrface", "death.frm", slide),
+				("art\\intrface", "death.pal", palette),
+				("art\\intrface", "eg_den01.frm", slide),
+				("art\\intrface", "eg_den01.pal", palette),
+				("art\\intrface", "small.frm", BuildFrm(1, 1, 4, 4)),
+				("art\\intrface", "small.pal", palette),
+				("art\\intrface", "nopal.frm", slide),
+				("art\\critters", "elsewhere.frm", slide),
+				("art\\critters", "elsewhere.pal", palette),
+				("text\\english\\cuts", "nar_1.txt", Encoding.ASCII.GetBytes("1:The ending of the game")),
+				("text\\english\\cuts", "nar_dth1.txt", Encoding.ASCII.GetBytes("1:The death\r\n2:of the player")));
+			using ViewerViewModel viewer = new(new ManualUiThread());
+
+			// A death screen: its text is a whole file of the death texts.
+			await viewer.LoadAsync(archive, archive.Find("art\\intrface\\death.frm")!);
+			Assert.True(viewer.Image.HasEnding);
+			Assert.True(viewer.Image.IsEndingUsable);
+			Assert.True(viewer.Image.Ending!.IsDeathScreen);
+			Assert.False(viewer.Image.EndingTextVisible);
+			viewer.Image.ShowEndingText = true;
+			Assert.True(viewer.Image.EndingTextVisible);
+			Assert.Equal("The death of the player", viewer.Image.EndingText);
+			Assert.Equal(EndingImages.DeathTextWidth, viewer.Image.EndingTextWidth);
+			Assert.Equal((EndingImages.ScreenWidth - EndingImages.DeathTextWidth) / 2.0, viewer.Image.EndingTextLeft);
+
+			// A slide: one line of a text of the endings; the toggle stays on for the next picture.
+			await viewer.LoadAsync(archive, archive.Find("art\\intrface\\eg_den01.frm")!);
+			Assert.True(viewer.Image.IsEndingUsable);
+			Assert.True(viewer.Image.EndingTextVisible);
+			Assert.Equal("The ending of the game", viewer.Image.EndingText);
+			Assert.Equal(EndingImages.SlideTextWidth, viewer.Image.EndingTextWidth);
+			Assert.True(viewer.Image.NewEndingTextCommand.CanExecute(null));
+
+			// Too small, in another folder: it says so, and there is no text over it.
+			await viewer.LoadAsync(archive, archive.Find("art\\intrface\\small.frm")!);
+			Assert.True(viewer.Image.HasEnding);
+			Assert.False(viewer.Image.IsEndingUsable);
+			Assert.Equal(EndingKind.WrongSize, viewer.Image.Ending!.Kind);
+			Assert.False(viewer.Image.EndingTextVisible);
+			Assert.False(viewer.Image.NewEndingTextCommand.CanExecute(null));
+			await viewer.LoadAsync(archive, archive.Find("art\\critters\\elsewhere.frm")!);
+			Assert.Equal(EndingKind.WrongFolder, viewer.Image.Ending!.Kind);
+
+			// No palette of its own: nothing is said.
+			await viewer.LoadAsync(archive, archive.Find("art\\intrface\\nopal.frm")!);
+			Assert.False(viewer.Image.HasEnding);
+			Assert.Equal(String.Empty, viewer.Image.EndingStatus);
+		}
+
+		[Fact]
+		public async Task AnEndingImage_WithoutTextOfTheEndings_ShowsTheSample()
+		{
+			Byte[] palette = new Byte[768];
+			using DatArchive archive = CreateArchive(("art\\intrface", "eg_den01.frm", BuildFrm(1, 1, 640, 480)), ("art\\intrface", "eg_den01.pal", palette));
+			using ViewerViewModel viewer = new(new ManualUiThread());
+
+			await viewer.LoadAsync(archive, archive.Find("art\\intrface\\eg_den01.frm")!);
+			viewer.Image.ShowEndingText = true;
+
+			Assert.Equal(EndingImages.SampleText, viewer.Image.EndingText);
+		}
+
+		#endregion
+
 		#endregion
 
 		#region Movies

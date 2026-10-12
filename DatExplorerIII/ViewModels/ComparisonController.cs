@@ -265,6 +265,7 @@ namespace DatExplorerIII.ViewModels
 			comparison.ShowDifferences = _settings.Data.CompareShowDifferences;
 			Current = comparison;
 			ApplySubtitles();
+			ApplyMessageChecks();
 			_host.StatusText = _comparison!.SummaryText;
 		}
 
@@ -418,6 +419,16 @@ namespace DatExplorerIII.ViewModels
 			DatDocument document = left ? comparison.Left : comparison.Right;
 			await _host.SaveDocumentAsync(document, false);
 			comparison.RefreshTitles();
+		}
+
+		/// <summary>Tells the viewers of the comparison that is shown which kinds of problems of the message files are not looked for.</summary>
+		public void ApplyMessageChecks()
+		{
+			if (_comparison != null)
+			{
+				_comparison.LeftViewer.DisabledMessageChecks = _settings.Data.DisabledMessageChecks;
+				_comparison.RightViewer.DisabledMessageChecks = _settings.Data.DisabledMessageChecks;
+			}
 		}
 
 		/// <summary>Gives the option of the subtitles to the viewers of the comparison that is shown.</summary>

@@ -15,6 +15,13 @@ namespace DatExplorerIII.Models
 
 		public const Double MaximumColumnWidth = 2000;
 
+		/// <summary>The limits of the width of the block of the folders, and of the share of the preview.</summary>
+		public const Double MinimumTreeWidth = 100;
+
+		public const Double MinimumPreviewShare = 0.1;
+
+		public const Double MaximumPreviewShare = 10;
+
 		public Boolean AssociationAsked { get; set; }
 
 		public String? LastExtractFolder { get; set; }
@@ -101,6 +108,21 @@ namespace DatExplorerIII.Models
 
 		/// <summary>Whether the main window comes back where it was.</summary>
 		public Boolean SaveWindowPosition { get; set; } = true;
+
+		/// <summary>Whether the width of the blocks of the main window (the folders, the preview) comes back as it was.</summary>
+		public Boolean SaveBlockWidths { get; set; } = true;
+
+		/// <summary>The width of the block of the folders, in pixels (0: the width of the design).</summary>
+		public Double TreeWidth { get; set; }
+
+		/// <summary>The width of the preview compared with the one of the list of the files (0: the proportion of the design).</summary>
+		public Double PreviewShare { get; set; }
+
+		/// <summary>The kinds of problems of the message files (.msg) that are not looked for (by default only the missing empty line at the end of the file, which the game does not mind).</summary>
+		public List<MsgIssueKind> DisabledMessageChecks { get; set; } = new() { MsgIssueKind.NoFinalEmptyLine };
+
+		/// <summary>Whether a double click on a message file (.msg) that has problems opens the window of the problems instead of the file.</summary>
+		public Boolean DoubleClickMessageProblems { get; set; }
 
 		/// <summary>Where the main window was when the program ended.</summary>
 		public WindowPlacement? Window { get; set; }

@@ -1,6 +1,7 @@
 namespace DatExplorerIII.Views
 {
 	using System;
+	using System.Linq;
 	using System.Windows;
 	using ViewModels;
 
@@ -16,12 +17,18 @@ namespace DatExplorerIII.Views
 			TitleBarTheme.Attach(this);
 			DataContext = settings;
 
-			// A tab control is as tall as the tab that is shown: both tabs get the height of the taller, so that the window does not
+			// A tab control is as tall as the tab that is shown: all the tabs get the height of the tallest, so that the window does not
 			// change its size (and push its buttons out of the screen) when the tab changes.
-			if (CompareTab.Content is FrameworkElement compare && GeneralTab.Content is FrameworkElement general)
+			FrameworkElement[] pages = [(FrameworkElement)GeneralTab.Content, (FrameworkElement)CompareTab.Content, (FrameworkElement)MessagesTab.Content];
+			foreach (FrameworkElement page in pages)
 			{
-				compare.Measure(new Size(Width - 80, Double.PositiveInfinity));
-				general.MinHeight = compare.DesiredSize.Height;
+				page.Measure(new Size(Width - 80, Double.PositiveInfinity));
+			}
+
+			Double height = pages.Max(page => page.DesiredSize.Height);
+			foreach (FrameworkElement page in pages)
+			{
+				page.MinHeight = height;
 			}
 
 			// Centered on a main window that is taller than the room left by the task bar, the buttons would be out of reach.

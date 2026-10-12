@@ -148,6 +148,12 @@ namespace DatExplorerIII.Services
 			new SearchResultsWindow(title, results, goTo) { Owner = Owner }.Show();
 		}
 
+		public void ShowMessageIssues(MsgIssuesViewModel issues)
+		{
+			// Not modal: the list stays open while the user fixes the files.
+			new MsgIssuesWindow(issues) { Owner = Owner }.Show();
+		}
+
 		public void ShowViewer(ViewerViewModel viewer)
 		{
 			// Not modal: the user keeps browsing, and can open several viewers.

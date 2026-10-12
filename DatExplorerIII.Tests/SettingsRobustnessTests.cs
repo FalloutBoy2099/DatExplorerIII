@@ -9,6 +9,30 @@ namespace DatExplorerIII.Tests
 	public sealed class SettingsRobustnessTests
 	{
 		[Fact]
+		public void TheWidthsOfTheBlocksAndTheMessageChecks_AreBroughtBackToWhatMakesSense()
+		{
+			SettingsData fine = SettingsService.Parse("{\"TreeWidth\": 320, \"PreviewShare\": 0.8, \"DisabledMessageChecks\": [6, 8, 6], \"SaveBlockWidths\": false}");
+			Assert.Equal(320, fine.TreeWidth);
+			Assert.Equal(0.8, fine.PreviewShare);
+			Assert.Equal([MsgIssueKind.DuplicateId, MsgIssueKind.WordTooLong], fine.DisabledMessageChecks);
+			Assert.False(fine.SaveBlockWidths);
+
+			SettingsData wrong = SettingsService.Parse("{\"TreeWidth\": 3, \"PreviewShare\": -2, \"DisabledMessageChecks\": [17, 3]}");
+			Assert.Equal(0, wrong.TreeWidth);
+			Assert.Equal(0, wrong.PreviewShare);
+			Assert.Equal([MsgIssueKind.StrayCloseBrace], wrong.DisabledMessageChecks);
+
+			SettingsData huge = SettingsService.Parse("{\"TreeWidth\": 90000, \"PreviewShare\": 500}");
+			Assert.Equal(SettingsData.MaximumColumnWidth, huge.TreeWidth);
+			Assert.Equal(SettingsData.MaximumPreviewShare, huge.PreviewShare);
+
+			SettingsData defaults = new();
+			Assert.True(defaults.SaveBlockWidths);
+			Assert.Equal([MsgIssueKind.NoFinalEmptyLine], defaults.DisabledMessageChecks);
+			Assert.False(defaults.DoubleClickMessageProblems);
+		}
+
+		[Fact]
 		public void ASettingThatIsNull_KeepsItsDefault_WhereAValueIsNeeded()
 		{
 			SettingsData data = SettingsService.Parse("{\"ComparisonOptions\": null, \"RecentFiles\": null, \"Theme\": null, \"ViewMode\": null, \"LastDatFolder\": null}");

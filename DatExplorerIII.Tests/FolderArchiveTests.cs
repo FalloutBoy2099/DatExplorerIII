@@ -324,6 +324,11 @@ namespace DatExplorerIII.Tests
 
 			public Boolean ShowSettings(SettingsDialogViewModel settings) => SettingsScript?.Invoke(settings) ?? false;
 
+			/// <summary>The problems of message files that were shown.</summary>
+			public List<MsgIssuesViewModel> ShownIssues { get; } = new();
+
+			public void ShowMessageIssues(MsgIssuesViewModel issues) => ShownIssues.Add(issues);
+
 			public void ShowAbout()
 			{
 			}
@@ -648,6 +653,294 @@ namespace DatExplorerIII.Tests
 			MainViewModel second = CreateViewModel(new FakeDialogs());
 			Assert.Equal(35, second.Preview.Audio.Volume);
 			Assert.True(second.Preview.Audio.IsLooping);
+		}
+
+		/// <summary>A folder opened as an archive, with a message file that is right, one that is not, and a text.</summary>
+		private String MakeFolderWithMessages()
+		{
+			String folder = MakeFolder("messages.dat");
+			String game = Path.Combine(folder, "text", "english", "game");
+			File.WriteAllText(Path.Combine(game, "combat.msg"), "{100}{}{Hello}\r\n");
+			File.WriteAllText(Path.Combine(game, "broken.msg"), "{x}{}{one}\r\n{2}{}{two}\r\n{2}{}{three}\r\n");
+			File.WriteAllText(Path.Combine(game, "notes.txt"), "{x}{}{this is not a message file}");
+			return folder;
+		}
+
+		[Fact]
+		public async Task TheMessageFilesOfTheFolderShown_GetAWarning_WhenTheyHaveProblems()
+		{
+			FakeDialogs dialogs = new();
+			MainViewModel viewModel = CreateViewModel(dialogs);
+			await viewModel.OpenFilesAsync([MakeFolderWithMessages()]);
+			FolderNode root = Assert.Single(viewModel.Roots);
+
+			viewModel.SelectFolder(root.Document.FindNode("text\\english\\game")!);
+			await viewModel.MessageScan;
+
+			ListEntry broken = viewModel.Items.Single(item => item.Name == "broken.msg");
+			ListEntry fine = viewModel.Items.Single(item => item.Name == "combat.msg");
+			ListEntry text = viewModel.Items.Single(item => item.Name == "notes.txt");
+			Assert.True(broken.IsMessageFile);
+			Assert.True(broken.HasMessageIssues);
+			Assert.Equal(MsgIssueSeverity.Critical, broken.MessageSeverity);
+			Assert.Equal(2, broken.Messages!.Issues.Count);
+			Assert.False(String.IsNullOrEmpty(broken.MessageTip));
+			Assert.NotNull(fine.Messages);
+			Assert.False(fine.HasMessageIssues);
+			Assert.Null(fine.MessageSeverity);
+			Assert.Equal(String.Empty, fine.MessageTip);
+			Assert.False(text.IsMessageFile);
+			Assert.Null(text.Messages);
+		}
+
+		[Fact]
+		public async Task TheWarning_TellsItsViewWhenTheCheckEnds_AndTheResultsAreKeptWhenTheListIsMadeAgain()
+		{
+			MainViewModel viewModel = CreateViewModel(new FakeDialogs());
+			await viewModel.OpenFilesAsync([MakeFolderWithMessages()]);
+			viewModel.SelectFolder(Assert.Single(viewModel.Roots).Document.FindNode("text\\english\\game")!);
+			ListEntry first = viewModel.Items.Single(item => item.Name == "broken.msg");
+			await viewModel.MessageScan;
+			Assert.True(first.HasMessageIssues);
+
+			// A result tells the view (the check runs in the background: it can end before anything listens, so it is given again).
+			List<String?> changes = new();
+			first.PropertyChanged += (_, args) => changes.Add(args.PropertyName);
+			first.SetMessages(first.Messages!);
+			Assert.Contains(nameof(ListEntry.HasMessageIssues), changes);
+			Assert.Contains(nameof(ListEntry.MessageSeverity), changes);
+
+			// A new list (a refresh, a sort) has the warnings at once, without a new check.
+			viewModel.RefreshCommand.Execute(null);
+			ListEntry second = viewModel.Items.Single(item => item.Name == "broken.msg");
+			Assert.NotSame(first, second);
+			Assert.True(second.HasMessageIssues);
+			await viewModel.MessageScan;
+		}
+
+		[Fact]
+		public async Task TheProblemsOfTheSelectedMessageFiles_AreListedInAWindow()
+		{
+			FakeDialogs dialogs = new();
+			MainViewModel viewModel = CreateViewModel(dialogs);
+			await viewModel.OpenFilesAsync([MakeFolderWithMessages()]);
+			viewModel.SelectFolder(Assert.Single(viewModel.Roots).Document.FindNode("text\\english\\game")!);
+			await viewModel.MessageScan;
+
+			// Nothing selected, or a text that is not a message file: the command is not there.
+			Assert.False(viewModel.ShowMessageProblemsCommand.CanExecute(null));
+			viewModel.SetSelectedItems([viewModel.Items.Single(item => item.Name == "notes.txt")]);
+			Assert.False(viewModel.ShowMessageProblemsCommand.CanExecute(null));
+
+			viewModel.SetSelectedItems([viewModel.Items.Single(item => item.Name == "broken.msg"), viewModel.Items.Single(item => item.Name == "combat.msg")]);
+			Assert.True(viewModel.ShowMessageProblemsCommand.CanExecute(null));
+			await viewModel.ShowMessageProblemsAsync();
+
+			MsgIssuesViewModel issues = Assert.Single(dialogs.ShownIssues);
+			MsgFileItem file = Assert.Single(issues.Files);
+			Assert.EndsWith("broken.msg", file.Path, StringComparison.Ordinal);
+			Assert.Equal(2, file.Count);
+
+			// A file that is right: a message, no window.
+			viewModel.SetSelectedItems([viewModel.Items.Single(item => item.Name == "combat.msg")]);
+			await viewModel.ShowMessageProblemsAsync();
+			Assert.Single(dialogs.ShownIssues);
+			Assert.Contains("Str.MsgNoProblems", dialogs.Messages);
+		}
+
+		[Fact]
+		public async Task TheMessageFilesOfTheWholeArchive_AreCheckedFromTheToolsMenu()
+		{
+			FakeDialogs dialogs = new();
+			MainViewModel viewModel = CreateViewModel(dialogs);
+			Assert.False(viewModel.ScanMessagesCommand.CanExecute(null));
+			await viewModel.OpenFilesAsync([MakeFolderWithMessages()]);
+			Assert.True(viewModel.ScanMessagesCommand.CanExecute(null));
+
+			await viewModel.ScanMessagesAsync();
+
+			MsgIssuesViewModel issues = Assert.Single(dialogs.ShownIssues);
+			Assert.Equal(2, Assert.Single(issues.Files).Count);
+
+			// What was found is kept: the list of a folder opened later has its warnings at once.
+			viewModel.SelectFolder(Assert.Single(viewModel.Roots).Document.FindNode("text\\english\\game")!);
+			Assert.True(viewModel.Items.Single(item => item.Name == "broken.msg").HasMessageIssues);
+			await viewModel.MessageScan;
+		}
+
+		[Fact]
+		public async Task AnArchiveWhoseMessageFilesAreRight_SaysSo()
+		{
+			FakeDialogs dialogs = new();
+			MainViewModel viewModel = CreateViewModel(dialogs);
+			await viewModel.OpenFilesAsync([MakeFolder()]);
+
+			await viewModel.ScanMessagesAsync();
+
+			// The one message file there is has no problem: a message, no window.
+			Assert.Empty(dialogs.ShownIssues);
+			Assert.Contains("Str.MsgNoProblems", dialogs.Messages);
+		}
+
+		[Fact]
+		public async Task TheChecksThatAreTurnedOff_AreNotLookedForInTheMessageFiles()
+		{
+			FakeDialogs dialogs = new();
+			MainViewModel viewModel = CreateViewModel(dialogs);
+			await viewModel.OpenFilesAsync([MakeFolderWithMessages()]);
+			viewModel.SelectFolder(Assert.Single(viewModel.Roots).Document.FindNode("text\\english\\game")!);
+			await viewModel.MessageScan;
+			ListEntry broken = viewModel.Items.Single(item => item.Name == "broken.msg");
+			Assert.Equal([MsgIssueKind.NoFinalEmptyLine], viewModel.DisabledMessageChecks);
+			Assert.Equal(2, broken.Messages!.Issues.Count);
+
+			// The duplicate numbers are not looked for any more: at once, and without checking again.
+			SettingsDialogViewModel model = new(new SettingsData());
+			model.MessageChecks.SelectMany(group => group.Items).Single(option => option.Kind == MsgIssueKind.DuplicateId).IsEnabled = false;
+			await viewModel.ApplySettingsAsync(model);
+			Assert.Equal([MsgIssueKind.DuplicateId, MsgIssueKind.NoFinalEmptyLine], viewModel.DisabledMessageChecks);
+			Assert.Equal(MsgIssueKind.InvalidId, Assert.Single(broken.Messages!.Issues).Kind);
+			Assert.Equal([MsgIssueKind.DuplicateId, MsgIssueKind.NoFinalEmptyLine], viewModel.Preview.DisabledMessageChecks);
+
+			// The window lists what is looked for only.
+			viewModel.SetSelectedItems([broken]);
+			await viewModel.ShowMessageProblemsAsync();
+			Assert.Equal(1, Assert.Single(Assert.Single(dialogs.ShownIssues).Files).Count);
+
+			// Turned on again: everything comes back.
+			await viewModel.ApplySettingsAsync(new SettingsDialogViewModel(new SettingsData()));
+			Assert.Equal(2, broken.Messages!.Issues.Count);
+		}
+
+		[Fact]
+		public async Task TheExtractionItem_SaysFileForOneFile_AndFilesForMore()
+		{
+			MainViewModel viewModel = CreateViewModel(new FakeDialogs());
+			await viewModel.OpenFilesAsync([MakeFolderWithMessages()]);
+			viewModel.SelectFolder(Assert.Single(viewModel.Roots).Document.FindNode("text\\english\\game")!);
+			List<String?> changes = new();
+			viewModel.PropertyChanged += (_, args) => changes.Add(args.PropertyName);
+
+			Assert.Equal("Str.ExtractFiles", viewModel.ExtractItemsText);
+			viewModel.SetSelectedItems([viewModel.Items.Single(item => item.Name == "combat.msg")]);
+			Assert.Equal("Str.ExtractFile", viewModel.ExtractItemsText);
+			Assert.Contains(nameof(MainViewModel.ExtractItemsText), changes);
+
+			viewModel.SetSelectedItems([viewModel.Items.Single(item => item.Name == "combat.msg"), viewModel.Items.Single(item => item.Name == "broken.msg")]);
+			Assert.Equal("Str.ExtractFiles", viewModel.ExtractItemsText);
+
+			// The menu of the list is shorter with several files selected.
+			Assert.True(viewModel.IsMultiSelection);
+			viewModel.SetSelectedItems([viewModel.Items.Single(item => item.Name == "combat.msg")]);
+			Assert.False(viewModel.IsMultiSelection);
+			Assert.Contains(nameof(MainViewModel.IsMultiSelection), changes);
+		}
+
+		[Fact]
+		public async Task ADoubleClickOnAMessageFileWithProblems_OpensTheWindowOfTheProblems_WhenTheSettingSaysSo()
+		{
+			FakeDialogs dialogs = new();
+			MainViewModel viewModel = CreateViewModel(dialogs);
+			await viewModel.OpenFilesAsync([MakeFolderWithMessages()]);
+			viewModel.SelectFolder(Assert.Single(viewModel.Roots).Document.FindNode("text\\english\\game")!);
+			await viewModel.MessageScan;
+			ListEntry broken = viewModel.Items.Single(item => item.Name == "broken.msg");
+			ListEntry fine = viewModel.Items.Single(item => item.Name == "combat.msg");
+
+			// Not asked: the file opens, as always (here the viewer).
+			viewModel.SetSelectedItems([broken]);
+			await viewModel.OpenItemAsync(broken);
+			Assert.Empty(dialogs.ShownIssues);
+
+			await viewModel.ApplySettingsAsync(new SettingsDialogViewModel(new SettingsData()) { DoubleClickMessageProblems = true });
+
+			// A file that has problems: the window, and not the file.
+			viewModel.SetSelectedItems([broken]);
+			await viewModel.OpenItemAsync(broken);
+			MsgFileItem file = Assert.Single(Assert.Single(dialogs.ShownIssues).Files);
+			Assert.EndsWith("broken.msg", file.Path, StringComparison.Ordinal);
+
+			// A file that is right opens as usual.
+			viewModel.SetSelectedItems([fine]);
+			await viewModel.OpenItemAsync(fine);
+			Assert.Single(dialogs.ShownIssues);
+		}
+
+		[Fact]
+		public async Task WhenNothingIsLookedFor_TheWindowsSaySo_AndTheListHasNoWarning()
+		{
+			FakeDialogs dialogs = new();
+			MainViewModel viewModel = CreateViewModel(dialogs);
+			await viewModel.OpenFilesAsync([MakeFolderWithMessages()]);
+			viewModel.SelectFolder(Assert.Single(viewModel.Roots).Document.FindNode("text\\english\\game")!);
+			await viewModel.MessageScan;
+			ListEntry broken = viewModel.Items.Single(item => item.Name == "broken.msg");
+			Assert.True(broken.HasMessageIssues);
+
+			SettingsDialogViewModel model = new(new SettingsData());
+			foreach (MsgCheckOption option in model.MessageChecks.SelectMany(group => group.Items))
+			{
+				option.IsEnabled = false;
+			}
+
+			await viewModel.ApplySettingsAsync(model);
+
+			Assert.False(broken.HasMessageIssues);
+			viewModel.SetSelectedItems([broken]);
+			await viewModel.ShowMessageProblemsAsync();
+			await viewModel.ScanMessagesAsync();
+			Assert.Empty(dialogs.ShownIssues);
+			Assert.Equal(["Str.MsgAllChecksOff", "Str.MsgAllChecksOff"], dialogs.Messages);
+		}
+
+		[Fact]
+		public async Task TheViewer_OpensTheWindowOfTheProblemsOfTheMessageFileItShows()
+		{
+			FakeDialogs dialogs = new();
+			MainViewModel viewModel = CreateViewModel(dialogs);
+			await viewModel.OpenFilesAsync([MakeFolderWithMessages()]);
+			viewModel.SelectFolder(Assert.Single(viewModel.Roots).Document.FindNode("text\\english\\game")!);
+			await viewModel.MessageScan;
+
+			TextViewerViewModel text = viewModel.Preview.Text;
+			Assert.False(text.CanShowProblems);
+			await viewModel.Preview.LoadAsync(viewModel.CurrentDocument!.Archive, viewModel.CurrentDocument.Archive.Find("text\\english\\game\\broken.msg")!);
+
+			Assert.True(text.CanShowProblems);
+			Assert.True(text.ShowProblemsCommand.CanExecute(null));
+			text.ShowProblemsCommand.Execute(null);
+			MsgFileItem file = Assert.Single(Assert.Single(dialogs.ShownIssues).Files);
+			Assert.EndsWith("broken.msg", file.Path, StringComparison.Ordinal);
+			Assert.Equal(2, file.Count);
+
+			await viewModel.Preview.LoadAsync(viewModel.CurrentDocument.Archive, viewModel.CurrentDocument.Archive.Find("text\\english\\game\\notes.txt")!);
+			Assert.False(text.CanShowProblems);
+		}
+
+		[Fact]
+		public async Task TheWidthOfTheBlocks_IsKeptWhenTheSettingSaysSo()
+		{
+			MainViewModel viewModel = CreateViewModel(new FakeDialogs());
+			Assert.True(viewModel.SaveBlockWidths);
+			Assert.Equal(0, viewModel.TreeWidth);
+			Assert.Equal(0, viewModel.PreviewShare);
+
+			viewModel.SaveBlocks(333, 0.75);
+			Assert.Equal(333, viewModel.TreeWidth);
+			Assert.Equal(0.75, viewModel.PreviewShare);
+
+			// Not wanted any more: forgotten, and nothing is kept until it is wanted again.
+			await viewModel.ApplySettingsAsync(new SettingsDialogViewModel(new SettingsData { SaveBlockWidths = false }) { SaveBlockWidths = false });
+			Assert.False(viewModel.SaveBlockWidths);
+			Assert.Equal(0, viewModel.TreeWidth);
+			viewModel.SaveBlocks(400, 1);
+			Assert.Equal(0, viewModel.TreeWidth);
+			Assert.Equal(0, viewModel.PreviewShare);
+
+			await viewModel.ApplySettingsAsync(new SettingsDialogViewModel(new SettingsData()));
+			viewModel.SaveBlocks(410, 1.5);
+			Assert.Equal(410, viewModel.TreeWidth);
+			Assert.Equal(1.5, viewModel.PreviewShare);
 		}
 
 		[Fact]

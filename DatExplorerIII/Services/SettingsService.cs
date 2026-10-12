@@ -159,6 +159,24 @@ namespace DatExplorerIII.Services
 				data.ColumnWidths = data.ColumnWidths.Select(width => Math.Clamp(width, SettingsData.MinimumColumnWidth, SettingsData.MaximumColumnWidth)).ToList();
 			}
 
+			// A block width that is not a number, or too small to be one, is the width of the design (0).
+			if (Double.IsNaN(data.TreeWidth) || Double.IsInfinity(data.TreeWidth) || data.TreeWidth < SettingsData.MinimumTreeWidth)
+			{
+				data.TreeWidth = 0;
+			}
+
+			data.TreeWidth = Math.Min(data.TreeWidth, SettingsData.MaximumColumnWidth);
+			if (Double.IsNaN(data.PreviewShare) || Double.IsInfinity(data.PreviewShare) || data.PreviewShare <= 0)
+			{
+				data.PreviewShare = 0;
+			}
+			else
+			{
+				data.PreviewShare = Math.Clamp(data.PreviewShare, SettingsData.MinimumPreviewShare, SettingsData.MaximumPreviewShare);
+			}
+
+			data.DisabledMessageChecks = data.DisabledMessageChecks.Where(kind => Enum.IsDefined(kind)).Distinct().ToList();
+
 			data.ScrollBarWidth = ScrollBarMetrics.Clamp(data.ScrollBarWidth, ScrollBarMetrics.MinimumWidth, ScrollBarMetrics.MaximumWidth);
 			data.ScrollBarMinimumThumb = ScrollBarMetrics.Clamp(data.ScrollBarMinimumThumb, ScrollBarMetrics.MinimumThumbLength, ScrollBarMetrics.MaximumThumbLength);
 		}

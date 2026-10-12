@@ -32,6 +32,7 @@ namespace DatExplorerIII.Views
 			DataContext = viewModel;
 			InitializeComponent();
 			viewModel.PropertyChanged += OnViewModelPropertyChanged;
+			RestoreBlockWidths();
 			ApplyPreviewVisibility();
 			ApplyWindowFrame();
 
@@ -124,6 +125,26 @@ namespace DatExplorerIII.Views
 			PreviewColumn.MinWidth = visible ? 200 : 0;
 		}
 
+		/// <summary>The widths of the blocks come back as the user left them (when the settings keep them).</summary>
+		private void RestoreBlockWidths()
+		{
+			if (_viewModel.TreeWidth >= SettingsData.MinimumTreeWidth)
+			{
+				TreeColumn.Width = new GridLength(_viewModel.TreeWidth);
+			}
+
+			if (_viewModel.PreviewShare > 0)
+			{
+				_previewShare = _viewModel.PreviewShare;
+			}
+		}
+
+		/// <summary>The share of the width of the preview compared with the list, as it is now (or as it was when the preview was hidden).</summary>
+		private Double CurrentPreviewShare()
+		{
+			return _viewModel.IsPreviewVisible && PreviewColumn.Width.IsStar && ListColumn.Width.Value > 0 ? PreviewColumn.Width.Value / ListColumn.Width.Value : _previewShare;
+		}
+
 		private void OnClosing(Object? sender, CancelEventArgs e)
 		{
 			if (!_viewModel.ConfirmExit())
@@ -132,6 +153,7 @@ namespace DatExplorerIII.Views
 				return;
 			}
 
+			_viewModel.SaveBlocks(TreeColumn.Width.IsAbsolute ? TreeColumn.Width.Value : TreeColumn.ActualWidth, CurrentPreviewShare());
 		}
 
 		/// <summary>The window is closed for good (after the placement was kept by its behavior): the program lets go of what it holds.</summary>

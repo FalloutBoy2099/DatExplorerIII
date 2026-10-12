@@ -1,14 +1,17 @@
 namespace DatExplorerIII.ViewModels
 {
 	using System;
+	using Infrastructure;
 	using Models;
 	using Services;
 
 	/// <summary>
 	/// A line of the file list: a sub folder or a file of the current folder.
 	/// </summary>
-	public sealed class ListEntry
+	public sealed class ListEntry : ObservableObject
 	{
+		private MsgFileReport? _messages;
+
 		public ListEntry(FolderNode folder)
 		{
 			Folder = folder;
@@ -54,5 +57,30 @@ namespace DatExplorerIII.ViewModels
 		public String SizeText { get; }
 
 		public String PackedSizeText { get; }
+
+		/// <summary>True for a file of messages (.msg), which the program checks.</summary>
+		public Boolean IsMessageFile => Entry != null && !IsDamaged && MsgScanner.IsMsgName(Name);
+
+		/// <summary>What the check of the message file found; null until it was checked (or when this is not a message file).</summary>
+		public MsgFileReport? Messages => _messages;
+
+		/// <summary>True when the check found something: the list shows a warning.</summary>
+		public Boolean HasMessageIssues => _messages is { HasIssues: true };
+
+		/// <summary>The worst problem of the file, which tells the color of the warning.</summary>
+		public MsgIssueSeverity? MessageSeverity => _messages?.Worst;
+
+		/// <summary>What the warning says: how many problems, of which severity.</summary>
+		public String MessageTip => _messages is { HasIssues: true } report ? MsgIssueSummary.Describe(report.Issues) : String.Empty;
+
+		/// <summary>Gives the result of the check of the message file.</summary>
+		public void SetMessages(MsgFileReport report)
+		{
+			_messages = report;
+			OnPropertyChanged(nameof(Messages));
+			OnPropertyChanged(nameof(HasMessageIssues));
+			OnPropertyChanged(nameof(MessageSeverity));
+			OnPropertyChanged(nameof(MessageTip));
+		}
 	}
 }

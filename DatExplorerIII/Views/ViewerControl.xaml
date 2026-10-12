@@ -12,6 +12,8 @@
         <infrastructure:EnvelopeGeometryConverter x:Key="EnvelopeGeometry" />
         <infrastructure:FractionOfWidthConverter x:Key="FractionOfWidth" />
         <infrastructure:RightMarginConverter x:Key="RightMargin" />
+        <infrastructure:ScrollBarPaddingConverter x:Key="ScrollBarPadding" />
+        <infrastructure:EndingTextMarginConverter x:Key="EndingTextMargin" />
 
         <!--  The grid that shows through the transparent parts of a sprite  -->
         <DrawingBrush
@@ -40,6 +42,18 @@
             </DrawingBrush.Drawing>
         </DrawingBrush>
 
+        <!--  The odd lines of a table are a little lighter than the even ones.  -->
+        <Style
+            x:Key="StripedRow"
+            BasedOn="{StaticResource {x:Type DataGridRow}}"
+            TargetType="DataGridRow">
+            <Style.Triggers>
+                <Trigger Property="ItemsControl.AlternationIndex" Value="1">
+                    <Setter Property="Background" Value="{DynamicResource SubtleFillColorTertiaryBrush}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
         <!--  A group of lines of a sheet (a character, a prototype)  -->
         <DataTemplate x:Key="SectionTemplate">
             <StackPanel Margin="0,0,12,14">
@@ -49,21 +63,32 @@
                     FontWeight="SemiBold"
                     Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}"
                     Text="{Binding Title}" />
-                <ItemsControl ItemsSource="{Binding Rows}">
+                <ItemsControl AlternationCount="2" ItemsSource="{Binding Rows}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Grid Margin="0,1">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="{Binding Label}" TextTrimming="CharacterEllipsis" />
-                                <TextBlock
-                                    Grid.Column="1"
-                                    Margin="16,0,0,0"
-                                    FontWeight="SemiBold"
-                                    Text="{Binding Value}" />
-                            </Grid>
+                            <Border Padding="6,2">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding (ItemsControl.AlternationIndex), RelativeSource={RelativeSource AncestorType=ContentPresenter}}" Value="1">
+                                                <Setter Property="Background" Value="{DynamicResource SubtleFillColorTertiaryBrush}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{Binding Label}" TextTrimming="CharacterEllipsis" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Margin="16,0,0,0"
+                                        FontWeight="SemiBold"
+                                        Text="{Binding Value}" />
+                                </Grid>
+                            </Border>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
@@ -83,7 +108,7 @@
             BasedOn="{StaticResource {x:Type CheckBox}}"
             TargetType="CheckBox">
             <Setter Property="VerticalContentAlignment" Value="Center" />
-            <Setter Property="Padding" Value="8,0,0,5" />
+            <Setter Property="Padding" Value="8,0,0,3" />
         </Style>
 
         <Style x:Key="ToolbarLabel" TargetType="TextBlock">
@@ -127,36 +152,51 @@
         <Grid DataContext="{Binding Text}" Visibility="{Binding DataContext.IsText, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <StackPanel Margin="0,0,0,6" Orientation="Horizontal">
-                <TextBlock Style="{StaticResource ToolbarLabel}" Text="{DynamicResource Str.ViewerEncoding}" />
-                <ComboBox
-                    MinWidth="190"
-                    DisplayMemberPath="Display"
-                    ItemsSource="{Binding Options}"
-                    SelectedItem="{Binding SelectedEncoding}" />
+            <!--  A narrow pane puts what does not fit on the next line.  -->
+            <WrapPanel Margin="0,0,0,2">
+                <StackPanel
+                    Margin="0,0,0,4"
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal">
+                    <TextBlock Style="{StaticResource ToolbarLabel}" Text="{DynamicResource Str.ViewerEncoding}" />
+                    <ComboBox
+                        MinWidth="190"
+                        DisplayMemberPath="Display"
+                        ItemsSource="{Binding Options}"
+                        SelectedItem="{Binding SelectedEncoding}" />
+                </StackPanel>
                 <CheckBox
-                    Margin="14,0,0,0"
+                    Margin="14,0,0,4"
+                    VerticalAlignment="Center"
                     Content="{DynamicResource Str.ViewerWrap}"
                     IsChecked="{Binding WrapLines}"
                     Style="{StaticResource ToolbarCheckBox}" />
                 <Button
-                    Margin="14,0,0,0"
+                    Margin="8,0,0,4"
+                    VerticalAlignment="Center"
+                    AutomationProperties.Name="{DynamicResource Str.ViewerCopy}"
                     Command="{Binding CopyCommand, Mode=OneTime}"
-                    Content="{DynamicResource Str.ViewerCopy}" />
-            </StackPanel>
-
-            <TextBlock
-                Grid.Row="1"
-                Style="{StaticResource Notice}"
-                Text="{Binding Notice}" />
+                    ToolTip="{DynamicResource Str.ViewerCopy}">
+                    <TextBlock FontFamily="{StaticResource IconFont}" Text="&#xE8C8;" />
+                </Button>
+                <Button
+                    x:Name="MessageProblemsButton"
+                    Margin="4,0,0,4"
+                    VerticalAlignment="Center"
+                    AutomationProperties.Name="{DynamicResource Str.MsgProblemsCommand}"
+                    Command="{Binding ShowProblemsCommand, Mode=OneTime}"
+                    ToolTip="{DynamicResource Str.MsgProblemsCommand}"
+                    Visibility="{Binding CanShowProblems, Converter={StaticResource BoolToVisibility}}">
+                    <TextBlock FontFamily="{StaticResource IconFont}" Text="&#xE7BA;" />
+                </Button>
+            </WrapPanel>
 
             <TextBox
-                Grid.Row="2"
+                Grid.Row="1"
                 AcceptsReturn="True"
                 FontFamily="Consolas"
                 HorizontalScrollBarVisibility="Auto"
@@ -167,9 +207,12 @@
                 <TextBox.Style>
                     <Style BasedOn="{StaticResource {x:Type TextBox}}" TargetType="TextBox">
                         <Setter Property="TextWrapping" Value="NoWrap" />
+                        <!--  The scroll bars are drawn over the text: the padding leaves them room (the horizontal one only when the lines do not wrap).  -->
+                        <Setter Property="Padding" Value="{Binding Width, Source={StaticResource ScrollBarMetrics}, Converter={StaticResource ScrollBarPadding}, ConverterParameter='10,5,6,6|rb'}" />
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding WrapLines}" Value="True">
                                 <Setter Property="TextWrapping" Value="Wrap" />
+                                <Setter Property="Padding" Value="{Binding Width, Source={StaticResource ScrollBarMetrics}, Converter={StaticResource ScrollBarPadding}, ConverterParameter='10,5,6,6|r'}" />
                             </DataTrigger>
                             <DataTrigger Binding="{Binding IsHighlighted}" Value="True">
                                 <Setter Property="Visibility" Value="Collapsed" />
@@ -182,19 +225,43 @@
             <!--  A text with colors (message files): the document is made by the code behind.  -->
             <RichTextBox
                 x:Name="HighlightedBox"
-                Grid.Row="2"
+                Grid.Row="1"
                 FontFamily="Consolas"
                 IsReadOnly="True"
                 IsReadOnlyCaretVisible="True"
                 VerticalScrollBarVisibility="Auto"
-                Visibility="{Binding IsHighlighted, Converter={StaticResource BoolToVisibility}}" />
+                Visibility="{Binding IsHighlighted, Converter={StaticResource BoolToVisibility}}">
+                <RichTextBox.Style>
+                    <Style BasedOn="{StaticResource {x:Type RichTextBox}}" TargetType="RichTextBox">
+                        <Setter Property="Padding" Value="{Binding Width, Source={StaticResource ScrollBarMetrics}, Converter={StaticResource ScrollBarPadding}, ConverterParameter='10,5,6,6|rb'}" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding WrapLines}" Value="True">
+                                <Setter Property="Padding" Value="{Binding Width, Source={StaticResource ScrollBarMetrics}, Converter={StaticResource ScrollBarPadding}, ConverterParameter='10,5,6,6|r'}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </RichTextBox.Style>
+            </RichTextBox>
 
-            <TextBlock
-                Grid.Row="3"
-                Margin="0,6,0,0"
-                Opacity="0.7"
-                Text="{Binding Status}"
-                TextTrimming="CharacterEllipsis" />
+            <!--  The state of the text on the left, and what is wrong with it (a binary file, a message file with problems...) on the right.  -->
+            <Grid Grid.Row="2" Margin="0,6,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock
+                    Opacity="0.7"
+                    Text="{Binding Status}"
+                    TextTrimming="CharacterEllipsis" />
+                <TextBlock
+                    Grid.Column="1"
+                    Margin="12,0,0,0"
+                    Style="{StaticResource Notice}"
+                    Text="{Binding Notice}"
+                    TextTrimming="CharacterEllipsis"
+                    TextWrapping="NoWrap"
+                    ToolTip="{Binding NoticeTip}" />
+            </Grid>
         </Grid>
 
         <!--  Picture  -->
@@ -205,75 +272,135 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <WrapPanel Margin="0,0,0,6">
-                <StackPanel
-                    Margin="0,0,14,4"
-                    Orientation="Horizontal"
-                    Visibility="{Binding HasPaletteChoices, Converter={StaticResource BoolToVisibility}}">
-                    <TextBlock Style="{StaticResource ToolbarLabel}" Text="{DynamicResource Str.ViewerPalette}" />
-                    <ComboBox
-                        MinWidth="150"
-                        DisplayMemberPath="Display"
-                        ItemsSource="{Binding PaletteChoices}"
-                        SelectedItem="{Binding SelectedPalette}" />
-                </StackPanel>
+            <StackPanel>
+                <WrapPanel Margin="0,0,0,2">
+                    <StackPanel
+                        Margin="0,0,14,4"
+                        Orientation="Horizontal"
+                        Visibility="{Binding HasPaletteChoices, Converter={StaticResource BoolToVisibility}}">
+                        <TextBlock Style="{StaticResource ToolbarLabel}" Text="{DynamicResource Str.ViewerPalette}" />
+                        <ComboBox
+                            MinWidth="150"
+                            DisplayMemberPath="Display"
+                            ItemsSource="{Binding PaletteChoices}"
+                            SelectedItem="{Binding SelectedPalette}" />
+                    </StackPanel>
 
-                <StackPanel
-                    Margin="0,0,14,4"
-                    Orientation="Horizontal"
-                    Visibility="{Binding HasDirections, Converter={StaticResource BoolToVisibility}}">
-                    <TextBlock Style="{StaticResource ToolbarLabel}" Text="{DynamicResource Str.ViewerDirection}" />
-                    <ComboBox
-                        MinWidth="56"
-                        ItemsSource="{Binding Directions}"
-                        SelectedIndex="{Binding SelectedDirection}" />
-                </StackPanel>
+                    <StackPanel
+                        Margin="0,0,14,4"
+                        Orientation="Horizontal"
+                        Visibility="{Binding HasDirections, Converter={StaticResource BoolToVisibility}}">
+                        <TextBlock Style="{StaticResource ToolbarLabel}" Text="{DynamicResource Str.ViewerDirection}" />
+                        <ComboBox
+                            MinWidth="56"
+                            ItemsSource="{Binding Directions}"
+                            SelectedIndex="{Binding SelectedDirection}" />
+                    </StackPanel>
 
-                <StackPanel
-                    Margin="0,0,14,4"
-                    Orientation="Horizontal"
-                    Visibility="{Binding IsAnimated, Converter={StaticResource BoolToVisibility}}">
-                    <Button Command="{Binding PreviousCommand, Mode=OneTime}" ToolTip="{DynamicResource Str.ViewerPreviousFrame}">
-                        <TextBlock FontFamily="{StaticResource IconFont}" Text="&#xE892;" />
-                    </Button>
-                    <Button
-                        Margin="4,0,0,0"
-                        Command="{Binding PlayCommand, Mode=OneTime}"
-                        ToolTip="{DynamicResource Str.ViewerPlay}">
-                        <TextBlock FontFamily="{StaticResource IconFont}">
+                    <StackPanel
+                        Margin="0,0,14,4"
+                        Orientation="Horizontal"
+                        Visibility="{Binding IsAnimated, Converter={StaticResource BoolToVisibility}}">
+                        <Button Command="{Binding PreviousCommand, Mode=OneTime}" ToolTip="{DynamicResource Str.ViewerPreviousFrame}">
+                            <TextBlock FontFamily="{StaticResource IconFont}" Text="&#xE892;" />
+                        </Button>
+                        <Button
+                            Margin="4,0,0,0"
+                            Command="{Binding PlayCommand, Mode=OneTime}"
+                            ToolTip="{DynamicResource Str.ViewerPlay}">
+                            <TextBlock FontFamily="{StaticResource IconFont}">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Text" Value="&#xE768;" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsPlaying}" Value="True">
+                                                <Setter Property="Text" Value="&#xE769;" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Button>
+                        <Button
+                            Margin="4,0,0,0"
+                            Command="{Binding NextCommand, Mode=OneTime}"
+                            ToolTip="{DynamicResource Str.ViewerNextFrame}">
+                            <TextBlock FontFamily="{StaticResource IconFont}" Text="&#xE893;" />
+                        </Button>
+                        <TextBlock
+                            Margin="8,0,0,0"
+                            VerticalAlignment="Center"
+                            Text="{Binding FrameLabel}" />
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,14,4" Orientation="Horizontal">
+                        <TextBlock Style="{StaticResource ToolbarLabel}" Text="{DynamicResource Str.ViewerZoom}" />
+                        <ComboBox
+                            MinWidth="76"
+                            DisplayMemberPath="Display"
+                            ItemsSource="{Binding ZoomOptions}"
+                            SelectedItem="{Binding SelectedZoom}" />
+                    </StackPanel>
+                </WrapPanel>
+
+                <!--  A picture with a palette of its own: can the game use it as an image of the ending? On a line of its own, with the toggle.  -->
+                <WrapPanel Margin="0,0,0,4" Visibility="{Binding HasEnding, Converter={StaticResource BoolToVisibility}}">
+                    <StackPanel
+                        x:Name="EndingStatusPanel"
+                        Margin="0,0,14,4"
+                        VerticalAlignment="Center"
+                        Background="Transparent"
+                        Orientation="Horizontal"
+                        ToolTip="{Binding EndingTip}"
+                        Visibility="{Binding HasEnding, Converter={StaticResource BoolToVisibility}}">
+                        <TextBlock
+                            Margin="0,0,6,0"
+                            VerticalAlignment="Center"
+                            FontFamily="{StaticResource IconFont}">
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock">
-                                    <Setter Property="Text" Value="&#xE768;" />
+                                    <Setter Property="Text" Value="&#xE711;" />
+                                    <Setter Property="Foreground" Value="#E5484D" />
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding IsPlaying}" Value="True">
-                                            <Setter Property="Text" Value="&#xE769;" />
+                                        <DataTrigger Binding="{Binding IsEndingUsable}" Value="True">
+                                            <Setter Property="Text" Value="&#xE73E;" />
+                                            <Setter Property="Foreground" Value="#3FB950" />
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
                             </TextBlock.Style>
                         </TextBlock>
-                    </Button>
-                    <Button
-                        Margin="4,0,0,0"
-                        Command="{Binding NextCommand, Mode=OneTime}"
-                        ToolTip="{DynamicResource Str.ViewerNextFrame}">
-                        <TextBlock FontFamily="{StaticResource IconFont}" Text="&#xE893;" />
-                    </Button>
-                    <TextBlock
-                        Margin="8,0,0,0"
-                        VerticalAlignment="Center"
-                        Text="{Binding FrameLabel}" />
-                </StackPanel>
+                        <TextBlock VerticalAlignment="Center" Text="{Binding EndingStatus}" />
+                    </StackPanel>
 
-                <StackPanel Margin="0,0,0,4" Orientation="Horizontal">
-                    <TextBlock Style="{StaticResource ToolbarLabel}" Text="{DynamicResource Str.ViewerZoom}" />
-                    <ComboBox
-                        MinWidth="76"
-                        DisplayMemberPath="Display"
-                        ItemsSource="{Binding ZoomOptions}"
-                        SelectedItem="{Binding SelectedZoom}" />
-                </StackPanel>
-            </WrapPanel>
+                    <ToggleButton
+                        x:Name="EndingTextToggle"
+                        Margin="0,0,4,4"
+                        VerticalAlignment="Center"
+                        IsChecked="{Binding ShowEndingText}"
+                        ToolTip="{DynamicResource Str.ViewerEndingTextTip}"
+                        Visibility="{Binding IsEndingUsable, Converter={StaticResource BoolToVisibility}}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock
+                                Margin="0,0,6,0"
+                                VerticalAlignment="Center"
+                                FontFamily="{StaticResource IconFont}"
+                                Text="&#xE8D2;" />
+                            <TextBlock VerticalAlignment="Center" Text="{DynamicResource Str.ViewerEndingText}" />
+                        </StackPanel>
+                    </ToggleButton>
+                    <Button
+                        x:Name="EndingTextAnother"
+                        Margin="0,0,0,4"
+                        VerticalAlignment="Center"
+                        AutomationProperties.Name="{DynamicResource Str.ViewerEndingAnother}"
+                        Command="{Binding NewEndingTextCommand, Mode=OneTime}"
+                        ToolTip="{DynamicResource Str.ViewerEndingAnother}"
+                        Visibility="{Binding EndingTextVisible, Converter={StaticResource BoolToVisibility}}">
+                        <TextBlock FontFamily="{StaticResource IconFont}" Text="&#xE8B1;" />
+                    </Button>
+                </WrapPanel>
+            </StackPanel>
 
             <Border
                 Grid.Row="1"
@@ -285,24 +412,63 @@
                         Stretch="Uniform"
                         StretchDirection="Both"
                         Visibility="{Binding IsFit, Converter={StaticResource BoolToVisibility}}">
-                        <Image
-                            behaviors:PixelImageSource.Image="{Binding Picture}"
-                            RenderOptions.BitmapScalingMode="NearestNeighbor"
-                            SnapsToDevicePixels="True" />
+                        <!--  The text is in the pixels of the picture: it follows the magnification.  -->
+                        <Grid>
+                            <Image
+                                behaviors:PixelImageSource.Image="{Binding Picture}"
+                                RenderOptions.BitmapScalingMode="NearestNeighbor"
+                                SnapsToDevicePixels="True" />
+                            <Border
+                                Width="{Binding EndingTextWidth}"
+                                Margin="{Binding EndingTextLeft, Converter={StaticResource EndingTextMargin}}"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Bottom"
+                                Background="#CC000000"
+                                Visibility="{Binding EndingTextVisible, Converter={StaticResource BoolToVisibility}}">
+                                <TextBlock
+                                    Padding="4,2"
+                                    FontFamily="Arial"
+                                    FontSize="14"
+                                    Foreground="White"
+                                    Text="{Binding EndingText}"
+                                    TextAlignment="Center"
+                                    TextWrapping="Wrap" />
+                            </Border>
+                        </Grid>
                     </Viewbox>
                     <ScrollViewer
                         HorizontalScrollBarVisibility="Auto"
                         VerticalScrollBarVisibility="Auto"
                         Visibility="{Binding IsFit, Converter={StaticResource InverseBoolToVisibility}}">
-                        <Image
+                        <Viewbox
                             Width="{Binding DisplayWidth}"
                             Height="{Binding DisplayHeight}"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
-                            behaviors:PixelImageSource.Image="{Binding Picture}"
-                            RenderOptions.BitmapScalingMode="NearestNeighbor"
-                            SnapsToDevicePixels="True"
-                            Stretch="Fill" />
+                            Stretch="Fill">
+                            <Grid>
+                                <Image
+                                    behaviors:PixelImageSource.Image="{Binding Picture}"
+                                    RenderOptions.BitmapScalingMode="NearestNeighbor"
+                                    SnapsToDevicePixels="True" />
+                                <Border
+                                    Width="{Binding EndingTextWidth}"
+                                    Margin="{Binding EndingTextLeft, Converter={StaticResource EndingTextMargin}}"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Bottom"
+                                    Background="#CC000000"
+                                    Visibility="{Binding EndingTextVisible, Converter={StaticResource BoolToVisibility}}">
+                                    <TextBlock
+                                        Padding="4,2"
+                                        FontFamily="Arial"
+                                        FontSize="14"
+                                        Foreground="White"
+                                        Text="{Binding EndingText}"
+                                        TextAlignment="Center"
+                                        TextWrapping="Wrap" />
+                                </Border>
+                            </Grid>
+                        </Viewbox>
                     </ScrollViewer>
                 </Grid>
             </Border>
@@ -635,6 +801,7 @@
 
             <DataGrid
                 Grid.Row="1"
+                AlternationCount="2"
                 AutoGenerateColumns="True"
                 AutoGeneratingColumn="OnAutoGeneratingColumn"
                 CanUserAddRows="False"
@@ -643,6 +810,7 @@
                 HeadersVisibility="Column"
                 IsReadOnly="True"
                 ItemsSource="{Binding Rows}"
+                RowStyle="{StaticResource StripedRow}"
                 SelectionUnit="FullRow" />
 
             <TextBlock

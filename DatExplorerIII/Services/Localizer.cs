@@ -86,6 +86,43 @@ namespace DatExplorerIII.Services
 			return text != null;
 		}
 
+		/// <summary>
+		/// Which form of a plural text goes with a number, in a language. The forms of a plural text are written
+		/// in this order, separated by a bar: for English, German, Spanish, Italian and Swedish "one|other"; for French and
+		/// Portuguese (where 0 is singular too) "one|other"; for Russian "one|few|many" (1, 21, 31... | 2 to 4, 22 to 24... | the
+		/// rest, and 11 to 14); for Polish the same, with 1 alone as the first form; for Czech "one|few|other" (1 | 2 to 4 | the
+		/// rest); for Chinese a single form.
+		/// </summary>
+		public static Int32 PluralIndex(String language, Int64 count)
+		{
+			Int64 n = Math.Abs(count);
+			Boolean few = n % 10 is >= 2 and <= 4 && n % 100 is not (>= 12 and <= 14);
+			return language switch
+			{
+				"ru" => n % 10 == 1 && n % 100 != 11 ? 0 : few ? 1 : 2,
+				"pl" => n == 1 ? 0 : few ? 1 : 2,
+				"cs" => n == 1 ? 0 : n is >= 2 and <= 4 ? 1 : 2,
+				"zh" => 0,
+				"fr" or "pt" => n is 0 or 1 ? 0 : 1,
+				_ => n == 1 ? 0 : 1,
+			};
+		}
+
+		/// <summary>A text with the right form for a number: "{0} file|{0} files" gives "1 file" and "2 files" ({0} is the number).</summary>
+		public static String Plural(String key, Int64 count)
+		{
+			String[] forms = Get(key).Split('|');
+			String form = forms[Math.Min(PluralIndex(Language, count), forms.Length - 1)];
+			try
+			{
+				return String.Format(CultureInfo.CurrentCulture, form, count);
+			}
+			catch (FormatException)
+			{
+				return form;
+			}
+		}
+
 		public static String Format(String key, params Object[] arguments)
 		{
 			String format = Get(key);

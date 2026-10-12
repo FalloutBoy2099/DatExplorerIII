@@ -27,6 +27,9 @@ namespace DatExplorerIII.Services
 		/// <summary>A place in a text where the game puts a value (%s, %d...).</summary>
 		Placeholder,
 
+		/// <summary>The name of a file that a list names and that is not there.</summary>
+		Missing,
+
 		/// <summary>A word of the language of the scripts (<c>procedure</c>, <c>begin</c>, <c>if</c>...).</summary>
 		Keyword,
 
