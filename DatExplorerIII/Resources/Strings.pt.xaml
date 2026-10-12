@@ -402,8 +402,9 @@
     <sys:String x:Key="Str.ViewerPreviousFrame">Quadro anterior</sys:String>
     <sys:String x:Key="Str.ViewerNextFrame">Próximo quadro</sys:String>
     <sys:String x:Key="Str.ViewerPlay">Reproduzir</sys:String>
-    <sys:String x:Key="Str.ViewerStop">Parar</sys:String>
     <sys:String x:Key="Str.ViewerPause">Pausar</sys:String>
+    <sys:String x:Key="Str.ViewerVolume">Volume</sys:String>
+    <sys:String x:Key="Str.ViewerLoop">Repetir</sys:String>
     <sys:String x:Key="Str.ViewerZoom">Zoom:</sys:String>
     <sys:String x:Key="Str.ZoomFit">Ajustar</sys:String>
     <sys:String x:Key="Str.ViewerImageFrm">{0}×{1} · {2} direção(ões) · {3} quadro(s) por direção · {4} fps</sys:String>

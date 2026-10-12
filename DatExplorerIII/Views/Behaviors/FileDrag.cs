@@ -69,31 +69,12 @@ namespace DatExplorerIII.Views.Behaviors
 			return state;
 		}
 
-		/// <summary>The item (a tree item, a list item) that holds the element under the mouse, if there is one.</summary>
-		private static FrameworkElement? ItemAt(Object? original)
-		{
-			DependencyObject? current = original as DependencyObject;
-			while (current != null)
-			{
-				if (current is TreeViewItem or ListBoxItem)
-				{
-					return (FrameworkElement)current;
-				}
-
-				current = current is Visual or System.Windows.Media.Media3D.Visual3D
-					? VisualTreeHelper.GetParent(current)
-					: LogicalTreeHelper.GetParent(current);
-			}
-
-			return null;
-		}
-
 		private static void OnMouseDown(Object sender, MouseButtonEventArgs e)
 		{
 			UIElement element = (UIElement)sender;
 			DragState state = StateOf(element);
 			state.Origin = e.GetPosition(null);
-			state.Candidate = ItemAt(e.OriginalSource) != null;
+			state.Candidate = VisualTree.ItemAt(e.OriginalSource) != null;
 		}
 
 		private static void OnMouseMove(Object sender, MouseEventArgs e)
@@ -106,7 +87,7 @@ namespace DatExplorerIII.Views.Behaviors
 			}
 
 			state.Candidate = false;
-			if (GetSource(element) is not { } source || ItemAt(e.OriginalSource) is not { } item)
+			if (GetSource(element) is not { } source || VisualTree.ItemAt(e.OriginalSource) is not { } item)
 			{
 				return;
 			}

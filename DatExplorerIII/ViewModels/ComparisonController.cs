@@ -14,11 +14,30 @@ namespace DatExplorerIII.ViewModels
 
 	/// <summary>
 	/// The comparison mode: two archives (files or folders) side by side in the main window, the files that are identical,
-	/// different or only on one side, and the copy or move of files from one to the other.
+	/// different or only on one side, and the copy or move of files from one to the other. The main view model owns one and
+	/// gives it, through <see cref="IComparisonHost"/>, what it needs of the archives that are open.
 	/// </summary>
-	public sealed partial class MainViewModel
+	public sealed class ComparisonController : ObservableObject
 	{
+		private const Int32 MaxListedItems = 12;
+
+		private readonly IComparisonHost _host;
+		private readonly IDialogService _dialogs;
+		private readonly SettingsService _settings;
+		private readonly TempFolder _temp;
+		private readonly IUiThread _uiThread;
+
 		private ComparisonViewModel? _comparison;
+
+		internal ComparisonController(IComparisonHost host, IDialogService dialogs, SettingsService settings, TempFolder temp, IUiThread uiThread)
+		{
+			_host = host;
+			_dialogs = dialogs;
+			_settings = settings;
+			_temp = temp;
+			_uiThread = uiThread;
+			CreateCommands();
+		}
 
 		public ICommand CompareCommand { get; private set; } = null!;
 
@@ -39,7 +58,7 @@ namespace DatExplorerIII.ViewModels
 		public ICommand SaveRightCommand { get; private set; } = null!;
 
 		/// <summary>The comparison that is shown; null when the window shows the archives.</summary>
-		public ComparisonViewModel? Comparison
+		public ComparisonViewModel? Current
 		{
 			get => _comparison;
 			private set
@@ -47,7 +66,7 @@ namespace DatExplorerIII.ViewModels
 				if (SetProperty(ref _comparison, value))
 				{
 					OnPropertyChanged(nameof(IsComparing));
-					CommandManager.InvalidateRequerySuggested();
+					CommandRequery.Invalidate();
 				}
 			}
 		}
@@ -138,30 +157,30 @@ namespace DatExplorerIII.ViewModels
 			}
 		}
 
-		private void CreateComparisonCommands()
+		private void CreateCommands()
 		{
-			CompareCommand = new AsyncRelayCommand(CompareAsync, CanBrowse);
-			CloseComparisonCommand = new RelayCommand(CloseComparison, () => IsComparing && !Busy.IsBusy);
-			CompareAgainCommand = new AsyncRelayCommand(CompareAgainAsync, () => IsComparing && !Busy.IsBusy);
+			CompareCommand = new AsyncRelayCommand(CompareAsync, _host.CanBrowse);
+			CloseComparisonCommand = new RelayCommand(CloseComparison, () => IsComparing && !_host.Busy.IsBusy);
+			CompareAgainCommand = new AsyncRelayCommand(CompareAgainAsync, () => IsComparing && !_host.Busy.IsBusy);
 			CopyToRightCommand = new AsyncRelayCommand(() => TransferAsync(true, false), () => CanTransfer(true));
 			CopyToLeftCommand = new AsyncRelayCommand(() => TransferAsync(false, false), () => CanTransfer(false));
 			MoveToRightCommand = new AsyncRelayCommand(() => TransferAsync(true, true), () => CanTransfer(true));
 			MoveToLeftCommand = new AsyncRelayCommand(() => TransferAsync(false, true), () => CanTransfer(false));
-			SaveLeftCommand = new AsyncRelayCommand(() => SaveComparedAsync(true), () => IsComparing && !Busy.IsBusy);
-			SaveRightCommand = new AsyncRelayCommand(() => SaveComparedAsync(false), () => IsComparing && !Busy.IsBusy);
+			SaveLeftCommand = new AsyncRelayCommand(() => SaveComparedAsync(true), () => IsComparing && !_host.Busy.IsBusy);
+			SaveRightCommand = new AsyncRelayCommand(() => SaveComparedAsync(false), () => IsComparing && !_host.Busy.IsBusy);
 		}
 
 		private Boolean CanTransfer(Boolean toRight)
 		{
-			return _comparison is { } comparison && !Busy.IsBusy && (toRight ? comparison.CanSendRight : comparison.CanSendLeft);
+			return _comparison is { } comparison && !_host.Busy.IsBusy && (toRight ? comparison.CanSendRight : comparison.CanSendLeft);
 		}
 
 		/// <summary>Asks for the two archives, opens them (when they are not open yet) and compares them.</summary>
 		internal async Task CompareAsync()
 		{
 			// Two archives that are open are the natural choice; otherwise the two that were compared last.
-			String? defaultLeft = Roots.Count > 1 ? Roots[0].Document.FilePath : _settings.Data.CompareLastLeft;
-			String? defaultRight = Roots.Count > 1 ? Roots[1].Document.FilePath : _settings.Data.CompareLastRight;
+			String? defaultLeft = _host.Roots.Count > 1 ? _host.Roots[0].Document.FilePath : _settings.Data.CompareLastLeft;
+			String? defaultRight = _host.Roots.Count > 1 ? _host.Roots[1].Document.FilePath : _settings.Data.CompareLastRight;
 
 			ComparisonSources? sources = _dialogs.PickComparisonSources(defaultLeft, defaultRight, ComparisonSuggestions());
 			if (sources == null)
@@ -186,7 +205,7 @@ namespace DatExplorerIII.ViewModels
 		/// <summary>The archives to propose for a side of the comparison: the ones that are open, then the last ones used, then the recent files.</summary>
 		internal IReadOnlyList<String> ComparisonSuggestions()
 		{
-			return Roots.Select(root => root.Document.FilePath)
+			return _host.Roots.Select(root => root.Document.FilePath)
 				.Concat(new[] { _settings.Data.CompareLastLeft, _settings.Data.CompareLastRight }.OfType<String>())
 				.Concat(_settings.Data.RecentFiles)
 				.Where(path => File.Exists(path) || Directory.Exists(path))
@@ -207,11 +226,11 @@ namespace DatExplorerIII.ViewModels
 		private async Task<DatDocument?> OpenForComparisonAsync(String path)
 		{
 			String full = Path.GetFullPath(path);
-			FolderNode? FindRoot() => Roots.FirstOrDefault(root => String.Equals(root.Document.FilePath, full, StringComparison.OrdinalIgnoreCase));
+			FolderNode? FindRoot() => _host.Roots.FirstOrDefault(root => String.Equals(root.Document.FilePath, full, StringComparison.OrdinalIgnoreCase));
 
 			if (FindRoot() == null)
 			{
-				await OpenArchiveAsync(full);
+				await _host.OpenArchiveAsync(full);
 			}
 
 			return FindRoot()?.Document;
@@ -222,7 +241,7 @@ namespace DatExplorerIII.ViewModels
 			IReadOnlyList<DatCompareItem>? items = null;
 			ComparisonOptions options = _settings.Data.ComparisonOptions;
 			TextEquality? text = TextContentComparer.CreateEquality(options);
-			Boolean done = await RunBusyAsync(Loc.Get("Str.Comparing"), true, async (progress, token) =>
+			Boolean done = await _host.RunBusyAsync(Loc.Get("Str.Comparing"), true, async (progress, token) =>
 			{
 				items = await Task.Run(() => DatComparer.Compare(left.Archive, right.Archive, progress, token, text), token);
 			});
@@ -233,7 +252,7 @@ namespace DatExplorerIII.ViewModels
 			}
 
 			_comparison?.Dispose();
-			ComparisonViewModel comparison = new(left, right, items, OpenArchives, _uiThread, options);
+			ComparisonViewModel comparison = new(left, right, items, _host.OpenArchives, _uiThread, options);
 			comparison.PropertyChanged += (_, args) =>
 			{
 				if (args.PropertyName == nameof(ComparisonViewModel.ShowDifferences))
@@ -244,17 +263,17 @@ namespace DatExplorerIII.ViewModels
 			};
 
 			comparison.ShowDifferences = _settings.Data.CompareShowDifferences;
-			Comparison = comparison;
-			ApplySubtitlesOption();
-			StatusText = _comparison!.SummaryText;
+			Current = comparison;
+			ApplySubtitles();
+			_host.StatusText = _comparison!.SummaryText;
 		}
 
 		private void CloseComparison()
 		{
 			ComparisonViewModel? comparison = _comparison;
-			Comparison = null;
+			Current = null;
 			comparison?.Dispose();
-			RefreshItems();
+			_host.RefreshItems();
 		}
 
 		/// <summary>
@@ -277,7 +296,7 @@ namespace DatExplorerIII.ViewModels
 			List<ComparisonRow> rows = comparison.Selected.Where(row => SourceOf(row) != null).ToList();
 			if (rows.Count == 0)
 			{
-				_dialogs.ShowMessage(Title, Loc.Get("Str.CompareNothingToDo"), DialogIcon.Information);
+				_dialogs.ShowMessage(_host.Title, Loc.Get("Str.CompareNothingToDo"), DialogIcon.Information);
 				return;
 			}
 
@@ -290,7 +309,7 @@ namespace DatExplorerIII.ViewModels
 					question += (question.Length > 0 ? Environment.NewLine + Environment.NewLine : String.Empty) + Loc.Format("Str.CompareConfirmReplace", replaced);
 				}
 
-				if (!_dialogs.Confirm(Title, question + Environment.NewLine + Environment.NewLine + Loc.Get("Str.CompareContinue"), DialogIcon.Warning))
+				if (!_dialogs.Confirm(_host.Title, question + Environment.NewLine + Environment.NewLine + Loc.Get("Str.CompareContinue"), DialogIcon.Warning))
 				{
 					return;
 				}
@@ -301,7 +320,7 @@ namespace DatExplorerIII.ViewModels
 			Dictionary<ComparisonRow, String?> prepared = new();
 			List<String> failures = new();
 
-			Boolean read = await RunBusyAsync(Loc.Get(move ? "Str.CompareMoving" : "Str.CompareCopying"), true, (progress, token) => Task.Run(() =>
+			Boolean read = await _host.RunBusyAsync(Loc.Get(move ? "Str.CompareMoving" : "Str.CompareCopying"), true, (progress, token) => Task.Run(() =>
 			{
 				DatProgressThrottle throttle = new(progress, rows.Count);
 				for (Int32 index = 0; index < rows.Count; index++)
@@ -371,9 +390,9 @@ namespace DatExplorerIII.ViewModels
 
 			comparison.Left.Refresh();
 			comparison.Right.Refresh();
-			RefreshItems();
+			_host.RefreshItems();
 			comparison.Refresh();
-			StatusText = Loc.Format("Str.CompareTransferDone", done);
+			_host.StatusText = Loc.Format("Str.CompareTransferDone", done);
 
 			if (failures.Count > 0)
 			{
@@ -383,7 +402,7 @@ namespace DatExplorerIII.ViewModels
 					lines.Add(Loc.Format("Str.AndMore", failures.Count - MaxListedItems));
 				}
 
-				_dialogs.ShowMessage(Title, Loc.Get("Str.CompareTransferFailures") + Environment.NewLine + Environment.NewLine + String.Join(Environment.NewLine, lines), DialogIcon.Warning);
+				_dialogs.ShowMessage(_host.Title, Loc.Get("Str.CompareTransferFailures") + Environment.NewLine + Environment.NewLine + String.Join(Environment.NewLine, lines), DialogIcon.Warning);
 			}
 		}
 
@@ -397,8 +416,18 @@ namespace DatExplorerIII.ViewModels
 			}
 
 			DatDocument document = left ? comparison.Left : comparison.Right;
-			await SaveDocumentAsync(document, false);
+			await _host.SaveDocumentAsync(document, false);
 			comparison.RefreshTitles();
+		}
+
+		/// <summary>Gives the option of the subtitles to the viewers of the comparison that is shown.</summary>
+		public void ApplySubtitles()
+		{
+			if (_comparison != null)
+			{
+				_comparison.LeftViewer.ShowSubtitles = _settings.Data.ShowSubtitles;
+				_comparison.RightViewer.ShowSubtitles = _settings.Data.ShowSubtitles;
+			}
 		}
 	}
 }

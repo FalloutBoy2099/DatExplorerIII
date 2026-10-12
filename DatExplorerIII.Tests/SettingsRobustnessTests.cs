@@ -65,6 +65,32 @@ namespace DatExplorerIII.Tests
 		}
 
 		[Fact]
+		public void TheSortAndTheColumnWidths_AreKeptWhenTheyAreValid_AndBackToTheDesignWhenTheyAreNot()
+		{
+			SettingsData good = SettingsService.Parse("{\"SortColumn\": \"Size\", \"SortDescending\": true, \"ColumnWidths\": [150, 70, 90, 5000]}");
+			Assert.Equal("Size", good.SortColumn);
+			Assert.True(good.SortDescending);
+			Assert.Equal([150.0, 70.0, 90.0, SettingsData.MaximumColumnWidth], good.ColumnWidths);
+
+			// An unknown column, widths for another number of columns: the defaults.
+			SettingsData bad = SettingsService.Parse("{\"SortColumn\": \"Nope\", \"ColumnWidths\": [150, 70]}");
+			Assert.Equal("Name", bad.SortColumn);
+			Assert.Empty(bad.ColumnWidths);
+			Assert.Empty(new SettingsData().ColumnWidths);
+		}
+
+		[Fact]
+		public void TheVolumeOfTheSounds_StaysBetween0And100()
+		{
+			Assert.Equal(100, new SettingsData().AudioVolume);
+			Assert.Equal(100, SettingsService.Parse("{\"AudioVolume\": 400}").AudioVolume);
+			Assert.Equal(0, SettingsService.Parse("{\"AudioVolume\": -3}").AudioVolume);
+			SettingsData kept = SettingsService.Parse("{\"AudioVolume\": 35, \"AudioLoop\": true}");
+			Assert.Equal(35, kept.AudioVolume);
+			Assert.True(kept.AudioLoop);
+		}
+
+		[Fact]
 		public void TheLists_LoseTheirEmptyEntries_AndTheNumbersComeBackToTheirLimits()
 		{
 			SettingsData data = SettingsService.Parse("{\"RecentFiles\": [\"a.dat\", null, \"\", \"  \", \"b.dat\"], \"ScrollBarWidth\": 99999, \"ScrollBarMinimumThumb\": -5}");

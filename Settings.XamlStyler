@@ -1,0 +1,20 @@
+{
+  "IndentSize": 4,
+  "IndentWithTabs": false,
+  "AttributesTolerance": 2,
+  "KeepFirstAttributeOnSameLine": false,
+  "MaxAttributeCharactersPerLine": 0,
+  "MaxAttributesPerLine": 1,
+  "NoNewLineElements": "",
+  "PutAttributeOrderRuleGroupsOnSeparateLines": false,
+  "AttributeIndentation": 0,
+  "AttributeIndentationStyle": 1,
+  "RemoveDesignTimeReferences": false,
+  "EnableAttributeReordering": true,
+  "FormatMarkupExtension": true,
+  "NoNewLineMarkupExtensions": "x:Bind, Binding",
+  "ThicknessSeparator": 2,
+  "ThicknessAttributes": "Margin, Padding, BorderThickness, ThumbnailClipMargin",
+  "CommentSpaces": 2,
+  "RootElementLineBreakRule": 0
+}

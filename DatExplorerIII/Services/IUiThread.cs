@@ -12,5 +12,8 @@ namespace DatExplorerIII.Services
 
 		/// <summary>Makes a timer whose ticks run on the thread of the user interface.</summary>
 		IUiTimer CreateTimer();
+
+		/// <summary>Puts a text on the clipboard (which belongs to the thread of the user interface). Does nothing when another program holds it.</summary>
+		void SetClipboardText(String text);
 	}
 }

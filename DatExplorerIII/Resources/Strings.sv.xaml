@@ -402,8 +402,9 @@
     <sys:String x:Key="Str.ViewerPreviousFrame">Föregående bildruta</sys:String>
     <sys:String x:Key="Str.ViewerNextFrame">Nästa bildruta</sys:String>
     <sys:String x:Key="Str.ViewerPlay">Spela upp</sys:String>
-    <sys:String x:Key="Str.ViewerStop">Stoppa</sys:String>
     <sys:String x:Key="Str.ViewerPause">Paus</sys:String>
+    <sys:String x:Key="Str.ViewerVolume">Volym</sys:String>
+    <sys:String x:Key="Str.ViewerLoop">Upprepa</sys:String>
     <sys:String x:Key="Str.ViewerZoom">Zoom:</sys:String>
     <sys:String x:Key="Str.ZoomFit">Anpassa</sys:String>
     <sys:String x:Key="Str.ViewerImageFrm">{0}×{1} · {2} riktning(ar) · {3} bildruta/bildrutor per riktning · {4} bilder/s</sys:String>

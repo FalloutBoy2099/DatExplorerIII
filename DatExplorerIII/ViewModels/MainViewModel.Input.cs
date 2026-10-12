@@ -5,6 +5,7 @@ namespace DatExplorerIII.ViewModels
 	using System.Linq;
 	using System.Windows.Input;
 	using Infrastructure;
+	using Models;
 	using Services;
 
 	/// <summary>What the keyboard and the mouse ask for, as commands: the shortcuts and the drag and drop of files.</summary>
@@ -23,6 +24,29 @@ namespace DatExplorerIII.ViewModels
 
 		/// <summary>Makes real files of the selected entries of the list dragged to the file explorer.</summary>
 		public IDragOutSource ListDragSource { get; private set; } = null!;
+
+		/// <summary>The tree has a new selected folder; the parameter is its node (null when nothing is selected).</summary>
+		public ICommand TreeSelectionChangedCommand { get; private set; } = null!;
+
+		/// <summary>The selection of the list changed; the parameter is the list of the selected entries.</summary>
+		public ICommand ListSelectionChangedCommand { get; private set; } = null!;
+
+		/// <summary>Sorts the list by a column; the parameter is the name of a <see cref="DatSortColumn"/>.</summary>
+		public ICommand SortCommand { get; private set; } = null!;
+
+		/// <summary>The widths of the columns of the list of the files, kept for the next run (empty: the widths of the design).</summary>
+		public IReadOnlyList<Double> ColumnWidths
+		{
+			get => _settings.Data.ColumnWidths;
+			set
+			{
+				if (value is { Count: SettingsData.ColumnCount } && !value.SequenceEqual(_settings.Data.ColumnWidths))
+				{
+					_settings.Data.ColumnWidths = value.ToList();
+					OnPropertyChanged();
+				}
+			}
+		}
 
 		public ICommand TogglePreviewCommand { get; private set; } = null!;
 
@@ -52,6 +76,9 @@ namespace DatExplorerIII.ViewModels
 			FolderDragSource = new DelegateDragOutSource(item => item is FolderNode node ? PrepareDragOut(node) : null);
 			ListDragSource = new DelegateDragOutSource(_ => SelectedItems.Count > 0 ? PrepareDragOut(SelectedItems.ToList()) : null);
 
+			TreeSelectionChangedCommand = new RelayCommand(parameter => OnTreeSelectionChanged(parameter as FolderNode));
+			ListSelectionChangedCommand = new RelayCommand(parameter => SetSelectedItems(((IEnumerable<Object>)parameter!).OfType<ListEntry>().ToList()), parameter => parameter is IEnumerable<Object>);
+			SortCommand = new RelayCommand(parameter => SortBy(Enum.Parse<DatSortColumn>((String)parameter!)), parameter => parameter is String name && Enum.TryParse<DatSortColumn>(name, out _));
 			TogglePreviewCommand = new RelayCommand(() => IsPreviewVisible = !IsPreviewVisible);
 			FocusSearchCommand = new RelayCommand(() => SearchFocusRequests++);
 			FindNextCommand = new RelayCommand(() => Find(true));

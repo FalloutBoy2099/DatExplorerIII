@@ -24,7 +24,7 @@ namespace DatExplorerIII.ViewModels
 			StatusText = Loc.Get("Str.Ready");
 			RefreshItems();
 			Preview.RefreshLanguage();
-			_comparison?.RefreshLanguage();
+			Comparison.Current?.RefreshLanguage();
 		}
 
 		private void Associate()

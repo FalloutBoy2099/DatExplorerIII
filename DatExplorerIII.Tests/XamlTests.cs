@@ -14,7 +14,6 @@ namespace DatExplorerIII.Tests
 	/// The XAML of the program is only read when a window opens: these tests read it, so that a wrong key, a wrong name or a style
 	/// that does not load is found by the tests and not when the program starts.
 	/// </summary>
-	[Collection("ScrollBarSizes")]
 	public sealed class XamlTests
 	{
 		private static void RunOnStaThread(Action action)
@@ -81,32 +80,31 @@ namespace DatExplorerIII.Tests
 			RunOnStaThread(() =>
 			{
 				ResourceDictionary resources = LoadScrollBars();
-				ScrollBarMetrics.Apply(16, 60);
-				try
-				{
-					// The theme would draw a slider of 500 * 27 / 953 = 14; the track gets a viewport that makes it 60.
-					(ScrollBar vertical, Track verticalTrack) = CreateScrollBar(resources, Orientation.Vertical, 500);
-					Assert.Equal(16, vertical.ActualWidth, 1);
-					Assert.NotNull(verticalTrack.Thumb);
-					Assert.Equal(60, verticalTrack.Thumb.ActualHeight, 1);
+				ScrollBarMetrics metrics = (ScrollBarMetrics)resources["ScrollBarMetrics"];
+				metrics.Update(16, 60);
+				// The theme would draw a slider of 500 * 27 / 953 = 14; the track gets a viewport that makes it 60.
+				(ScrollBar vertical, Track verticalTrack) = CreateScrollBar(resources, Orientation.Vertical, 500);
+				Assert.Equal(16, vertical.ActualWidth, 1);
+				Assert.NotNull(verticalTrack.Thumb);
+				Assert.Equal(60, verticalTrack.Thumb.ActualHeight, 1);
 
-					(ScrollBar horizontal, Track horizontalTrack) = CreateScrollBar(resources, Orientation.Horizontal, 500);
-					Assert.Equal(16, horizontal.ActualHeight, 1);
-					Assert.Equal(60, horizontalTrack.Thumb.ActualWidth, 1);
+				(ScrollBar horizontal, Track horizontalTrack) = CreateScrollBar(resources, Orientation.Horizontal, 500);
+				Assert.Equal(16, horizontal.ActualHeight, 1);
+				Assert.Equal(60, horizontalTrack.Thumb.ActualWidth, 1);
 
-					// A longer minimum gives a longer slider, at once.
-					ScrollBarMetrics.Apply(16, 120);
-					vertical.UpdateLayout();
-					verticalTrack.InvalidateArrange();
-					vertical.Measure(new Size(2000, 2000));
-					vertical.Arrange(new Rect(0, 0, vertical.DesiredSize.Width, vertical.DesiredSize.Height));
-					vertical.UpdateLayout();
-					Assert.Equal(120, verticalTrack.Thumb.ActualHeight, 1);
-				}
-				finally
-				{
-					ScrollBarMetrics.Apply(ScrollBarMetrics.DefaultWidth, ScrollBarMetrics.DefaultMinimumThumb);
-				}
+				// A longer minimum gives a longer slider, at once.
+				metrics.Update(16, 120);
+				vertical.UpdateLayout();
+				verticalTrack.InvalidateArrange();
+				vertical.Measure(new Size(2000, 2000));
+				vertical.Arrange(new Rect(0, 0, vertical.DesiredSize.Width, vertical.DesiredSize.Height));
+				vertical.UpdateLayout();
+				Assert.Equal(120, verticalTrack.Thumb.ActualHeight, 1);
+
+				// The width follows too.
+				metrics.Update(24, 120);
+				vertical.Measure(new Size(2000, 2000));
+				Assert.Equal(24, vertical.DesiredSize.Width, 1);
 			});
 		}
 

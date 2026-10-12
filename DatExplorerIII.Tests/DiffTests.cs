@@ -306,10 +306,10 @@ namespace DatExplorerIII.Tests
 		private async Task<ComparisonViewModel> CompareAsync((String Path, Byte[] Content)[] left, (String Path, Byte[] Content)[] right)
 		{
 			Dialogs dialogs = new() { Sources = new ComparisonSources(Folder("left", left), Folder("right", right)) };
-			MainViewModel viewModel = new(dialogs, new SettingsService(Path.Combine(_root, "settings"), null), new TempFolder(), new ManualUiThread());
+			MainViewModel viewModel = new(dialogs, new SettingsService(Path.Combine(_root, "settings"), null), new TempFolder(), new ManualUiThread(), new ScrollBarMetrics());
 			_viewModels.Add(viewModel);
-			await viewModel.CompareAsync();
-			return viewModel.Comparison!;
+			await viewModel.Comparison.CompareAsync();
+			return viewModel.Comparison.Current!;
 		}
 
 		private static async Task SelectAsync(ComparisonViewModel comparison, String path)

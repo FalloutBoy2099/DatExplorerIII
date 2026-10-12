@@ -8,6 +8,13 @@ namespace DatExplorerIII.Models
 	/// </summary>
 	public sealed class SettingsData
 	{
+		/// <summary>The number of columns of the list of the files (name, type, size, packed size).</summary>
+		public const Int32 ColumnCount = 4;
+
+		public const Double MinimumColumnWidth = 20;
+
+		public const Double MaximumColumnWidth = 2000;
+
 		public Boolean AssociationAsked { get; set; }
 
 		public String? LastExtractFolder { get; set; }
@@ -20,6 +27,15 @@ namespace DatExplorerIII.Models
 		public List<String> RecentFiles { get; set; } = new();
 
 		public String ViewMode { get; set; } = "Details";
+
+		/// <summary>The column the list of the files is sorted by (a name of <c>DatSortColumn</c>).</summary>
+		public String SortColumn { get; set; } = "Name";
+
+		/// <summary>Whether the list of the files is sorted from the last to the first.</summary>
+		public Boolean SortDescending { get; set; }
+
+		/// <summary>The widths of the columns of the list of the files (in the details view), in pixels; empty for the widths of the design.</summary>
+		public List<Double> ColumnWidths { get; set; } = new();
 
 		/// <summary>Whether the preview pane next to the file list is shown (the name is new: an old setting made when it was off by default is ignored).</summary>
 		public Boolean PreviewPaneVisible { get; set; } = true;
@@ -67,6 +83,12 @@ namespace DatExplorerIII.Models
 
 		/// <summary>Whether the movies are shown with their subtitles (the .sve file that has the name of the movie), when they have some.</summary>
 		public Boolean ShowSubtitles { get; set; } = true;
+
+		/// <summary>The volume of the sounds of the viewer, 0 to 100.</summary>
+		public Int32 AudioVolume { get; set; } = 100;
+
+		/// <summary>Whether a sound of the viewer starts again when it ends.</summary>
+		public Boolean AudioLoop { get; set; }
 
 		/// <summary>Whether a double click on a file that has a viewer opens it there instead of in the default program.</summary>
 		public Boolean DoubleClickOpensViewer { get; set; } = true;

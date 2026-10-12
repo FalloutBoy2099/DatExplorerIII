@@ -178,6 +178,107 @@ namespace DatExplorerIII.Tests
 			Assert.Equal(3000, BinaryPrimitives.ReadInt16LittleEndian(player.Played[1].AsSpan(44)));
 		}
 
+		private static Int16 SampleAt(Byte[] wav, Int32 index) => BinaryPrimitives.ReadInt16LittleEndian(wav.AsSpan(44 + (index * 2)));
+
+		[Fact]
+		public void ApplyGain_ScalesThePlainSamples_WithoutTouchingTheOriginal()
+		{
+			Byte[] wav = FourSeconds();
+
+			Byte[] half = WavWriter.ApplyGain(wav, 0.5);
+
+			Assert.NotSame(wav, half);
+			Assert.Equal(2000, SampleAt(wav, 2000));
+			Assert.Equal(1000, SampleAt(half, 2000));
+			Assert.Equal(wav.Length, half.Length);
+			Assert.Equal(0, SampleAt(WavWriter.ApplyGain(wav, 0), 3000));
+
+			// Full volume (or more) and what is not plain samples are returned as they are.
+			Assert.Same(wav, WavWriter.ApplyGain(wav, 1));
+			Byte[] other = (Byte[])wav.Clone();
+			BinaryPrimitives.WriteInt16LittleEndian(other.AsSpan(20), 2);
+			Assert.False(WavWriter.IsPcm16(other));
+			Assert.Same(other, WavWriter.ApplyGain(other, 0.5));
+			Assert.True(WavWriter.IsPcm16(wav));
+			Assert.False(WavWriter.IsPcm16(new Byte[5]));
+		}
+
+		[Fact]
+		public async Task Volume_IsInTheSoundThatPlays_AndChangesItAtOnce()
+		{
+			(AudioViewerViewModel viewer, FakePlayer player, FakeClock clock, _) = await CreateAsync();
+			Assert.True(viewer.CanChangeVolume);
+			Assert.Equal(100, viewer.Volume);
+
+			viewer.Volume = 50;
+			viewer.PlayStopCommand.Execute(null);
+			Assert.Equal(1000, SampleAt(player.Played[0], 2000));
+
+			// A change while it plays: from where it is, with the new volume.
+			clock.Advance(TimeSpan.FromSeconds(1));
+			viewer.Volume = 25;
+			Assert.True(viewer.IsPlaying);
+			Assert.Equal(2, player.Played.Count);
+			Assert.Equal(1000 / 4, SampleAt(player.Played[1], 0));
+
+			// The volume stays between 0 and 100.
+			viewer.Volume = 500;
+			Assert.Equal(100, viewer.Volume);
+			viewer.Volume = -5;
+			Assert.Equal(0, viewer.Volume);
+		}
+
+		[Fact]
+		public async Task ASoundThatIsNotPlainSamples_HasNoVolume()
+		{
+			Byte[] wav = FourSeconds();
+			BinaryPrimitives.WriteInt16LittleEndian(wav.AsSpan(20), 2);
+			AudioViewerViewModel viewer = new(new ManualUiThread(), new FakePlayer(), new FakeClock());
+
+			await viewer.ShowAsync(wav, ".wav");
+
+			Assert.True(viewer.HasClip);
+			Assert.False(viewer.CanChangeVolume);
+		}
+
+		[Fact]
+		public async Task Looping_StartsTheSoundAgainWhenItEnds()
+		{
+			(AudioViewerViewModel viewer, FakePlayer player, FakeClock clock, ManualUiThread ui) = await CreateAsync();
+			ManualTimer timer = Assert.Single(ui.Created);
+			viewer.IsLooping = true;
+			viewer.PlayStopCommand.Execute(null);
+
+			clock.Advance(TimeSpan.FromSeconds(4.2));
+			timer.Raise();
+
+			Assert.True(viewer.IsPlaying);
+			Assert.Equal(0, viewer.Position);
+			Assert.Equal(2, player.Played.Count);
+
+			// Without it the sound stops.
+			viewer.IsLooping = false;
+			clock.Advance(TimeSpan.FromSeconds(4.2));
+			timer.Raise();
+			Assert.False(viewer.IsPlaying);
+		}
+
+		[Fact]
+		public async Task TheMarkOnTheShape_FollowsThePosition()
+		{
+			(AudioViewerViewModel viewer, _, _, _) = await CreateAsync();
+			List<String?> changes = new();
+			viewer.PropertyChanged += (_, args) => changes.Add(args.PropertyName);
+			Assert.Equal(0, viewer.PlayedFraction);
+
+			viewer.Position = 1000;
+
+			Assert.Equal(0.25, viewer.PlayedFraction, 3);
+			Assert.Contains(nameof(AudioViewerViewModel.PlayedFraction), changes);
+			viewer.Position = 4000;
+			Assert.Equal(1, viewer.PlayedFraction);
+		}
+
 		[Fact]
 		public async Task ASoundThatIsNotThere_HasNoBarToMove()
 		{

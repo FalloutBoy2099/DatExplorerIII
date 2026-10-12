@@ -22,7 +22,7 @@ A rewrite in **.NET 10 / WPF (Fluent theme)** of *DAT Explorer II* by Mr.STALIN,
 - File sizes that people can read (B, KB, MB, GB, TB in English; o, Ko, Mo, Go, To in French; Б/КБ/МБ/ГБ/ТБ in Russian...) in the list and in the viewer.
 - List of the last 10 DAT files opened successfully in the *File* menu (a file that no longer exists is removed from it), with an entry to clear the list.
 - Association of the `.dat` files with the program (for the current user, without administrator rights).
-- Navigation by tree, three display modes (details, list, large icons), sorting by column.
+- Navigation by tree, three display modes (details, list, large icons), sorting by column; the sort and the widths of the columns (narrow by default: the files of Fallout have 8.3 names) are remembered.
 - Search in the current folder (`Enter` / `Shift+Enter`) and in the whole DAT (list of results).
 - Extraction of files, folders or the whole DAT with their tree, and drag and drop to Windows Explorer.
 - Import of files and folders (menu or drag and drop from Explorer), creation, renaming and deletion of files and folders.
@@ -46,7 +46,7 @@ A rewrite in **.NET 10 / WPF (Fluent theme)** of *DAT Explorer II* by Mr.STALIN,
   - `.pro` prototypes of Arcanum (detected automatically: an Arcanum `.pro` starts with `77 00 00 00` and the integer −1, a Fallout one with an identifier whose first byte is 0 to 5): type of object, number and fields with their technical names (verified on real files for the ammunition and the characters);
   - Arcanum files: `.art` images (rotations, pictures, up to four palettes), tables for the `.mes` messages and the `.dlg` dialogs (sortable, with the detected encoding);
   - common `.png`, `.bmp`, `.jpg`, `.gif` images and `.mp3` sounds (NLayer decoder, MIT license: no Windows codec needed);
-  - `.acm` sounds (built-in decoder, playback, waveform, mono/stereo detected from the sound because the header is wrong for speech and sound effects, with a manual choice) and `.wav`.
+  - `.acm` sounds (built-in decoder, mono/stereo detected from the sound because the header is wrong for speech and sound effects, with a manual choice) and `.wav`: play and pause, a bar to go anywhere in the sound, a mark on the waveform that follows the playback, a volume (for the sounds made of plain 16 bit samples) and a repeat button, both remembered.
 
     ![An .acm sound: waveform, play button and choice of the channels](_screenshots/datex3_2.jpg)
 - Custom title bar with two buttons: theme (automatic, light or dark) and language of the interface. The choice is remembered and applied at once, dialog boxes included.

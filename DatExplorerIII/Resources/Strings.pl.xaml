@@ -402,8 +402,9 @@
     <sys:String x:Key="Str.ViewerPreviousFrame">Poprzednia klatka</sys:String>
     <sys:String x:Key="Str.ViewerNextFrame">Następna klatka</sys:String>
     <sys:String x:Key="Str.ViewerPlay">Odtwórz</sys:String>
-    <sys:String x:Key="Str.ViewerStop">Zatrzymaj</sys:String>
     <sys:String x:Key="Str.ViewerPause">Wstrzymaj</sys:String>
+    <sys:String x:Key="Str.ViewerVolume">Głośność</sys:String>
+    <sys:String x:Key="Str.ViewerLoop">Powtarzaj</sys:String>
     <sys:String x:Key="Str.ViewerZoom">Powiększenie:</sys:String>
     <sys:String x:Key="Str.ZoomFit">Dopasuj</sys:String>
     <sys:String x:Key="Str.ViewerImageFrm">{0}×{1} · kierunki: {2} · klatki na kierunek: {3} · {4} fps</sys:String>

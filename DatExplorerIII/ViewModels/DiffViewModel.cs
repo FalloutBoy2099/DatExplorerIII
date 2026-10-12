@@ -97,7 +97,7 @@ namespace DatExplorerIII.ViewModels
 			DifferenceCount = 0;
 			Summary = String.Empty;
 			Message = Loc.Get(key);
-			CommandManager.InvalidateRequerySuggested();
+			CommandRequery.Invalidate();
 		}
 
 		/// <summary>
@@ -116,7 +116,7 @@ namespace DatExplorerIII.ViewModels
 			DifferenceCount = _starts.Count;
 			SelectedRow = _starts.Count > 0 ? _list[_starts[0]] : null;
 			Summary = BuildSummary();
-			CommandManager.InvalidateRequerySuggested();
+			CommandRequery.Invalidate();
 		}
 
 		/// <summary>The number of differences, then what else there is to say about the two texts.</summary>

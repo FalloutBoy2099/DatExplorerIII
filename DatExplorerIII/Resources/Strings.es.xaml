@@ -402,8 +402,9 @@
     <sys:String x:Key="Str.ViewerPreviousFrame">Fotograma anterior</sys:String>
     <sys:String x:Key="Str.ViewerNextFrame">Fotograma siguiente</sys:String>
     <sys:String x:Key="Str.ViewerPlay">Reproducir</sys:String>
-    <sys:String x:Key="Str.ViewerStop">Detener</sys:String>
     <sys:String x:Key="Str.ViewerPause">Pausa</sys:String>
+    <sys:String x:Key="Str.ViewerVolume">Volumen</sys:String>
+    <sys:String x:Key="Str.ViewerLoop">Repetir</sys:String>
     <sys:String x:Key="Str.ViewerZoom">Zoom:</sys:String>
     <sys:String x:Key="Str.ZoomFit">Ajustar</sys:String>
     <sys:String x:Key="Str.ViewerImageFrm">{0}×{1} · {2} dirección(es) · {3} fotograma(s) por dirección · {4} fps</sys:String>

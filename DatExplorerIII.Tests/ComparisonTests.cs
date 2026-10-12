@@ -13,7 +13,6 @@ namespace DatExplorerIII.Tests
 	using DatExplorerIII.ViewModels;
 
 	/// <summary>The comparison of two archives (DAT files or folders) and the copy or move of files between them.</summary>
-	[Collection("ScrollBarSizes")] // Opening the settings applies the sizes of the scroll bars, which the other tests of that collection measure.
 	public sealed class ComparisonTests : IDisposable
 	{
 		private readonly String _root = Path.Combine(Path.GetTempPath(), "DatExplorerIII.Tests", Path.GetRandomFileName());
@@ -182,8 +181,8 @@ namespace DatExplorerIII.Tests
 			String right = Folder("opt-right", ("a.txt", "hello world"));
 			Dialogs dialogs = new() { Sources = new ComparisonSources(left, right) };
 			MainViewModel viewModel = CreateViewModel(dialogs);
-			await viewModel.CompareAsync();
-			ComparisonViewModel before = viewModel.Comparison!;
+			await viewModel.Comparison.CompareAsync();
+			ComparisonViewModel before = viewModel.Comparison.Current!;
 			Assert.Equal(1, before.Count(DatCompareState.Different));
 
 			dialogs.SettingsScript = model =>
@@ -198,8 +197,8 @@ namespace DatExplorerIII.Tests
 			};
 			await viewModel.OpenSettingsAsync();
 
-			Assert.NotSame(before, viewModel.Comparison);
-			Assert.Equal(1, viewModel.Comparison!.Count(DatCompareState.Identical));
+			Assert.NotSame(before, viewModel.Comparison.Current);
+			Assert.Equal(1, viewModel.Comparison.Current!.Count(DatCompareState.Identical));
 			Assert.True(viewModel.ComparisonOptions.IgnoreCase);
 			Assert.False(viewModel.IsSingleInstance);
 			Assert.False(viewModel.SaveWindowSize);
@@ -224,8 +223,8 @@ namespace DatExplorerIII.Tests
 			String right = Folder("cancel-right", ("a.txt", "hello world"));
 			Dialogs dialogs = new() { Sources = new ComparisonSources(left, right) };
 			MainViewModel viewModel = CreateViewModel(dialogs);
-			await viewModel.CompareAsync();
-			ComparisonViewModel before = viewModel.Comparison!;
+			await viewModel.Comparison.CompareAsync();
+			ComparisonViewModel before = viewModel.Comparison.Current!;
 
 			dialogs.SettingsScript = model =>
 			{
@@ -235,7 +234,7 @@ namespace DatExplorerIII.Tests
 			};
 			await viewModel.OpenSettingsAsync();
 
-			Assert.Same(before, viewModel.Comparison);
+			Assert.Same(before, viewModel.Comparison.Current);
 			Assert.False(viewModel.ComparisonOptions.IgnoreCase);
 			Assert.True(viewModel.IsSingleInstance);
 		}
@@ -247,8 +246,8 @@ namespace DatExplorerIII.Tests
 			String right = Folder("same-right", ("a.txt", "two"));
 			Dialogs dialogs = new() { Sources = new ComparisonSources(left, right) };
 			MainViewModel viewModel = CreateViewModel(dialogs);
-			await viewModel.CompareAsync();
-			ComparisonViewModel before = viewModel.Comparison!;
+			await viewModel.Comparison.CompareAsync();
+			ComparisonViewModel before = viewModel.Comparison.Current!;
 
 			dialogs.SettingsScript = model =>
 			{
@@ -258,7 +257,7 @@ namespace DatExplorerIII.Tests
 			};
 			await viewModel.OpenSettingsAsync();
 
-			Assert.Same(before, viewModel.Comparison);
+			Assert.Same(before, viewModel.Comparison.Current);
 			Assert.True(viewModel.IsWindowFrameVisible);
 			Assert.False(viewModel.IsBlockSeparatorsVisible);
 		}
@@ -270,8 +269,8 @@ namespace DatExplorerIII.Tests
 			String right = Folder("eol-right", ("a.txt", "one" + Convert.ToChar(10) + "two" + Convert.ToChar(10)));
 			Dialogs dialogs = new() { Sources = new ComparisonSources(left, right) };
 			MainViewModel viewModel = CreateViewModel(dialogs);
-			await viewModel.CompareAsync();
-			ComparisonViewModel comparison = viewModel.Comparison!;
+			await viewModel.Comparison.CompareAsync();
+			ComparisonViewModel comparison = viewModel.Comparison.Current!;
 			Assert.Equal(1, comparison.Count(DatCompareState.Different));
 
 			Select(viewModel, "a.txt");
@@ -288,7 +287,7 @@ namespace DatExplorerIII.Tests
 				return true;
 			};
 			await viewModel.OpenSettingsAsync();
-			Assert.Equal(1, viewModel.Comparison!.Count(DatCompareState.Identical));
+			Assert.Equal(1, viewModel.Comparison.Current!.Count(DatCompareState.Identical));
 		}
 
 		#endregion
@@ -362,14 +361,14 @@ namespace DatExplorerIII.Tests
 
 		private MainViewModel CreateViewModel(Dialogs dialogs)
 		{
-			MainViewModel viewModel = new(dialogs, new SettingsService(Path.Combine(_root, "settings"), null), new TempFolder(), new ManualUiThread());
+			MainViewModel viewModel = new(dialogs, new SettingsService(Path.Combine(_root, "settings"), null), new TempFolder(), new ManualUiThread(), new ScrollBarMetrics());
 			_viewModels.Add(viewModel);
 			return viewModel;
 		}
 
 		private static void Select(MainViewModel viewModel, params String[] paths)
 		{
-			viewModel.Comparison!.SetSelection(viewModel.Comparison.AllRows.Where(row => paths.Contains(row.Path, StringComparer.OrdinalIgnoreCase)).ToList());
+			viewModel.Comparison.Current!.SetSelection(viewModel.Comparison.Current.AllRows.Where(row => paths.Contains(row.Path, StringComparer.OrdinalIgnoreCase)).ToList());
 		}
 
 		[Fact]
@@ -379,18 +378,18 @@ namespace DatExplorerIII.Tests
 			Dialogs dialogs = new() { Sources = new ComparisonSources(left, right) };
 			MainViewModel viewModel = CreateViewModel(dialogs);
 
-			await viewModel.CompareAsync();
+			await viewModel.Comparison.CompareAsync();
 
 			// Both archives are open in the window, and the window is in the comparison mode.
 			Assert.Equal(2, viewModel.Roots.Count);
-			Assert.True(viewModel.IsComparing);
-			ComparisonViewModel comparison = viewModel.Comparison!;
+			Assert.True(viewModel.Comparison.IsComparing);
+			ComparisonViewModel comparison = viewModel.Comparison.Current!;
 			Assert.Equal(1, comparison.Count(DatCompareState.Identical));
 			Assert.Equal(2, comparison.Count(DatCompareState.Different));
 			Assert.Equal(1, comparison.Count(DatCompareState.LeftOnly));
 			Assert.Equal(1, comparison.Count(DatCompareState.RightOnly));
 			Assert.False(viewModel.OpenCommand.CanExecute(null));
-			Assert.True(viewModel.CloseComparisonCommand.CanExecute(null));
+			Assert.True(viewModel.Comparison.CloseComparisonCommand.CanExecute(null));
 
 			// Without the identical files the list is the one of what differs.
 			Assert.Equal(4, comparison.Rows.Count);
@@ -403,9 +402,9 @@ namespace DatExplorerIII.Tests
 			comparison.ShowRightOnly = false;
 			Assert.Single(comparison.Rows);
 
-			viewModel.CloseComparisonCommand.Execute(null);
-			Assert.False(viewModel.IsComparing);
-			Assert.Null(viewModel.Comparison);
+			viewModel.Comparison.CloseComparisonCommand.Execute(null);
+			Assert.False(viewModel.Comparison.IsComparing);
+			Assert.Null(viewModel.Comparison.Current);
 			Assert.Equal(2, viewModel.Roots.Count);
 		}
 
@@ -416,8 +415,8 @@ namespace DatExplorerIII.Tests
 			String right = Folder("tree-right", ("root.txt", "2"), ("art\\cuts\\a.txt", "right"), ("art\\heads\\b.txt", "same"), ("text\\c.txt", "same"));
 			Dialogs dialogs = new() { Sources = new ComparisonSources(left, right) };
 			MainViewModel viewModel = CreateViewModel(dialogs);
-			await viewModel.CompareAsync();
-			ComparisonViewModel comparison = viewModel.Comparison!;
+			await viewModel.Comparison.CompareAsync();
+			ComparisonViewModel comparison = viewModel.Comparison.Current!;
 			comparison.ShowIdentical = true;
 
 			// The folders of both archives, each followed by its sub folders; the whole is the first.
@@ -462,12 +461,12 @@ namespace DatExplorerIII.Tests
 			String right = Folder("count-right", ("art\\a.txt", "right"));
 			Dialogs dialogs = new() { Sources = new ComparisonSources(left, right) };
 			MainViewModel viewModel = CreateViewModel(dialogs);
-			await viewModel.CompareAsync();
-			ComparisonViewModel comparison = viewModel.Comparison!;
+			await viewModel.Comparison.CompareAsync();
+			ComparisonViewModel comparison = viewModel.Comparison.Current!;
 			Assert.Equal(1, comparison.Root.Differences);
 
 			Select(viewModel, "art\\a.txt");
-			await viewModel.TransferAsync(true, false);
+			await viewModel.Comparison.TransferAsync(true, false);
 
 			Assert.Equal(0, comparison.Root.Differences);
 			Assert.Equal(0, comparison.FlatFolders.Single(folder => folder.Path == "art\\").Differences);
@@ -477,30 +476,30 @@ namespace DatExplorerIII.Tests
 		public void Layout_TheChoicesAreKeptInTheSettings_AndSideAndStackedAreTheTwoFacesOfOneChoice()
 		{
 			SettingsService settings = new(Path.Combine(_root, "layout-settings"), null);
-			MainViewModel viewModel = new(new Dialogs(), settings, new TempFolder(), new ManualUiThread());
+			MainViewModel viewModel = new(new Dialogs(), settings, new TempFolder(), new ManualUiThread(), new ScrollBarMetrics());
 			_viewModels.Add(viewModel);
 
 			// By default: the folders above the files, the two archives side by side, the two groups side by side, the tree shown.
-			Assert.True(viewModel.IsCompareListStacked);
-			Assert.False(viewModel.IsCompareViewersStacked);
-			Assert.False(viewModel.IsCompareGroupsStacked);
-			Assert.True(viewModel.IsCompareGroupsSide);
-			Assert.True(viewModel.IsCompareTreeVisible);
+			Assert.True(viewModel.Comparison.IsCompareListStacked);
+			Assert.False(viewModel.Comparison.IsCompareViewersStacked);
+			Assert.False(viewModel.Comparison.IsCompareGroupsStacked);
+			Assert.True(viewModel.Comparison.IsCompareGroupsSide);
+			Assert.True(viewModel.Comparison.IsCompareTreeVisible);
 
 			List<String> changed = new();
-			viewModel.PropertyChanged += (_, args) => changed.Add(args.PropertyName!);
+			viewModel.Comparison.PropertyChanged += (_, args) => changed.Add(args.PropertyName!);
 
-			viewModel.IsCompareListStacked = false;
-			Assert.True(viewModel.IsCompareListSide);
+			viewModel.Comparison.IsCompareListStacked = false;
+			Assert.True(viewModel.Comparison.IsCompareListSide);
 			Assert.Contains("IsCompareListSide", changed);
 
-			viewModel.IsCompareViewersSide = false;
-			Assert.True(viewModel.IsCompareViewersStacked);
+			viewModel.Comparison.IsCompareViewersSide = false;
+			Assert.True(viewModel.Comparison.IsCompareViewersStacked);
 
-			viewModel.IsCompareGroupsSide = false;
-			Assert.True(viewModel.IsCompareGroupsStacked);
+			viewModel.Comparison.IsCompareGroupsSide = false;
+			Assert.True(viewModel.Comparison.IsCompareGroupsStacked);
 
-			viewModel.IsCompareTreeVisible = false;
+			viewModel.Comparison.IsCompareTreeVisible = false;
 
 			SettingsData back = new SettingsService(Path.Combine(_root, "layout-settings"), null).Data;
 			Assert.False(back.CompareListStacked);
@@ -515,12 +514,12 @@ namespace DatExplorerIII.Tests
 			(String left, String right) = TwoFolders();
 			Dialogs dialogs = new() { Sources = new ComparisonSources(left, right) };
 			MainViewModel viewModel = CreateViewModel(dialogs);
-			await viewModel.CompareAsync();
-			ComparisonViewModel comparison = viewModel.Comparison!;
+			await viewModel.Comparison.CompareAsync();
+			ComparisonViewModel comparison = viewModel.Comparison.Current!;
 
 			Select(viewModel, "data\\changed.txt", "only-left.txt", "same.txt");
 			Assert.True(comparison.CanSendRight);
-			await viewModel.TransferAsync(true, false);
+			await viewModel.Comparison.TransferAsync(true, false);
 
 			// The question mentions the file that is replaced.
 			Assert.Single(dialogs.Questions);
@@ -549,13 +548,13 @@ namespace DatExplorerIII.Tests
 			(String left, String right) = TwoFolders();
 			Dialogs dialogs = new() { Sources = new ComparisonSources(left, right) };
 			MainViewModel viewModel = CreateViewModel(dialogs);
-			await viewModel.CompareAsync();
-			ComparisonViewModel comparison = viewModel.Comparison!;
+			await viewModel.Comparison.CompareAsync();
+			ComparisonViewModel comparison = viewModel.Comparison.Current!;
 
 			Select(viewModel, "only-right.txt");
 			Assert.True(comparison.CanSendLeft);
 			Assert.False(comparison.CanSendRight);
-			await viewModel.TransferAsync(false, true);
+			await viewModel.Comparison.TransferAsync(false, true);
 
 			Assert.NotNull(comparison.Left.Archive.Find("only-right.txt"));
 			Assert.Null(comparison.Right.Archive.Find("only-right.txt"));
@@ -574,13 +573,13 @@ namespace DatExplorerIII.Tests
 			(String left, String right) = TwoFolders();
 			Dialogs dialogs = new() { Sources = new ComparisonSources(left, right), Answer = false };
 			MainViewModel viewModel = CreateViewModel(dialogs);
-			await viewModel.CompareAsync();
+			await viewModel.Comparison.CompareAsync();
 
 			Select(viewModel, "data\\changed.txt");
-			await viewModel.TransferAsync(true, false);
+			await viewModel.Comparison.TransferAsync(true, false);
 
-			Assert.False(viewModel.Comparison!.Right.ShouldSave);
-			Assert.Equal(DatCompareState.Different, viewModel.Comparison.AllRows.Single(row => row.Path == "data\\changed.txt").State);
+			Assert.False(viewModel.Comparison.Current!.Right.ShouldSave);
+			Assert.Equal(DatCompareState.Different, viewModel.Comparison.Current.AllRows.Single(row => row.Path == "data\\changed.txt").State);
 		}
 
 		[Fact]
@@ -589,11 +588,11 @@ namespace DatExplorerIII.Tests
 			(String left, String right) = TwoFolders();
 			Dialogs dialogs = new() { Sources = new ComparisonSources(left, right) };
 			MainViewModel viewModel = CreateViewModel(dialogs);
-			await viewModel.CompareAsync();
+			await viewModel.Comparison.CompareAsync();
 
 			// A file that only the right archive has cannot be copied to the right.
 			Select(viewModel, "only-right.txt");
-			await viewModel.TransferAsync(true, false);
+			await viewModel.Comparison.TransferAsync(true, false);
 
 			Assert.Single(dialogs.Messages);
 			Assert.Empty(dialogs.Questions);
@@ -608,7 +607,7 @@ namespace DatExplorerIII.Tests
 			MainViewModel viewModel = CreateViewModel(dialogs);
 
 			// Nothing is open and nothing was compared yet: nothing is proposed.
-			await viewModel.CompareAsync();
+			await viewModel.Comparison.CompareAsync();
 			Assert.Null(dialogs.OfferedLeft);
 			Assert.Null(dialogs.OfferedRight);
 			Assert.Empty(dialogs.Suggestions);
@@ -618,22 +617,22 @@ namespace DatExplorerIII.Tests
 			Assert.Equal(left, new SettingsService(Path.Combine(_root, "settings"), null).Data.CompareLastLeft);
 			Assert.Equal(right, new SettingsService(Path.Combine(_root, "settings"), null).Data.CompareLastRight);
 
-			viewModel.CloseComparisonCommand.Execute(null);
-			await viewModel.CompareAsync();
+			viewModel.Comparison.CloseComparisonCommand.Execute(null);
+			await viewModel.Comparison.CompareAsync();
 			Assert.Equal(viewModel.Roots[0].Document.FilePath, dialogs.OfferedLeft);
 			Assert.Equal(viewModel.Roots[1].Document.FilePath, dialogs.OfferedRight);
 			Assert.Equal(2, dialogs.Suggestions.Count);
 
 			// An archive that is gone is not proposed, nothing is proposed twice, the recent files come last.
-			viewModel.CloseComparisonCommand.Execute(null);
+			viewModel.Comparison.CloseComparisonCommand.Execute(null);
 			SettingsService settings = new(Path.Combine(_root, "other-settings"), null);
 			settings.Data.CompareLastLeft = missing;
 			settings.Data.CompareLastRight = right;
 			settings.Data.RecentFiles.AddRange([left, right.ToUpperInvariant(), missing]);
-			MainViewModel fresh = new(dialogs, settings, new TempFolder(), new ManualUiThread());
+			MainViewModel fresh = new(dialogs, settings, new TempFolder(), new ManualUiThread(), new ScrollBarMetrics());
 			_viewModels.Add(fresh);
 
-			IReadOnlyList<String> suggestions = fresh.ComparisonSuggestions();
+			IReadOnlyList<String> suggestions = fresh.Comparison.ComparisonSuggestions();
 			Assert.Equal([right, left], suggestions);
 		}
 
@@ -660,19 +659,19 @@ namespace DatExplorerIII.Tests
 			Dialogs dialogs = new() { Sources = null };
 			MainViewModel viewModel = CreateViewModel(dialogs);
 
-			await viewModel.CompareAsync();
-			Assert.False(viewModel.IsComparing);
+			await viewModel.Comparison.CompareAsync();
+			Assert.False(viewModel.Comparison.IsComparing);
 
 			dialogs.Sources = new ComparisonSources(left, right);
-			await viewModel.CompareAsync();
-			ComparisonViewModel first = viewModel.Comparison!;
+			await viewModel.Comparison.CompareAsync();
+			ComparisonViewModel first = viewModel.Comparison.Current!;
 
 			File.WriteAllText(Path.Combine(left, "only-right.txt"), "right only");
-			await viewModel.CompareAgainAsync();
+			await viewModel.Comparison.CompareAgainAsync();
 
 			// The folders were read when they were opened: the list is made again from the archives that are open.
-			Assert.NotSame(first, viewModel.Comparison);
-			Assert.Equal(first.AllRows.Count, viewModel.Comparison!.AllRows.Count);
+			Assert.NotSame(first, viewModel.Comparison.Current);
+			Assert.Equal(first.AllRows.Count, viewModel.Comparison.Current!.AllRows.Count);
 		}
 
 		#endregion

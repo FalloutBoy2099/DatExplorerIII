@@ -40,7 +40,7 @@ namespace DatExplorerIII.ViewModels
 		public ViewerViewModel(IUiThread uiThread)
 		{
 			_uiThread = uiThread;
-			Text = new TextViewerViewModel();
+			Text = new TextViewerViewModel(uiThread);
 			Image = new ImageViewerViewModel(uiThread);
 			Audio = new AudioViewerViewModel(uiThread);
 			Video = new VideoViewerViewModel(uiThread);
@@ -541,7 +541,7 @@ namespace DatExplorerIII.ViewModels
 			else if (extension is ".aaf" or ".fon")
 			{
 				FontFile font = extension == ".aaf" ? AafReader.Read(data) : FonReader.Read(data);
-				System.Windows.Media.Imaging.BitmapSource sheet = ImageRenderer.Render(font);
+				PixelImage sheet = ImageRenderer.Render(font);
 				String info = font.Format == FontFormat.Aaf
 					? Loc.Format("Str.ViewerFontAaf", font.Glyphs.Count, font.Height, font.Spacing, font.SpaceWidth, font.LineSpacing)
 					: Loc.Format("Str.ViewerFontFon", font.Glyphs.Count, font.Height, font.Spacing);
@@ -549,7 +549,7 @@ namespace DatExplorerIII.ViewModels
 			}
 			else if (extension is ".png" or ".bmp" or ".jpg" or ".jpeg" or ".gif")
 			{
-				System.Windows.Media.Imaging.BitmapSource bitmap = PictureDecoder.Decode(data);
+				PixelImage bitmap = PictureDecoder.Decode(data);
 				OnUi(() => Image.ShowBitmap(bitmap));
 			}
 			else

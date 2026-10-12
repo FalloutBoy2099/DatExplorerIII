@@ -332,7 +332,7 @@ namespace DatExplorerIII.Tests
 		private MainViewModel CreateViewModel(FakeDialogs dialogs)
 		{
 			SettingsService settings = new(Path.Combine(_root, "settings"), null);
-			MainViewModel viewModel = new(dialogs, settings, new TempFolder(), new ManualUiThread());
+			MainViewModel viewModel = new(dialogs, settings, new TempFolder(), new ManualUiThread(), new ScrollBarMetrics());
 			_viewModels.Add(viewModel);
 			return viewModel;
 		}
@@ -588,13 +588,9 @@ namespace DatExplorerIII.Tests
 		[Fact]
 		public async Task DragSources_ExtractWhatIsDragged_AndRefuseWhatCannotBe()
 		{
-			// The files of a folder opened like an archive are not in a DAT yet: they are saved as one first.
-			String target = Path.Combine(_root, "dragged.dat");
-			MainViewModel source = CreateViewModel(new FakeDialogs { Choice = new SaveAsChoice(target, DatFormat.Fallout2) });
-			await source.OpenFilesAsync([MakeFolder()]);
-			await source.SaveAsAsync();
+			// A folder opened like an archive can be dragged out too: its files are not in a DAT, they are copied from the folder.
 			MainViewModel viewModel = CreateViewModel(new FakeDialogs());
-			await viewModel.OpenFilesAsync([target]);
+			await viewModel.OpenFilesAsync([MakeFolder()]);
 
 			// Nothing selected: nothing to drag.
 			Assert.Null(viewModel.ListDragSource.PrepareDragOut(null));
@@ -612,6 +608,46 @@ namespace DatExplorerIII.Tests
 			Assert.True(File.Exists(Path.Combine(folderPath, "critters", "hero.frm")));
 			Assert.Null(viewModel.FolderDragSource.PrepareDragOut(root));
 			Assert.Null(viewModel.FolderDragSource.PrepareDragOut("art"));
+		}
+
+		[Fact]
+		public async Task TheSortAndTheColumnWidths_AreKeptForTheNextRun()
+		{
+			String settingsFolder = Path.Combine(_root, "settings");
+			MainViewModel first = CreateViewModel(new FakeDialogs());
+			await first.OpenFilesAsync([MakeFolder()]);
+			Assert.Equal(DatSortColumn.Name, first.SortColumn);
+			Assert.Empty(first.ColumnWidths);
+
+			first.SortCommand.Execute("Size");
+			first.SortCommand.Execute("Size");
+			first.ColumnWidths = [120, 60, 70, 100];
+			first.ColumnWidths = [1, 2];
+			Assert.Equal([120.0, 60.0, 70.0, 100.0], first.ColumnWidths);
+			Assert.False(first.SortCommand.CanExecute("Nope"));
+			first.Shutdown();
+
+			MainViewModel second = new(new FakeDialogs(), new SettingsService(settingsFolder, null), new TempFolder(), new ManualUiThread(), new ScrollBarMetrics());
+			_viewModels.Add(second);
+			Assert.Equal(DatSortColumn.Size, second.SortColumn);
+			Assert.True(second.SortDescending);
+			Assert.Equal([120.0, 60.0, 70.0, 100.0], second.ColumnWidths);
+		}
+
+		[Fact]
+		public void TheVolumeAndTheRepeatOfTheSounds_AreKeptForTheNextRun()
+		{
+			MainViewModel first = CreateViewModel(new FakeDialogs());
+			Assert.Equal(100, first.Preview.Audio.Volume);
+			Assert.False(first.Preview.Audio.IsLooping);
+
+			first.Preview.Audio.Volume = 35;
+			first.Preview.Audio.IsLooping = true;
+			first.Shutdown();
+
+			MainViewModel second = CreateViewModel(new FakeDialogs());
+			Assert.Equal(35, second.Preview.Audio.Volume);
+			Assert.True(second.Preview.Audio.IsLooping);
 		}
 
 		[Fact]

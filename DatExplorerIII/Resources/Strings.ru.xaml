@@ -402,8 +402,9 @@
     <sys:String x:Key="Str.ViewerPreviousFrame">Предыдущий кадр</sys:String>
     <sys:String x:Key="Str.ViewerNextFrame">Следующий кадр</sys:String>
     <sys:String x:Key="Str.ViewerPlay">Воспроизвести</sys:String>
-    <sys:String x:Key="Str.ViewerStop">Стоп</sys:String>
     <sys:String x:Key="Str.ViewerPause">Пауза</sys:String>
+    <sys:String x:Key="Str.ViewerVolume">Громкость</sys:String>
+    <sys:String x:Key="Str.ViewerLoop">Повторять</sys:String>
     <sys:String x:Key="Str.ViewerZoom">Масштаб:</sys:String>
     <sys:String x:Key="Str.ZoomFit">По размеру</sys:String>
     <sys:String x:Key="Str.ViewerImageFrm">{0}×{1} · направлений: {2} · кадров в направлении: {3} · {4} к/с</sys:String>

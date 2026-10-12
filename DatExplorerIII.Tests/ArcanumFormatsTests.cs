@@ -335,11 +335,11 @@ namespace DatExplorerIII.Tests
 				_ => new GifBitmapEncoder(),
 			};
 
-			BitmapSource bitmap = PictureDecoder.Decode(EncodePicture(encoder));
+			PixelImage picture = PictureDecoder.Decode(EncodePicture(encoder));
 
-			Assert.Equal(16, bitmap.PixelWidth);
-			Assert.Equal(8, bitmap.PixelHeight);
-			Assert.True(bitmap.IsFrozen);
+			Assert.Equal(16, picture.Width);
+			Assert.Equal(8, picture.Height);
+			Assert.Equal(16 * 8 * 4, picture.Pixels.Length);
 		}
 
 		[Fact]
@@ -479,12 +479,12 @@ namespace DatExplorerIII.Tests
 			await viewer.LoadAsync(archive, archive.Find("art\\level.art")!);
 			Assert.True(viewer.IsImage);
 			Assert.Equal(2, viewer.Image.PaletteChoices.Count);
-			Assert.NotNull(viewer.Image.Bitmap);
+			Assert.NotNull(viewer.Image.Picture);
 
 			await viewer.LoadAsync(archive, archive.Find("pictures\\photo.png")!);
 			Assert.True(viewer.IsImage);
-			Assert.Equal(16, viewer.Image.Bitmap!.PixelWidth);
-			Assert.Equal(8, viewer.Image.Bitmap.PixelHeight);
+			Assert.Equal(16, viewer.Image.Picture!.Width);
+			Assert.Equal(8, viewer.Image.Picture.Height);
 			Assert.Empty(viewer.Image.PaletteChoices);
 		}
 
@@ -553,7 +553,7 @@ namespace DatExplorerIII.Tests
 
 			foreach (DatEntry entry in archive.Entries.Where(entry => entry.Name.EndsWith(".bmp", StringComparison.OrdinalIgnoreCase)).Take(40))
 			{
-				Assert.True(PictureDecoder.Decode(archive.ReadData(entry)).PixelWidth > 0, entry.FullPath);
+				Assert.True(PictureDecoder.Decode(archive.ReadData(entry)).Width > 0, entry.FullPath);
 			}
 		}
 

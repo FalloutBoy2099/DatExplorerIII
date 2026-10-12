@@ -97,6 +97,74 @@ namespace DatExplorerIII.Formats
 			return result;
 		}
 
+		/// <summary>Whether the sound is a WAV file of plain 16 bit samples (the only one whose volume can be changed).</summary>
+		public static Boolean IsPcm16(Byte[] wav)
+		{
+			return TryReadFormat(wav, out Int32 formatTag, out Int32 bits, out Int32 dataStart, out _) && formatTag == 1 && bits == 16 && dataStart > 0;
+		}
+
+		/// <summary>
+		/// The same sound with its samples multiplied by <paramref name="gain"/> (at most 1 is a lower volume), in a new array. A
+		/// sound that is not made of plain 16 bit samples is returned as it is.
+		/// </summary>
+		public static Byte[] ApplyGain(Byte[] wav, Double gain)
+		{
+			if (gain >= 1 || !TryReadFormat(wav, out Int32 formatTag, out Int32 bits, out Int32 dataStart, out Int32 dataLength) || formatTag != 1 || bits != 16)
+			{
+				return wav;
+			}
+
+			gain = Math.Max(0, gain);
+			Byte[] result = (Byte[])wav.Clone();
+			for (Int32 offset = dataStart; offset + 1 < dataStart + dataLength; offset += 2)
+			{
+				Int32 sample = BinaryPrimitives.ReadInt16LittleEndian(result.AsSpan(offset));
+				BinaryPrimitives.WriteInt16LittleEndian(result.AsSpan(offset), (Int16)Math.Clamp((Int32)Math.Round(sample * gain), Int16.MinValue, Int16.MaxValue));
+			}
+
+			return result;
+		}
+
+		private static Boolean TryReadFormat(Byte[] wav, out Int32 formatTag, out Int32 bits, out Int32 dataStart, out Int32 dataLength)
+		{
+			formatTag = 0;
+			bits = 0;
+			dataStart = -1;
+			dataLength = 0;
+			if (wav.Length < 12 || Encoding.ASCII.GetString(wav, 0, 4) != "RIFF")
+			{
+				return false;
+			}
+
+			Int32 position = 12;
+			while (position + 8 <= wav.Length)
+			{
+				Int32 size = BinaryPrimitives.ReadInt32LittleEndian(wav.AsSpan(position + 4));
+				Int32 body = position + 8;
+				String id = Encoding.ASCII.GetString(wav, position, 4);
+				if (id == "fmt " && size >= 16 && body + 16 <= wav.Length)
+				{
+					formatTag = BinaryPrimitives.ReadUInt16LittleEndian(wav.AsSpan(body));
+					bits = BinaryPrimitives.ReadUInt16LittleEndian(wav.AsSpan(body + 14));
+				}
+				else if (id == "data")
+				{
+					dataStart = body;
+					dataLength = size < 0 || body + (Int64)size > wav.Length ? wav.Length - body : size;
+					return formatTag != 0;
+				}
+
+				if (size < 0 || body + (Int64)size > wav.Length)
+				{
+					return false;
+				}
+
+				position = body + size + (size & 1);
+			}
+
+			return false;
+		}
+
 		/// <summary>The loudest sample of each of <paramref name="length"/> slices of the sound, from 0 to 255.</summary>
 		public static Byte[] CreateEnvelope(Byte[] pcm, Int32 length)
 		{

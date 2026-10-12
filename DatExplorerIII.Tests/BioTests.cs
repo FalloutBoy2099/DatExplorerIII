@@ -95,7 +95,7 @@ namespace DatExplorerIII.Tests
 		[Fact]
 		public void TheViewer_ColorsBiographies_ButNotOtherTexts()
 		{
-			TextViewerViewModel viewer = new();
+			TextViewerViewModel viewer = new(new ManualUiThread());
 			Byte[] bio = Encoding.ASCII.GetBytes(Biography(30));
 
 			viewer.Show(bio, bio.Length, ".bio");

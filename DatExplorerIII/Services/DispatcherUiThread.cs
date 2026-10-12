@@ -1,6 +1,7 @@
 namespace DatExplorerIII.Services
 {
 	using System;
+	using System.Runtime.InteropServices;
 	using System.Windows;
 	using System.Windows.Threading;
 
@@ -13,6 +14,18 @@ namespace DatExplorerIII.Services
 		public IUiTimer CreateTimer()
 		{
 			return new Timer();
+		}
+
+		public void SetClipboardText(String text)
+		{
+			try
+			{
+				Clipboard.SetText(text);
+			}
+			catch (ExternalException)
+			{
+				// Another program holds the clipboard: nothing to do, the user can try again.
+			}
 		}
 
 		public void Invoke(Action action)

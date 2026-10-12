@@ -6,9 +6,7 @@ namespace DatExplorerIII.ViewModels
 	using System.Globalization;
 	using System.IO;
 	using System.Threading.Tasks;
-	using System.Windows;
 	using System.Windows.Input;
-	using System.Windows.Media;
 	using Formats;
 	using Infrastructure;
 	using Models;
@@ -35,7 +33,7 @@ namespace DatExplorerIII.ViewModels
 		private Byte[] _source = Array.Empty<Byte>();
 		private String _extension = String.Empty;
 		private AudioClip? _clip;
-		private Geometry? _shape;
+		private Byte[] _envelope = Array.Empty<Byte>();
 		private String _info = String.Empty;
 		private String _warning = String.Empty;
 		private Boolean _isPlaying;
@@ -47,6 +45,8 @@ namespace DatExplorerIII.ViewModels
 		private Int64 _clockTimestamp;
 		private Boolean _isSeeking;
 		private Boolean _resumeAfterSeek;
+		private Double _volume = 100;
+		private Boolean _isLooping;
 
 		/// <param name="uiThread">Gives the timer that follows the sound as it plays.</param>
 		/// <param name="player">What plays the sound (the sound card of the computer when null).</param>
@@ -98,11 +98,11 @@ namespace DatExplorerIII.ViewModels
 			}
 		}
 
-		/// <summary>The shape of the sound, drawn in a box of 1000 by 100 units.</summary>
-		public Geometry? Shape
+		/// <summary>The loudness along the sound, 0 to 255 (the view draws the shape of the sound from it); empty when unknown.</summary>
+		public Byte[] Envelope
 		{
-			get => _shape;
-			private set => SetProperty(ref _shape, value);
+			get => _envelope;
+			private set => SetProperty(ref _envelope, value);
 		}
 
 		public String Info
@@ -122,6 +122,34 @@ namespace DatExplorerIII.ViewModels
 			get => _isPlaying;
 			private set => SetProperty(ref _isPlaying, value);
 		}
+
+		/// <summary>The volume, 0 to 100. It only applies to sounds made of plain 16 bit samples (<see cref="CanChangeVolume"/>).</summary>
+		public Double Volume
+		{
+			get => _volume;
+			set
+			{
+				if (SetProperty(ref _volume, Math.Clamp(value, 0, 100)) && _isPlaying && CanChangeVolume)
+				{
+					// The sound that plays has the old volume: it goes on from where it is with the new one.
+					Pause();
+					Play();
+				}
+			}
+		}
+
+		/// <summary>Whether the sound that is shown can be played louder or softer.</summary>
+		public Boolean CanChangeVolume => _clip != null && WavWriter.IsPcm16(_clip.WavData);
+
+		/// <summary>Whether the sound starts again when it ends.</summary>
+		public Boolean IsLooping
+		{
+			get => _isLooping;
+			set => SetProperty(ref _isLooping, value);
+		}
+
+		/// <summary>How far the sound has played, 0 to 1 (the mark on its shape).</summary>
+		public Double PlayedFraction => _clip == null || _clip.Duration <= TimeSpan.Zero ? 0 : Math.Clamp(_position.TotalMilliseconds / _clip.Duration.TotalMilliseconds, 0, 1);
 
 		/// <summary>The length of the sound in milliseconds: the end of the position bar.</summary>
 		public Double Maximum => Math.Max(1, _clip?.Duration.TotalMilliseconds ?? 1);
@@ -247,13 +275,14 @@ namespace DatExplorerIII.ViewModels
 			_clip = null;
 			_isSeeking = false;
 			_resumeAfterSeek = false;
-			Shape = null;
+			Envelope = Array.Empty<Byte>();
 			Info = String.Empty;
 			Warning = String.Empty;
 			SetPosition(TimeSpan.Zero);
 			OnPropertyChanged(nameof(Maximum));
 			OnPropertyChanged(nameof(HasClip));
 			OnPropertyChanged(nameof(CanChooseChannels));
+			OnPropertyChanged(nameof(CanChangeVolume));
 		}
 
 		private async Task DecodeAsync()
@@ -275,7 +304,7 @@ namespace DatExplorerIII.ViewModels
 				_clip = clip;
 				SetPosition(TimeSpan.Zero);
 				OnPropertyChanged(nameof(Maximum));
-				Shape = CreateShape(clip.Envelope);
+				Envelope = clip.Envelope;
 				Info = Loc.Format(
 					"Str.ViewerAudioInfo",
 					clip.SampleRate.ToString("N0", CultureInfo.CurrentCulture),
@@ -296,7 +325,7 @@ namespace DatExplorerIII.ViewModels
 					_clip = null;
 					SetPosition(TimeSpan.Zero);
 					OnPropertyChanged(nameof(Maximum));
-					Shape = null;
+					Envelope = Array.Empty<Byte>();
 					Info = String.Empty;
 					Warning = Loc.Get("Str.ViewerInvalid");
 				}
@@ -304,7 +333,8 @@ namespace DatExplorerIII.ViewModels
 
 			OnPropertyChanged(nameof(HasClip));
 			OnPropertyChanged(nameof(CanChooseChannels));
-			CommandManager.InvalidateRequerySuggested();
+			OnPropertyChanged(nameof(CanChangeVolume));
+			CommandRequery.Invalidate();
 		}
 
 		private static AudioClip Decode(Byte[] source, String extension, Int32 channels)
@@ -324,40 +354,12 @@ namespace DatExplorerIII.ViewModels
 				: duration.ToString(@"m\:ss\.f", CultureInfo.InvariantCulture);
 		}
 
-		/// <summary>The outline of the loudness, mirrored around the middle line of a 1000 by 100 box.</summary>
-		private static Geometry? CreateShape(Byte[] envelope)
-		{
-			if (envelope.Length == 0)
-			{
-				return null;
-			}
-
-			StreamGeometry geometry = new();
-			using (StreamGeometryContext context = geometry.Open())
-			{
-				Double step = 1000.0 / envelope.Length;
-				context.BeginFigure(new Point(0, 50), true, true);
-
-				for (Int32 i = 0; i < envelope.Length; i++)
-				{
-					context.LineTo(new Point(i * step, 50 - (envelope[i] / 255.0 * 50)), true, false);
-				}
-
-				for (Int32 i = envelope.Length - 1; i >= 0; i--)
-				{
-					context.LineTo(new Point(i * step, 50 + (envelope[i] / 255.0 * 50)), true, false);
-				}
-			}
-
-			geometry.Freeze();
-			return geometry;
-		}
-
 		private void SetPosition(TimeSpan position)
 		{
 			_position = position;
 			OnPropertyChanged(nameof(Position));
 			OnPropertyChanged(nameof(PositionText));
+			OnPropertyChanged(nameof(PlayedFraction));
 		}
 
 		private void PlayOrPause()
@@ -385,7 +387,9 @@ namespace DatExplorerIII.ViewModels
 				SetPosition(TimeSpan.Zero);
 			}
 
-			Byte[] wav = WavWriter.Slice(_clip.WavData, _position) ?? _clip.WavData;
+			Byte[]? slice = WavWriter.Slice(_clip.WavData, _position);
+			TimeSpan start = slice == null ? TimeSpan.Zero : _position;
+			Byte[] wav = WavWriter.ApplyGain(slice ?? _clip.WavData, _volume / 100);
 			try
 			{
 				_player.Play(wav);
@@ -396,7 +400,7 @@ namespace DatExplorerIII.ViewModels
 				return;
 			}
 
-			_clockStart = wav == _clip.WavData ? TimeSpan.Zero : _position;
+			_clockStart = start;
 			_clockTimestamp = _time.GetTimestamp();
 			IsPlaying = true;
 			_timer.Start();
@@ -433,6 +437,11 @@ namespace DatExplorerIII.ViewModels
 			{
 				StopPlayback();
 				SetPosition(TimeSpan.Zero);
+				if (_isLooping)
+				{
+					Play();
+				}
+
 				return;
 			}
 

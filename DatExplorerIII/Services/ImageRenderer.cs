@@ -2,12 +2,10 @@ namespace DatExplorerIII.Services
 {
 	using System;
 	using System.Linq;
-	using System.Windows.Media;
-	using System.Windows.Media.Imaging;
 	using Models;
 
 	/// <summary>
-	/// Turns the indexed pictures of Fallout into bitmaps the window can draw.
+	/// Turns the indexed pictures of Fallout into pictures made of pixels (<see cref="PixelImage"/>) the views can draw.
 	/// </summary>
 	public static class ImageRenderer
 	{
@@ -17,7 +15,7 @@ namespace DatExplorerIII.Services
 		/// Draws a frame on a canvas, centered horizontally and resting on the bottom (the origin of a Fallout sprite
 		/// is the bottom middle), so that the frames of an animation stay aligned. The index 0 is transparent.
 		/// </summary>
-		public static BitmapSource Render(FrmFrame frame, Int32 canvasWidth, Int32 canvasHeight, Palette palette)
+		public static PixelImage Render(FrmFrame frame, Int32 canvasWidth, Int32 canvasHeight, Palette palette)
 		{
 			canvasWidth = Math.Max(1, canvasWidth);
 			canvasHeight = Math.Max(1, canvasHeight);
@@ -41,7 +39,7 @@ namespace DatExplorerIII.Services
 		}
 
 		/// <summary>Draws a full screen picture, whose colors all show.</summary>
-		public static BitmapSource Render(RixImage image)
+		public static PixelImage Render(RixImage image)
 		{
 			Byte[] bgra = new Byte[image.Width * image.Height * 4];
 			for (Int32 i = 0; i < image.Pixels.Length; i++)
@@ -53,7 +51,7 @@ namespace DatExplorerIII.Services
 		}
 
 		/// <summary>Draws the 256 colors of a palette as a grid of 16 by 16 squares.</summary>
-		public static BitmapSource RenderPalette(Palette palette)
+		public static PixelImage RenderPalette(Palette palette)
 		{
 			Int32 side = 16 * SwatchSize;
 			Byte[] bgra = new Byte[side * side * 4];
@@ -80,7 +78,7 @@ namespace DatExplorerIII.Services
 		/// Draws the characters of a font in a table of 16 columns, a character per cell, from the code 0: light pixels on a dark
 		/// background (the nine levels of an AAF font are nine grays).
 		/// </summary>
-		public static BitmapSource Render(FontFile font)
+		public static PixelImage Render(FontFile font)
 		{
 			const Int32 columns = 16;
 			Int32 cellWidth = Math.Max(1, font.Glyphs.Max(glyph => glyph.Width)) + 3;
@@ -140,11 +138,9 @@ namespace DatExplorerIII.Services
 			bgra[offset + 3] = 255;
 		}
 
-		private static BitmapSource Create(Int32 width, Int32 height, Byte[] bgra)
+		private static PixelImage Create(Int32 width, Int32 height, Byte[] bgra)
 		{
-			BitmapSource bitmap = BitmapSource.Create(width, height, 96, 96, PixelFormats.Bgra32, null, bgra, width * 4);
-			bitmap.Freeze();
-			return bitmap;
+			return new PixelImage(width, height, bgra);
 		}
 	}
 }

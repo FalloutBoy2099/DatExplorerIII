@@ -8,8 +8,6 @@ namespace DatExplorerIII.ViewModels
 	using System.Threading;
 	using System.Threading.Tasks;
 	using System.Windows.Input;
-	using System.Windows.Media;
-	using System.Windows.Media.Imaging;
 	using Formats;
 	using Infrastructure;
 	using Models;
@@ -29,7 +27,7 @@ namespace DatExplorerIII.ViewModels
 		private MveMovie? _movie;
 		private MveFrameReader? _reader;
 		private Byte[] _pixels = Array.Empty<Byte>();
-		private WriteableBitmap? _bitmap;
+		private PixelImage? _frame;
 		private Int32 _shown;
 		private TimeSpan _clockStart;
 		private Boolean _isPlaying;
@@ -53,10 +51,11 @@ namespace DatExplorerIII.ViewModels
 
 		public Boolean HasMovie => _movie != null;
 
-		public WriteableBitmap? Bitmap
+		/// <summary>The picture of the movie that is shown; its pixels change as the movie plays.</summary>
+		public PixelImage? Frame
 		{
-			get => _bitmap;
-			private set => SetProperty(ref _bitmap, value);
+			get => _frame;
+			private set => SetProperty(ref _frame, value);
 		}
 
 		public String Info
@@ -136,7 +135,7 @@ namespace DatExplorerIII.ViewModels
 			_subtitles = subtitles;
 			_reader = movie.CreateFrameReader();
 			_pixels = new Byte[_reader.FrameBytes];
-			Bitmap = new WriteableBitmap(movie.Width, movie.Height, 96, 96, PixelFormats.Bgra32, null);
+			Frame = new PixelImage(movie.Width, movie.Height, _pixels);
 
 			ShowFrame(0);
 			Info = Loc.Format(
@@ -155,7 +154,7 @@ namespace DatExplorerIII.ViewModels
 			UpdateSubtitle();
 			OnPropertyChanged(nameof(HasMovie));
 			OnPropertyChanged(nameof(LastFrame));
-			CommandManager.InvalidateRequerySuggested();
+			CommandRequery.Invalidate();
 
 			// Jumping needs the states of the decoding that are saved as the movie is decoded: made in the background.
 			_building = new CancellationTokenSource();
@@ -218,7 +217,7 @@ namespace DatExplorerIII.ViewModels
 			_reader = null;
 			_pixels = Array.Empty<Byte>();
 			_shown = 0;
-			Bitmap = null;
+			Frame = null;
 			Info = String.Empty;
 			Warning = String.Empty;
 			OnPropertyChanged(nameof(HasMovie));
@@ -238,10 +237,7 @@ namespace DatExplorerIII.ViewModels
 			if (_reader.ReadFrame(_pixels))
 			{
 				_shown = _reader.FramePosition - 1;
-				if (_bitmap != null && _movie != null)
-				{
-					_bitmap.WritePixels(new System.Windows.Int32Rect(0, 0, _movie.Width, _movie.Height), _pixels, _movie.Width * 4, 0);
-				}
+				_frame?.Invalidate();
 			}
 
 			OnPropertyChanged(nameof(Position));

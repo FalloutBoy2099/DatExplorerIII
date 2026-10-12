@@ -5,8 +5,6 @@ namespace DatExplorerIII.ViewModels
 	using System.Globalization;
 	using System.Linq;
 	using System.Windows.Input;
-	using System.Windows.Media;
-	using System.Windows.Media.Imaging;
 	using Infrastructure;
 	using Models;
 	using Services;
@@ -29,13 +27,13 @@ namespace DatExplorerIII.ViewModels
 	/// </summary>
 	public sealed class ImageViewerViewModel : ObservableObject, IDisposable
 	{
-		private readonly Dictionary<(Int32 Direction, Int32 Frame, Int32 Palette), BitmapSource> _cache = new();
+		private readonly Dictionary<(Int32 Direction, Int32 Frame, Int32 Palette), PixelImage> _cache = new();
 		private readonly IUiTimer _timer;
 
 		private FrmImage? _animation;
 		private Int32 _canvasWidth;
 		private Int32 _canvasHeight;
-		private BitmapSource? _bitmap;
+		private PixelImage? _picture;
 		private IReadOnlyList<PaletteChoice> _paletteChoices = Array.Empty<PaletteChoice>();
 		private PaletteChoice? _selectedPalette;
 		private Int32 _direction;
@@ -73,12 +71,12 @@ namespace DatExplorerIII.ViewModels
 
 		public IReadOnlyList<ZoomOption> ZoomOptions { get; }
 
-		public BitmapSource? Bitmap
+		public PixelImage? Picture
 		{
-			get => _bitmap;
+			get => _picture;
 			private set
 			{
-				if (SetProperty(ref _bitmap, value))
+				if (SetProperty(ref _picture, value))
 				{
 					OnPropertyChanged(nameof(DisplayWidth));
 					OnPropertyChanged(nameof(DisplayHeight));
@@ -178,9 +176,9 @@ namespace DatExplorerIII.ViewModels
 		public Boolean IsFit => _selectedZoom.Factor == 0;
 
 		/// <summary>The width of the picture at the chosen magnification.</summary>
-		public Double DisplayWidth => (_bitmap?.PixelWidth ?? 0) * Math.Max(_selectedZoom.Factor, 1);
+		public Double DisplayWidth => (_picture?.Width ?? 0) * Math.Max(_selectedZoom.Factor, 1);
 
-		public Double DisplayHeight => (_bitmap?.PixelHeight ?? 0) * Math.Max(_selectedZoom.Factor, 1);
+		public Double DisplayHeight => (_picture?.Height ?? 0) * Math.Max(_selectedZoom.Factor, 1);
 
 		public String Info
 		{
@@ -206,18 +204,18 @@ namespace DatExplorerIII.ViewModels
 		}
 
 		/// <summary>Shows a picture file (PNG, BMP, JPEG, GIF) that was decoded.</summary>
-		public void ShowBitmap(BitmapSource bitmap, String? info = null)
+		public void ShowBitmap(PixelImage bitmap, String? info = null)
 		{
 			Reset();
-			Bitmap = bitmap;
-			Info = info ?? Loc.Format("Str.ViewerImageSize", bitmap.PixelWidth, bitmap.PixelHeight);
+			Picture = bitmap;
+			Info = info ?? Loc.Format("Str.ViewerImageSize", bitmap.Width, bitmap.Height);
 		}
 
 		/// <summary>Shows a full screen picture.</summary>
 		public void ShowPicture(RixImage image)
 		{
 			Reset();
-			Bitmap = ImageRenderer.Render(image);
+			Picture = ImageRenderer.Render(image);
 			Info = Loc.Format("Str.ViewerImageSize", image.Width, image.Height);
 		}
 
@@ -225,7 +223,7 @@ namespace DatExplorerIII.ViewModels
 		public void ShowPalette(Palette palette)
 		{
 			Reset();
-			Bitmap = ImageRenderer.RenderPalette(palette);
+			Picture = ImageRenderer.RenderPalette(palette);
 			Info = Loc.Get("Str.ViewerPaletteInfo");
 		}
 
@@ -255,7 +253,7 @@ namespace DatExplorerIII.ViewModels
 			_frame = 0;
 			_paletteChoices = Array.Empty<PaletteChoice>();
 			_selectedPalette = null;
-			Bitmap = null;
+			Picture = null;
 			OnAnimationChanged();
 		}
 
@@ -283,14 +281,14 @@ namespace DatExplorerIII.ViewModels
 
 			Int32 paletteIndex = _paletteChoices.ToList().IndexOf(_selectedPalette);
 			(Int32, Int32, Int32) key = (_direction, _frame, paletteIndex);
-			if (!_cache.TryGetValue(key, out BitmapSource? bitmap))
+			if (!_cache.TryGetValue(key, out PixelImage? bitmap))
 			{
 				FrmFrame frame = _animation.Directions[_direction].Frames[_frame];
 				bitmap = ImageRenderer.Render(frame, _canvasWidth, _canvasHeight, _selectedPalette.Palette);
 				_cache[key] = bitmap;
 			}
 
-			Bitmap = bitmap;
+			Picture = bitmap;
 			OnPropertyChanged(nameof(FrameLabel));
 		}
 

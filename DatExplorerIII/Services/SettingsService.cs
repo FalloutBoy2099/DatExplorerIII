@@ -2,6 +2,7 @@ namespace DatExplorerIII.Services
 {
 	using System;
 	using System.IO;
+	using System.Linq;
 	using System.Reflection;
 	using System.Text.Json;
 	using Models;
@@ -142,6 +143,22 @@ namespace DatExplorerIII.Services
 		private static void Normalize(SettingsData data)
 		{
 			data.RecentFiles.RemoveAll(path => String.IsNullOrWhiteSpace(path));
+			data.AudioVolume = Math.Clamp(data.AudioVolume, 0, 100);
+			if (!Enum.TryParse(data.SortColumn, out DatSortColumn _))
+			{
+				data.SortColumn = "Name";
+			}
+
+			// The widths of the columns come back whole or not at all (a number of columns that does not fit is an older layout).
+			if (data.ColumnWidths.Count != SettingsData.ColumnCount || data.ColumnWidths.Any(width => Double.IsNaN(width) || Double.IsInfinity(width)))
+			{
+				data.ColumnWidths.Clear();
+			}
+			else
+			{
+				data.ColumnWidths = data.ColumnWidths.Select(width => Math.Clamp(width, SettingsData.MinimumColumnWidth, SettingsData.MaximumColumnWidth)).ToList();
+			}
+
 			data.ScrollBarWidth = ScrollBarMetrics.Clamp(data.ScrollBarWidth, ScrollBarMetrics.MinimumWidth, ScrollBarMetrics.MaximumWidth);
 			data.ScrollBarMinimumThumb = ScrollBarMetrics.Clamp(data.ScrollBarMinimumThumb, ScrollBarMetrics.MinimumThumbLength, ScrollBarMetrics.MaximumThumbLength);
 		}

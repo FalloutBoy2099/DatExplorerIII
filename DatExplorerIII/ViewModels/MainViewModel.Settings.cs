@@ -28,18 +28,31 @@ namespace DatExplorerIII.ViewModels
 		/// <summary>A viewer for a file, set as the user wants (the other archives, the subtitles of the movies).</summary>
 		private ViewerViewModel CreateViewer()
 		{
-			return new ViewerViewModel(_uiThread) { OtherArchives = OpenArchives, ShowSubtitles = _settings.Data.ShowSubtitles };
+			ViewerViewModel viewer = new(_uiThread) { OtherArchives = OpenArchives, ShowSubtitles = _settings.Data.ShowSubtitles };
+
+			// The volume and the repeat are kept for the next sound, and for the next run.
+			viewer.Audio.Volume = _settings.Data.AudioVolume;
+			viewer.Audio.IsLooping = _settings.Data.AudioLoop;
+			viewer.Audio.PropertyChanged += (_, args) =>
+			{
+				if (args.PropertyName == nameof(AudioViewerViewModel.Volume))
+				{
+					_settings.Data.AudioVolume = (Int32)Math.Round(viewer.Audio.Volume);
+				}
+				else if (args.PropertyName == nameof(AudioViewerViewModel.IsLooping))
+				{
+					_settings.Data.AudioLoop = viewer.Audio.IsLooping;
+				}
+			};
+
+			return viewer;
 		}
 
 		/// <summary>Gives the option of the subtitles to the viewers that are open (the preview and those of a comparison).</summary>
 		private void ApplySubtitlesOption()
 		{
 			Preview.ShowSubtitles = _settings.Data.ShowSubtitles;
-			if (_comparison != null)
-			{
-				_comparison.LeftViewer.ShowSubtitles = _settings.Data.ShowSubtitles;
-				_comparison.RightViewer.ShowSubtitles = _settings.Data.ShowSubtitles;
-			}
+			Comparison.ApplySubtitles();
 		}
 
 		/// <summary>Opens the settings window; when the user accepts, the changes apply at once.</summary>
@@ -66,7 +79,7 @@ namespace DatExplorerIII.ViewModels
 			_settings.Data.ShowSubtitles = model.ShowSubtitles;
 			_settings.Data.ScrollBarWidth = ScrollBarMetrics.Clamp((Int32)Math.Round(model.ScrollBarWidth), ScrollBarMetrics.MinimumWidth, ScrollBarMetrics.MaximumWidth);
 			_settings.Data.ScrollBarMinimumThumb = ScrollBarMetrics.Clamp((Int32)Math.Round(model.ScrollBarMinimumThumb), ScrollBarMetrics.MinimumThumbLength, ScrollBarMetrics.MaximumThumbLength);
-			ScrollBarMetrics.Apply(_settings.Data.ScrollBarWidth, _settings.Data.ScrollBarMinimumThumb);
+			_scrollBars.Update(_settings.Data.ScrollBarWidth, _settings.Data.ScrollBarMinimumThumb);
 			ApplySubtitlesOption();
 
 			ComparisonOptions options = model.ToComparisonOptions();
@@ -80,9 +93,9 @@ namespace DatExplorerIII.ViewModels
 			OnPropertyChanged(nameof(IsShowSubtitles));
 			OnPropertyChanged(nameof(ComparisonOptions));
 
-			if (optionsChanged && IsComparing)
+			if (optionsChanged && Comparison.IsComparing)
 			{
-				await CompareAgainAsync();
+				await Comparison.CompareAgainAsync();
 			}
 		}
 	}

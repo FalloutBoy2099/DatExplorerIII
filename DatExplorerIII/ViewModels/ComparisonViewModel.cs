@@ -6,6 +6,7 @@ namespace DatExplorerIII.ViewModels
 	using System.Linq;
 	using System.Threading;
 	using System.Threading.Tasks;
+	using System.Windows.Input;
 	using Core;
 	using Formats;
 	using Infrastructure;
@@ -192,6 +193,7 @@ namespace DatExplorerIII.ViewModels
 			RightViewer = new ViewerViewModel(uiThread) { OtherArchives = archives };
 
 			Diff = new DiffViewModel();
+			SelectRowsCommand = new RelayCommand(parameter => SetSelection(((IEnumerable<Object>)parameter!).OfType<ComparisonRow>().ToList()), parameter => parameter is IEnumerable<Object>);
 			Root = BuildFolders();
 			_selectedFolder = Root;
 			Root.IsSelected = true;
@@ -441,6 +443,9 @@ namespace DatExplorerIII.ViewModels
 		public Boolean CanSendRight => _selected.Any(row => row.Left != null);
 
 		public Boolean CanSendLeft => _selected.Any(row => row.Right != null);
+
+		/// <summary>The selection of the list of the files changed; the parameter is the list of the selected rows.</summary>
+		public ICommand SelectRowsCommand { get; }
 
 		public void SetSelection(IReadOnlyList<ComparisonRow> rows)
 		{

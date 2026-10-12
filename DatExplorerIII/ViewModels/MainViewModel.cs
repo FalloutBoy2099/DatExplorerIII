@@ -14,7 +14,7 @@ namespace DatExplorerIII.ViewModels
 	/// <summary>
 	/// State and behavior of the main window. The behavior is split by feature in the other files of this class.
 	/// </summary>
-	public sealed partial class MainViewModel : ObservableObject, IDisposable
+	public sealed partial class MainViewModel : ObservableObject, IWindowPlacementStore, IComparisonHost, IDisposable
 	{
 		private const Int64 MaxDragBytes = 512L * 1024 * 1024;
 		private const Int32 LargeFileBytes = 1024 * 1024;
@@ -24,6 +24,7 @@ namespace DatExplorerIII.ViewModels
 		private readonly SettingsService _settings;
 		private readonly TempFolder _temp;
 		private readonly IUiThread _uiThread;
+		private readonly ScrollBarMetrics _scrollBars;
 
 		private FolderNode? _selectedFolder;
 		private IReadOnlyList<ListEntry> _items = Array.Empty<ListEntry>();
@@ -38,16 +39,19 @@ namespace DatExplorerIII.ViewModels
 		private String _totalText = String.Empty;
 		private String _pathText = String.Empty;
 
-		public MainViewModel(IDialogService dialogs, SettingsService settings, TempFolder temp, IUiThread uiThread)
+		public MainViewModel(IDialogService dialogs, SettingsService settings, TempFolder temp, IUiThread uiThread, ScrollBarMetrics scrollBars)
 		{
 			_dialogs = dialogs;
 			_uiThread = uiThread;
+			_scrollBars = scrollBars;
 			_settings = settings;
 			_temp = temp;
 			Busy = new BusyState(dialogs);
 			Preview = CreateViewer();
 			_statusText = Loc.Get("Str.Ready");
 			_viewMode = Enum.TryParse(settings.Data.ViewMode, out DatViewMode mode) ? mode : DatViewMode.Details;
+			_sortColumn = Enum.TryParse(settings.Data.SortColumn, out DatSortColumn sortColumn) ? sortColumn : DatSortColumn.Name;
+			_sortDescending = settings.Data.SortDescending;
 
 			OpenCommand = new AsyncRelayCommand(PickAndOpenAsync, CanBrowse);
 			OpenRecentCommand = new AsyncRelayCommand(OpenRecentAsync, _ => CanBrowse());
@@ -90,12 +94,15 @@ namespace DatExplorerIII.ViewModels
 			SetDoubleClickCommand = new RelayCommand(parameter => SetDoubleClick((String)parameter!));
 			AboutCommand = new RelayCommand(_dialogs.ShowAbout);
 			SettingsCommand = new AsyncRelayCommand(OpenSettingsAsync, () => !Busy.IsBusy);
-			CreateComparisonCommands();
+			Comparison = new ComparisonController(this, dialogs, settings, temp, uiThread);
 			CreateInputCommands();
 		}
 
 		/// <summary>Raised when a list entry should be selected and scrolled into view.</summary>
 		public event Action<ListEntry>? RevealRequested;
+
+		/// <summary>The comparison of two archives (the mode of the window that shows them side by side).</summary>
+		public ComparisonController Comparison { get; }
 
 		public ICommand OpenCommand { get; }
 
@@ -285,7 +292,7 @@ namespace DatExplorerIII.ViewModels
 		/// <summary>The archives can be browsed and changed when no operation runs and the window is not in the comparison mode.</summary>
 		private Boolean CanBrowse()
 		{
-			return !Busy.IsBusy && !IsComparing;
+			return !Busy.IsBusy && !Comparison.IsComparing;
 		}
 
 		private Boolean HasDocument()

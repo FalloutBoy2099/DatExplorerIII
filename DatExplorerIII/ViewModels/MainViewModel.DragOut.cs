@@ -22,8 +22,8 @@ namespace DatExplorerIII.ViewModels
 				return null;
 			}
 
-			List<DatEntry> entries = CollectEntries(folder.Document, items).Where(entry => !entry.IsNew).ToList();
-			List<String> top = items.Where(item => item.Folder != null || item.Entry is { IsNew: false }).Select(item => item.Name).ToList();
+			List<DatEntry> entries = CollectEntries(folder.Document, items).ToList();
+			List<String> top = items.Select(item => item.Name).ToList();
 			return ExtractForDrag(folder.Document, entries, folder.Path, top);
 		}
 
@@ -35,7 +35,7 @@ namespace DatExplorerIII.ViewModels
 			}
 
 			String parentPath = node.Parent?.Path ?? String.Empty;
-			return ExtractForDrag(node.Document, node.Document.Archive.GetEntriesUnder(node.Path).Where(entry => !entry.IsNew).ToList(), parentPath, new List<String> { node.Name });
+			return ExtractForDrag(node.Document, node.Document.Archive.GetEntriesUnder(node.Path).ToList(), parentPath, new List<String> { node.Name });
 		}
 
 		private IReadOnlyList<String>? ExtractForDrag(DatDocument document, List<DatEntry> entries, String stripPrefix, List<String> topLevelNames)

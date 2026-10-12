@@ -12,6 +12,8 @@
     Height="690"
     MinWidth="900"
     MinHeight="420"
+    behaviors:WindowPlacementBehavior.Store="{Binding}"
+    Closed="OnClosed"
     Closing="OnClosing"
     FontSize="12"
     Icon="pack://application:,,,/Resources/app.ico"
@@ -179,18 +181,22 @@
         <GridView x:Key="DetailsView">
             <GridViewColumn
                 Width="180"
+                behaviors:SortColumn.Key="Name"
                 CellTemplate="{StaticResource NameCellTemplate}"
                 Header="{DynamicResource Str.ColName}" />
             <GridViewColumn
                 Width="80"
+                behaviors:SortColumn.Key="Type"
                 DisplayMemberBinding="{Binding TypeText}"
                 Header="{DynamicResource Str.ColType}" />
             <GridViewColumn
                 Width="80"
+                behaviors:SortColumn.Key="Size"
                 DisplayMemberBinding="{Binding SizeText}"
                 Header="{DynamicResource Str.ColSize}" />
             <GridViewColumn
                 Width="130"
+                behaviors:SortColumn.Key="PackedSize"
                 DisplayMemberBinding="{Binding PackedSizeText}"
                 Header="{DynamicResource Str.ColPacked}" />
         </GridView>
@@ -610,34 +616,34 @@
                             <MenuItem
                                 Header="{DynamicResource Str.CompareLayoutListSide}"
                                 IsCheckable="True"
-                                IsChecked="{Binding IsCompareListSide}" />
+                                IsChecked="{Binding Comparison.IsCompareListSide}" />
                             <MenuItem
                                 Header="{DynamicResource Str.CompareLayoutListStacked}"
                                 IsCheckable="True"
-                                IsChecked="{Binding IsCompareListStacked}" />
+                                IsChecked="{Binding Comparison.IsCompareListStacked}" />
                             <Separator />
                             <MenuItem
                                 Header="{DynamicResource Str.CompareLayoutViewersSide}"
                                 IsCheckable="True"
-                                IsChecked="{Binding IsCompareViewersSide}" />
+                                IsChecked="{Binding Comparison.IsCompareViewersSide}" />
                             <MenuItem
                                 Header="{DynamicResource Str.CompareLayoutViewersStacked}"
                                 IsCheckable="True"
-                                IsChecked="{Binding IsCompareViewersStacked}" />
+                                IsChecked="{Binding Comparison.IsCompareViewersStacked}" />
                             <Separator />
                             <MenuItem
                                 Header="{DynamicResource Str.CompareLayoutGroupsSide}"
                                 IsCheckable="True"
-                                IsChecked="{Binding IsCompareGroupsSide}" />
+                                IsChecked="{Binding Comparison.IsCompareGroupsSide}" />
                             <MenuItem
                                 Header="{DynamicResource Str.CompareLayoutGroupsStacked}"
                                 IsCheckable="True"
-                                IsChecked="{Binding IsCompareGroupsStacked}" />
+                                IsChecked="{Binding Comparison.IsCompareGroupsStacked}" />
                             <Separator />
                             <MenuItem
                                 Header="{DynamicResource Str.CompareTree}"
                                 IsCheckable="True"
-                                IsChecked="{Binding IsCompareTreeVisible}" />
+                                IsChecked="{Binding Comparison.IsCompareTreeVisible}" />
                         </MenuItem>
                         <Separator />
                         <MenuItem
@@ -660,8 +666,8 @@
                             Header="{DynamicResource Str.RemoveDamaged}"
                             ToolTip="{DynamicResource Str.RemoveDamagedTip}" />
                         <Separator />
-                        <MenuItem Command="{Binding CompareCommand}" Header="{DynamicResource Str.Compare}" />
-                        <MenuItem Command="{Binding CloseComparisonCommand}" Header="{DynamicResource Str.CompareClose}" />
+                        <MenuItem Command="{Binding Comparison.CompareCommand}" Header="{DynamicResource Str.Compare}" />
+                        <MenuItem Command="{Binding Comparison.CloseComparisonCommand}" Header="{DynamicResource Str.CompareClose}" />
                         <Separator />
                         <MenuItem Command="{Binding SettingsCommand}" Header="{DynamicResource Str.Settings}" />
                     </MenuItem>
@@ -676,7 +682,7 @@
                     Grid.Row="1"
                     Margin="6,1"
                     IsEnabled="{Binding Busy.IsBusy, Converter={StaticResource InverseBool}}"
-                    Visibility="{Binding IsComparing, Converter={StaticResource InverseBoolToVisibility}}">
+                    Visibility="{Binding Comparison.IsComparing, Converter={StaticResource InverseBoolToVisibility}}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
@@ -829,7 +835,7 @@
                     Grid.Row="2"
                     Margin="6,6,6,6"
                     IsEnabled="{Binding Busy.IsBusy, Converter={StaticResource InverseBool}}"
-                    Visibility="{Binding IsComparing, Converter={StaticResource InverseBoolToVisibility}}">
+                    Visibility="{Binding Comparison.IsComparing, Converter={StaticResource InverseBoolToVisibility}}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="280" MinWidth="160" />
                         <ColumnDefinition Width="Auto" />
@@ -846,11 +852,11 @@
                         Grid.Column="0"
                         behaviors:FileDrag.Source="{Binding FolderDragSource, Mode=OneTime}"
                         behaviors:FileDrop.Command="{Binding OpenDroppedCommand, Mode=OneTime}"
+                        behaviors:TreeViewBehavior.SelectOnRightClick="True"
+                        behaviors:TreeViewBehavior.SelectedItemCommand="{Binding TreeSelectionChangedCommand, Mode=OneTime}"
                         ItemContainerStyle="{StaticResource FolderItemStyle}"
                         ItemTemplate="{StaticResource FolderTemplate}"
-                        ItemsSource="{Binding Roots}"
-                        PreviewMouseRightButtonDown="OnTreePreviewRightMouseDown"
-                        SelectedItemChanged="OnTreeSelectedItemChanged">
+                        ItemsSource="{Binding Roots}">
                         <TreeView.InputBindings>
                             <KeyBinding Key="Delete" Command="{Binding DeleteFolderCommand}" />
                             <KeyBinding Key="F2" Command="{Binding RenameFolderCommand}" />
@@ -881,10 +887,11 @@
                         Grid.Column="2"
                         behaviors:FileDrag.Source="{Binding ListDragSource, Mode=OneTime}"
                         behaviors:FileDrop.Command="{Binding ImportDroppedCommand, Mode=OneTime}"
-                        GridViewColumnHeader.Click="OnColumnHeaderClick"
+                        behaviors:GridViewColumnWidths.Widths="{Binding ColumnWidths, Mode=TwoWay}"
+                        behaviors:ItemActivation.Command="{Binding OpenItemCommand, Mode=OneTime}"
+                        behaviors:SelectionBehavior.Command="{Binding ListSelectionChangedCommand, Mode=OneTime}"
+                        behaviors:SortColumn.Command="{Binding SortCommand, Mode=OneTime}"
                         ItemsSource="{Binding Items}"
-                        MouseDoubleClick="OnListDoubleClick"
-                        SelectionChanged="OnListSelectionChanged"
                         SelectionMode="Extended"
                         Style="{StaticResource FileListStyle}">
                         <ListView.InputBindings>
@@ -940,7 +947,7 @@
                     Grid.Row="2"
                     Margin="6,0,6,6"
                     IsEnabled="{Binding Busy.IsBusy, Converter={StaticResource InverseBool}}"
-                    Visibility="{Binding IsComparing, Converter={StaticResource BoolToVisibility}}">
+                    Visibility="{Binding Comparison.IsComparing, Converter={StaticResource BoolToVisibility}}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
@@ -950,40 +957,40 @@
                     <!--  The tool bar: only icons, the text is the tool tip.  -->
                     <StackPanel Margin="0,-6,0,12" Orientation="Horizontal">
                         <ToggleButton
-                            AutomationProperties.Name="{Binding Comparison.DifferentFilterText}"
-                            IsChecked="{Binding Comparison.ShowDifferent}"
+                            AutomationProperties.Name="{Binding Comparison.Current.DifferentFilterText}"
+                            IsChecked="{Binding Comparison.Current.ShowDifferent}"
                             Style="{StaticResource IconToggle}"
-                            ToolTip="{Binding Comparison.DifferentFilterText}">
+                            ToolTip="{Binding Comparison.Current.DifferentFilterText}">
                             <TextBlock
                                 Foreground="{DynamicResource SystemFillColorCautionBrush}"
                                 Style="{StaticResource ToolIcon}"
                                 Text="&#xE7BA;" />
                         </ToggleButton>
                         <ToggleButton
-                            AutomationProperties.Name="{Binding Comparison.LeftOnlyFilterText}"
-                            IsChecked="{Binding Comparison.ShowLeftOnly}"
+                            AutomationProperties.Name="{Binding Comparison.Current.LeftOnlyFilterText}"
+                            IsChecked="{Binding Comparison.Current.ShowLeftOnly}"
                             Style="{StaticResource IconToggle}"
-                            ToolTip="{Binding Comparison.LeftOnlyFilterText}">
+                            ToolTip="{Binding Comparison.Current.LeftOnlyFilterText}">
                             <TextBlock
                                 Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}"
                                 Style="{StaticResource ToolIcon}"
                                 Text="&#xE72B;" />
                         </ToggleButton>
                         <ToggleButton
-                            AutomationProperties.Name="{Binding Comparison.RightOnlyFilterText}"
-                            IsChecked="{Binding Comparison.ShowRightOnly}"
+                            AutomationProperties.Name="{Binding Comparison.Current.RightOnlyFilterText}"
+                            IsChecked="{Binding Comparison.Current.ShowRightOnly}"
                             Style="{StaticResource IconToggle}"
-                            ToolTip="{Binding Comparison.RightOnlyFilterText}">
+                            ToolTip="{Binding Comparison.Current.RightOnlyFilterText}">
                             <TextBlock
                                 Foreground="{DynamicResource SystemFillColorSuccessBrush}"
                                 Style="{StaticResource ToolIcon}"
                                 Text="&#xE72A;" />
                         </ToggleButton>
                         <ToggleButton
-                            AutomationProperties.Name="{Binding Comparison.IdenticalFilterText}"
-                            IsChecked="{Binding Comparison.ShowIdentical}"
+                            AutomationProperties.Name="{Binding Comparison.Current.IdenticalFilterText}"
+                            IsChecked="{Binding Comparison.Current.ShowIdentical}"
                             Style="{StaticResource IconToggle}"
-                            ToolTip="{Binding Comparison.IdenticalFilterText}">
+                            ToolTip="{Binding Comparison.Current.IdenticalFilterText}">
                             <TextBlock
                                 Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                                 Style="{StaticResource ToolIcon}"
@@ -998,42 +1005,42 @@
 
                         <ToggleButton
                             AutomationProperties.Name="{DynamicResource Str.CompareSubfolders}"
-                            IsChecked="{Binding Comparison.IncludeSubfolders}"
+                            IsChecked="{Binding Comparison.Current.IncludeSubfolders}"
                             Style="{StaticResource IconToggle}"
                             ToolTip="{DynamicResource Str.CompareSubfolders}">
                             <TextBlock Style="{StaticResource ToolIcon}" Text="&#xE81E;" />
                         </ToggleButton>
                         <ToggleButton
                             AutomationProperties.Name="{DynamicResource Str.CompareTree}"
-                            IsChecked="{Binding IsCompareTreeVisible}"
+                            IsChecked="{Binding Comparison.IsCompareTreeVisible}"
                             Style="{StaticResource IconToggle}"
                             ToolTip="{DynamicResource Str.CompareTree}">
                             <TextBlock Style="{StaticResource ToolIcon}" Text="&#xE8A0;" />
                         </ToggleButton>
                         <ToggleButton
                             AutomationProperties.Name="{DynamicResource Str.CompareShowDifferences}"
-                            IsChecked="{Binding Comparison.ShowDifferences}"
+                            IsChecked="{Binding Comparison.Current.ShowDifferences}"
                             Style="{StaticResource IconToggle}"
                             ToolTip="{DynamicResource Str.CompareShowDifferences}">
                             <TextBlock Style="{StaticResource ToolIcon}" Text="&#xE746;" />
                         </ToggleButton>
                         <ToggleButton
                             AutomationProperties.Name="{DynamicResource Str.CompareLayoutListStacked}"
-                            IsChecked="{Binding IsCompareListStacked}"
+                            IsChecked="{Binding Comparison.IsCompareListStacked}"
                             Style="{StaticResource IconToggle}"
                             ToolTip="{DynamicResource Str.CompareLayoutListStacked}">
                             <Path Style="{StaticResource LayoutIconList}" />
                         </ToggleButton>
                         <ToggleButton
                             AutomationProperties.Name="{DynamicResource Str.CompareLayoutViewersStacked}"
-                            IsChecked="{Binding IsCompareViewersStacked}"
+                            IsChecked="{Binding Comparison.IsCompareViewersStacked}"
                             Style="{StaticResource IconToggle}"
                             ToolTip="{DynamicResource Str.CompareLayoutViewersStacked}">
                             <Path Style="{StaticResource LayoutIconViewers}" />
                         </ToggleButton>
                         <ToggleButton
                             AutomationProperties.Name="{DynamicResource Str.CompareLayoutGroupsStacked}"
-                            IsChecked="{Binding IsCompareGroupsStacked}"
+                            IsChecked="{Binding Comparison.IsCompareGroupsStacked}"
                             Style="{StaticResource IconToggle}"
                             ToolTip="{DynamicResource Str.CompareLayoutGroupsStacked}">
                             <Path Style="{StaticResource LayoutIconGroups}" />
@@ -1047,7 +1054,7 @@
 
                         <Button
                             AutomationProperties.Name="{DynamicResource Str.CompareCopyLeft}"
-                            Command="{Binding CopyToLeftCommand, Mode=OneTime}"
+                            Command="{Binding Comparison.CopyToLeftCommand, Mode=OneTime}"
                             Style="{StaticResource IconButton}"
                             ToolTip="{DynamicResource Str.CompareCopyLeft}">
                             <StackPanel Orientation="Horizontal">
@@ -1064,7 +1071,7 @@
                         </Button>
                         <Button
                             AutomationProperties.Name="{DynamicResource Str.CompareCopyRight}"
-                            Command="{Binding CopyToRightCommand, Mode=OneTime}"
+                            Command="{Binding Comparison.CopyToRightCommand, Mode=OneTime}"
                             Style="{StaticResource IconButton}"
                             ToolTip="{DynamicResource Str.CompareCopyRight}">
                             <StackPanel Orientation="Horizontal">
@@ -1081,7 +1088,7 @@
                         </Button>
                         <Button
                             AutomationProperties.Name="{DynamicResource Str.CompareMoveLeft}"
-                            Command="{Binding MoveToLeftCommand, Mode=OneTime}"
+                            Command="{Binding Comparison.MoveToLeftCommand, Mode=OneTime}"
                             Style="{StaticResource IconButton}"
                             ToolTip="{DynamicResource Str.CompareMoveLeft}">
                             <StackPanel Orientation="Horizontal">
@@ -1098,7 +1105,7 @@
                         </Button>
                         <Button
                             AutomationProperties.Name="{DynamicResource Str.CompareMoveRight}"
-                            Command="{Binding MoveToRightCommand, Mode=OneTime}"
+                            Command="{Binding Comparison.MoveToRightCommand, Mode=OneTime}"
                             Style="{StaticResource IconButton}"
                             ToolTip="{DynamicResource Str.CompareMoveRight}">
                             <StackPanel Orientation="Horizontal">
@@ -1123,7 +1130,7 @@
                         <!--  The bar at the side of the disk tells which archive is saved.  -->
                         <Button
                             AutomationProperties.Name="{DynamicResource Str.CompareSaveLeft}"
-                            Command="{Binding SaveLeftCommand, Mode=OneTime}"
+                            Command="{Binding Comparison.SaveLeftCommand, Mode=OneTime}"
                             Style="{StaticResource IconButton}"
                             ToolTip="{DynamicResource Str.CompareSaveLeft}">
                             <Border
@@ -1135,7 +1142,7 @@
                         </Button>
                         <Button
                             AutomationProperties.Name="{DynamicResource Str.CompareSaveRight}"
-                            Command="{Binding SaveRightCommand, Mode=OneTime}"
+                            Command="{Binding Comparison.SaveRightCommand, Mode=OneTime}"
                             Style="{StaticResource IconButton}"
                             ToolTip="{DynamicResource Str.CompareSaveRight}">
                             <Border
@@ -1154,14 +1161,14 @@
 
                         <Button
                             AutomationProperties.Name="{DynamicResource Str.CompareAgain}"
-                            Command="{Binding CompareAgainCommand, Mode=OneTime}"
+                            Command="{Binding Comparison.CompareAgainCommand, Mode=OneTime}"
                             Style="{StaticResource IconButton}"
                             ToolTip="{DynamicResource Str.CompareAgain}">
                             <TextBlock Style="{StaticResource ToolIcon}" Text="&#xE72C;" />
                         </Button>
                         <Button
                             AutomationProperties.Name="{DynamicResource Str.CompareClose}"
-                            Command="{Binding CloseComparisonCommand, Mode=OneTime}"
+                            Command="{Binding Comparison.CloseComparisonCommand, Mode=OneTime}"
                             Style="{StaticResource IconButton}"
                             ToolTip="{DynamicResource Str.CompareClose}">
                             <TextBlock Style="{StaticResource ToolIcon}" Text="&#xE711;" />
@@ -1172,19 +1179,19 @@
                     <views:SplitPair
                         Grid.Row="1"
                         FirstWeight="1.3"
-                        Orientation="{Binding IsCompareGroupsStacked, Converter={StaticResource BoolToOrientation}}"
+                        Orientation="{Binding Comparison.IsCompareGroupsStacked, Converter={StaticResource BoolToOrientation}}"
                         SecondWeight="1">
                         <views:SplitPair.First>
                             <views:SplitPair
-                                FirstVisible="{Binding IsCompareTreeVisible}"
+                                FirstVisible="{Binding Comparison.IsCompareTreeVisible}"
                                 FirstWeight="1"
-                                Orientation="{Binding IsCompareListStacked, Converter={StaticResource BoolToOrientation}}"
+                                Orientation="{Binding Comparison.IsCompareListStacked, Converter={StaticResource BoolToOrientation}}"
                                 SecondWeight="2.4">
                                 <views:SplitPair.First>
                                     <TreeView
                                         ItemContainerStyle="{StaticResource ComparisonFolderItemStyle}"
                                         ItemTemplate="{StaticResource ComparisonFolderTemplate}"
-                                        ItemsSource="{Binding Comparison.Tree}" />
+                                        ItemsSource="{Binding Comparison.Current.Tree}" />
                                 </views:SplitPair.First>
                                 <views:SplitPair.Second>
                                     <Grid>
@@ -1198,13 +1205,14 @@
                                             HorizontalAlignment="Stretch"
                                             AutomationProperties.Name="{DynamicResource Str.CompareFolderTip}"
                                             DisplayMemberPath="Display"
-                                            ItemsSource="{Binding Comparison.FlatFolders}"
-                                            SelectedItem="{Binding Comparison.SelectedFolder}"
+                                            ItemsSource="{Binding Comparison.Current.FlatFolders}"
+                                            SelectedItem="{Binding Comparison.Current.SelectedFolder}"
                                             ToolTip="{DynamicResource Str.CompareFolderTip}" />
 
                                         <DataGrid
                                             x:Name="ComparisonGrid"
                                             Grid.Row="1"
+                                            behaviors:SelectionBehavior.Command="{Binding Comparison.Current.SelectRowsCommand}"
                                             AutoGenerateColumns="False"
                                             CanUserAddRows="False"
                                             CanUserDeleteRows="False"
@@ -1212,18 +1220,17 @@
                                             GridLinesVisibility="Horizontal"
                                             HeadersVisibility="Column"
                                             IsReadOnly="True"
-                                            ItemsSource="{Binding Comparison.Rows}"
+                                            ItemsSource="{Binding Comparison.Current.Rows}"
                                             RowHeight="20"
-                                            SelectionChanged="OnComparisonSelectionChanged"
                                             SelectionMode="Extended"
                                             SelectionUnit="FullRow">
                                             <DataGrid.ContextMenu>
                                                 <ContextMenu>
-                                                    <MenuItem Command="{Binding CopyToLeftCommand}" Header="{DynamicResource Str.CompareCopyLeft}" />
-                                                    <MenuItem Command="{Binding CopyToRightCommand}" Header="{DynamicResource Str.CompareCopyRight}" />
+                                                    <MenuItem Command="{Binding Comparison.CopyToLeftCommand}" Header="{DynamicResource Str.CompareCopyLeft}" />
+                                                    <MenuItem Command="{Binding Comparison.CopyToRightCommand}" Header="{DynamicResource Str.CompareCopyRight}" />
                                                     <Separator />
-                                                    <MenuItem Command="{Binding MoveToLeftCommand}" Header="{DynamicResource Str.CompareMoveLeft}" />
-                                                    <MenuItem Command="{Binding MoveToRightCommand}" Header="{DynamicResource Str.CompareMoveRight}" />
+                                                    <MenuItem Command="{Binding Comparison.MoveToLeftCommand}" Header="{DynamicResource Str.CompareMoveLeft}" />
+                                                    <MenuItem Command="{Binding Comparison.MoveToRightCommand}" Header="{DynamicResource Str.CompareMoveRight}" />
                                                 </ContextMenu>
                                             </DataGrid.ContextMenu>
                                             <DataGrid.Columns>
@@ -1291,8 +1298,8 @@
 
                         <views:SplitPair.Second>
                             <Grid>
-                                <Grid Visibility="{Binding Comparison.ShowDifferences, Converter={StaticResource InverseBoolToVisibility}}">
-                                    <views:SplitPair Orientation="{Binding IsCompareViewersStacked, Converter={StaticResource BoolToOrientation}}">
+                                <Grid Visibility="{Binding Comparison.Current.ShowDifferences, Converter={StaticResource InverseBoolToVisibility}}">
+                                    <views:SplitPair Orientation="{Binding Comparison.IsCompareViewersStacked, Converter={StaticResource BoolToOrientation}}">
                                         <views:SplitPair.First>
                                             <Grid>
                                                 <Grid.RowDefinitions>
@@ -1302,15 +1309,16 @@
                                                 <TextBlock
                                                     Margin="8,0,0,4"
                                                     FontWeight="SemiBold"
-                                                    Text="{Binding Comparison.LeftTitle}"
+                                                    Text="{Binding Comparison.Current.LeftTitle}"
                                                     TextTrimming="CharacterEllipsis"
-                                                    ToolTip="{Binding Comparison.LeftToolTip}" />
+                                                    ToolTip="{Binding Comparison.Current.LeftToolTip}" />
                                                 <Border
                                                     x:Name="LeftViewerHost"
                                                     Grid.Row="1"
                                                     Padding="8,0,0,0"
-                                                    ScrollViewer.ScrollChanged="OnViewerScrollChanged">
-                                                    <views:ViewerControl DataContext="{Binding Comparison.LeftViewer}" />
+                                                    behaviors:ScrollSync.IsEnabled="{Binding IsCompareSyncScroll}"
+                                                    behaviors:ScrollSync.Partner="{Binding ElementName=RightViewerHost}">
+                                                    <views:ViewerControl DataContext="{Binding Comparison.Current.LeftViewer}" />
                                                 </Border>
                                             </Grid>
                                         </views:SplitPair.First>
@@ -1323,21 +1331,22 @@
                                                 <TextBlock
                                                     Margin="8,0,0,4"
                                                     FontWeight="SemiBold"
-                                                    Text="{Binding Comparison.RightTitle}"
+                                                    Text="{Binding Comparison.Current.RightTitle}"
                                                     TextTrimming="CharacterEllipsis"
-                                                    ToolTip="{Binding Comparison.RightToolTip}" />
+                                                    ToolTip="{Binding Comparison.Current.RightToolTip}" />
                                                 <Border
                                                     x:Name="RightViewerHost"
                                                     Grid.Row="1"
                                                     Padding="8,0,0,0"
-                                                    ScrollViewer.ScrollChanged="OnViewerScrollChanged">
-                                                    <views:ViewerControl DataContext="{Binding Comparison.RightViewer}" />
+                                                    behaviors:ScrollSync.IsEnabled="{Binding IsCompareSyncScroll}"
+                                                    behaviors:ScrollSync.Partner="{Binding ElementName=LeftViewerHost}">
+                                                    <views:ViewerControl DataContext="{Binding Comparison.Current.RightViewer}" />
                                                 </Border>
                                             </Grid>
                                         </views:SplitPair.Second>
                                     </views:SplitPair>
                                 </Grid>
-                                <Grid Visibility="{Binding Comparison.ShowDifferences, Converter={StaticResource BoolToVisibility}}">
+                                <Grid Visibility="{Binding Comparison.Current.ShowDifferences, Converter={StaticResource BoolToVisibility}}">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto" />
                                         <RowDefinition Height="Auto" />
@@ -1347,14 +1356,14 @@
                                     <StackPanel Margin="4,0,0,4" Orientation="Horizontal">
                                         <Button
                                             AutomationProperties.Name="{DynamicResource Str.CompareDiffPrevious}"
-                                            Command="{Binding Comparison.Diff.PreviousCommand}"
+                                            Command="{Binding Comparison.Current.Diff.PreviousCommand}"
                                             Style="{StaticResource IconButton}"
                                             ToolTip="{DynamicResource Str.CompareDiffPrevious}">
                                             <TextBlock Style="{StaticResource ToolIcon}" Text="&#xE70E;" />
                                         </Button>
                                         <Button
                                             AutomationProperties.Name="{DynamicResource Str.CompareDiffNext}"
-                                            Command="{Binding Comparison.Diff.NextCommand}"
+                                            Command="{Binding Comparison.Current.Diff.NextCommand}"
                                             Style="{StaticResource IconButton}"
                                             ToolTip="{DynamicResource Str.CompareDiffNext}">
                                             <TextBlock Style="{StaticResource ToolIcon}" Text="&#xE70D;" />
@@ -1362,13 +1371,13 @@
                                         <TextBlock
                                             Margin="8,0,0,0"
                                             VerticalAlignment="Center"
-                                            Text="{Binding Comparison.Diff.Summary}" />
+                                            Text="{Binding Comparison.Current.Diff.Summary}" />
                                     </StackPanel>
 
                                     <Grid
                                         Grid.Row="1"
                                         Margin="4,0,17,2"
-                                        Visibility="{Binding Comparison.Diff.HasRows, Converter={StaticResource BoolToVisibility}}">
+                                        Visibility="{Binding Comparison.Current.Diff.HasRows, Converter={StaticResource BoolToVisibility}}">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="44" />
                                             <ColumnDefinition Width="*" />
@@ -1378,12 +1387,12 @@
                                         <TextBlock
                                             Grid.Column="1"
                                             FontWeight="SemiBold"
-                                            Text="{Binding Comparison.LeftTitle}"
+                                            Text="{Binding Comparison.Current.LeftTitle}"
                                             TextTrimming="CharacterEllipsis" />
                                         <TextBlock
                                             Grid.Column="3"
                                             FontWeight="SemiBold"
-                                            Text="{Binding Comparison.RightTitle}"
+                                            Text="{Binding Comparison.Current.RightTitle}"
                                             TextTrimming="CharacterEllipsis" />
                                     </Grid>
 
@@ -1393,14 +1402,15 @@
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Center"
                                         Opacity="0.75"
-                                        Text="{Binding Comparison.Diff.Message}"
+                                        Text="{Binding Comparison.Current.Diff.Message}"
                                         TextAlignment="Center"
                                         TextWrapping="Wrap"
-                                        Visibility="{Binding Comparison.Diff.HasMessage, Converter={StaticResource BoolToVisibility}}" />
+                                        Visibility="{Binding Comparison.Current.Diff.HasMessage, Converter={StaticResource BoolToVisibility}}" />
 
                                     <DataGrid
                                         x:Name="DiffGrid"
                                         Grid.Row="2"
+                                        behaviors:ScrollIntoViewBehavior.Enabled="True"
                                         AutoGenerateColumns="False"
                                         CanUserAddRows="False"
                                         CanUserDeleteRows="False"
@@ -1410,14 +1420,13 @@
                                         GridLinesVisibility="None"
                                         HeadersVisibility="None"
                                         IsReadOnly="True"
-                                        ItemsSource="{Binding Comparison.Diff.Rows}"
+                                        ItemsSource="{Binding Comparison.Current.Diff.Rows}"
                                         RowHeight="20"
                                         RowStyle="{StaticResource DiffRowStyle}"
-                                        SelectedItem="{Binding Comparison.Diff.SelectedRow, Mode=TwoWay}"
-                                        SelectionChanged="OnDiffSelectionChanged"
+                                        SelectedItem="{Binding Comparison.Current.Diff.SelectedRow, Mode=TwoWay}"
                                         SelectionMode="Single"
                                         SelectionUnit="FullRow"
-                                        Visibility="{Binding Comparison.Diff.HasRows, Converter={StaticResource BoolToVisibility}}">
+                                        Visibility="{Binding Comparison.Current.Diff.HasRows, Converter={StaticResource BoolToVisibility}}">
                                         <DataGrid.Columns>
                                             <DataGridTextColumn
                                                 Width="44"
@@ -1446,7 +1455,7 @@
                         Grid.Row="2"
                         Margin="0,6,0,0"
                         Opacity="0.7"
-                        Text="{Binding Comparison.SummaryText}"
+                        Text="{Binding Comparison.Current.SummaryText}"
                         TextTrimming="CharacterEllipsis" />
                 </Grid>
 

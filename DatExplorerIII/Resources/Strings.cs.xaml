@@ -402,8 +402,9 @@
     <sys:String x:Key="Str.ViewerPreviousFrame">Předchozí snímek</sys:String>
     <sys:String x:Key="Str.ViewerNextFrame">Další snímek</sys:String>
     <sys:String x:Key="Str.ViewerPlay">Přehrát</sys:String>
-    <sys:String x:Key="Str.ViewerStop">Zastavit</sys:String>
     <sys:String x:Key="Str.ViewerPause">Pozastavit</sys:String>
+    <sys:String x:Key="Str.ViewerVolume">Hlasitost</sys:String>
+    <sys:String x:Key="Str.ViewerLoop">Opakovat</sys:String>
     <sys:String x:Key="Str.ViewerZoom">Zvětšení:</sys:String>
     <sys:String x:Key="Str.ZoomFit">Přizpůsobit</sys:String>
     <sys:String x:Key="Str.ViewerImageFrm">{0}×{1} · směrů: {2} · snímků na směr: {3} · {4} sn./s</sys:String>

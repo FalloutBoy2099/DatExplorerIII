@@ -73,6 +73,8 @@ namespace DatExplorerIII.ViewModels
 				_sortDescending = false;
 			}
 
+			_settings.Data.SortColumn = _sortColumn.ToString();
+			_settings.Data.SortDescending = _sortDescending;
 			OnPropertyChanged(nameof(SortColumn));
 			OnPropertyChanged(nameof(SortDescending));
 			RefreshItems();

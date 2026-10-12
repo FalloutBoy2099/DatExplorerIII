@@ -26,13 +26,14 @@ namespace DatExplorerIII
 			}
 
 			ThemeManager.Initialize(settings);
-			ScrollBarMetrics.Apply(settings.Data.ScrollBarWidth, settings.Data.ScrollBarMinimumThumb);
+			ScrollBarMetrics scrollBars = (ScrollBarMetrics)Resources["ScrollBarMetrics"];
+			scrollBars.Update(settings.Data.ScrollBarWidth, settings.Data.ScrollBarMinimumThumb);
 			TitleBarTheme.ApplyToAllWindows();
 			Loc.Initialize(settings.Data.Language ?? Loc.DetectSystemLanguage());
 			DispatcherUnhandledException += OnUnhandledException;
 			TempFolder.CleanStaleSessions();
 
-			MainViewModel viewModel = new(new DialogService(), settings, new TempFolder(), new DispatcherUiThread());
+			MainViewModel viewModel = new(new DialogService(), settings, new TempFolder(), new DispatcherUiThread(), scrollBars);
 			_mainViewModel = viewModel;
 			Views.MainWindow window = new(viewModel);
 			MainWindow = window;

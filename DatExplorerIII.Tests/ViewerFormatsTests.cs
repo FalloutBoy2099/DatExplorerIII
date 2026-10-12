@@ -964,9 +964,7 @@ namespace DatExplorerIII.Tests
 
 		private static Byte[] PixelsOf(VideoViewerViewModel video)
 		{
-			Byte[] pixels = new Byte[video.Bitmap!.PixelWidth * video.Bitmap.PixelHeight * 4];
-			video.Bitmap.CopyPixels(pixels, video.Bitmap.PixelWidth * 4, 0);
-			return pixels;
+			return video.Frame!.Pixels.ToArray();
 		}
 
 		#endregion

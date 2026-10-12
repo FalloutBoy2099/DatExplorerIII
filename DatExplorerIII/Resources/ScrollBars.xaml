@@ -7,9 +7,9 @@
     <!--
         The scroll bars of the program. The theme draws a thin slider that gets very small in a long list; these have a width and a
         smallest slider that the user chooses (Settings, General). The width is a resource that the program replaces when the settings
-        change, and the smallest slider comes from ScrollBarMetrics.Current, so that every scroll bar follows at once.
+        change, and the smallest slider comes from the ScrollBarMetrics below, so that every scroll bar follows at once.
     -->
-    <sys:Double x:Key="ScrollBarSize">16</sys:Double>
+    <services:ScrollBarMetrics x:Key="ScrollBarMetrics" />
     <services:ScrollBarViewportConverter x:Key="ScrollBarViewportConverter" />
 
     <!--  The arrow buttons at the ends, and the empty parts of the track that a click scrolls a page by.  -->
@@ -102,7 +102,7 @@
             </Grid.RowDefinitions>
 
             <RepeatButton
-                Height="{DynamicResource ScrollBarSize}"
+                Height="{Binding Width, Source={StaticResource ScrollBarMetrics}}"
                 Command="ScrollBar.LineUpCommand"
                 Style="{StaticResource ScrollBarArrowButton}">
                 <TextBlock
@@ -121,7 +121,7 @@
                         <Binding Path="Minimum" RelativeSource="{RelativeSource TemplatedParent}" />
                         <Binding Path="Maximum" RelativeSource="{RelativeSource TemplatedParent}" />
                         <Binding Path="ActualHeight" RelativeSource="{RelativeSource Self}" />
-                        <Binding Path="MinimumThumb" Source="{x:Static services:ScrollBarMetrics.Current}" />
+                        <Binding Path="MinimumThumb" Source="{StaticResource ScrollBarMetrics}" />
                     </MultiBinding>
                 </Track.ViewportSize>
                 <Track.DecreaseRepeatButton>
@@ -137,7 +137,7 @@
 
             <RepeatButton
                 Grid.Row="2"
-                Height="{DynamicResource ScrollBarSize}"
+                Height="{Binding Width, Source={StaticResource ScrollBarMetrics}}"
                 Command="ScrollBar.LineDownCommand"
                 Style="{StaticResource ScrollBarArrowButton}">
                 <TextBlock
@@ -157,7 +157,7 @@
             </Grid.ColumnDefinitions>
 
             <RepeatButton
-                Width="{DynamicResource ScrollBarSize}"
+                Width="{Binding Width, Source={StaticResource ScrollBarMetrics}}"
                 Command="ScrollBar.LineLeftCommand"
                 Style="{StaticResource ScrollBarArrowButton}">
                 <TextBlock
@@ -173,7 +173,7 @@
                         <Binding Path="Minimum" RelativeSource="{RelativeSource TemplatedParent}" />
                         <Binding Path="Maximum" RelativeSource="{RelativeSource TemplatedParent}" />
                         <Binding Path="ActualWidth" RelativeSource="{RelativeSource Self}" />
-                        <Binding Path="MinimumThumb" Source="{x:Static services:ScrollBarMetrics.Current}" />
+                        <Binding Path="MinimumThumb" Source="{StaticResource ScrollBarMetrics}" />
                     </MultiBinding>
                 </Track.ViewportSize>
                 <Track.DecreaseRepeatButton>
@@ -189,7 +189,7 @@
 
             <RepeatButton
                 Grid.Column="2"
-                Width="{DynamicResource ScrollBarSize}"
+                Width="{Binding Width, Source={StaticResource ScrollBarMetrics}}"
                 Command="ScrollBar.LineRightCommand"
                 Style="{StaticResource ScrollBarArrowButton}">
                 <TextBlock
@@ -201,12 +201,12 @@
     </ControlTemplate>
 
     <Style TargetType="ScrollBar">
-        <Setter Property="Width" Value="{DynamicResource ScrollBarSize}" />
+        <Setter Property="Width" Value="{Binding Width, Source={StaticResource ScrollBarMetrics}}" />
         <Setter Property="Template" Value="{StaticResource VerticalScrollBarTemplate}" />
         <Style.Triggers>
             <Trigger Property="Orientation" Value="Horizontal">
                 <Setter Property="Width" Value="Auto" />
-                <Setter Property="Height" Value="{DynamicResource ScrollBarSize}" />
+                <Setter Property="Height" Value="{Binding Width, Source={StaticResource ScrollBarMetrics}}" />
                 <Setter Property="Template" Value="{StaticResource HorizontalScrollBarTemplate}" />
             </Trigger>
         </Style.Triggers>

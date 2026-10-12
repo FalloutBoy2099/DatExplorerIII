@@ -95,19 +95,18 @@ namespace DatExplorerIII.Tests
 		[Fact]
 		public void Font_IsDrawnAsATableOfItsCharacters()
 		{
-			System.Windows.Media.Imaging.BitmapSource sheet = ImageRenderer.Render(AafReader.Read(BuildAaf()));
+			PixelImage sheet = ImageRenderer.Render(AafReader.Read(BuildAaf()));
 
 			// 16 columns of cells (the widest character plus the margins), enlarged three times.
-			Assert.Equal(((16 * 5) + 1) * 3, sheet.PixelWidth);
-			Assert.Equal(((16 * 5) + 1) * 3, sheet.PixelHeight);
+			Assert.Equal(((16 * 5) + 1) * 3, sheet.Width);
+			Assert.Equal(((16 * 5) + 1) * 3, sheet.Height);
 
-			Byte[] pixels = new Byte[sheet.PixelWidth * sheet.PixelHeight * 4];
-			sheet.CopyPixels(pixels, sheet.PixelWidth * 4, 0);
+			Byte[] pixels = sheet.Pixels;
 
 			// "A" is the second cell of the fifth row: its brightest pixel is lighter than its dimmest.
 			Int32 left = (((65 % 16) * 5) + 2) * 3;
 			Int32 top = (((65 / 16) * 5) + 2) * 3;
-			Byte Gray(Int32 x, Int32 y) => pixels[(((top + (y * 3)) * sheet.PixelWidth) + left + (x * 3)) * 4];
+			Byte Gray(Int32 x, Int32 y) => pixels[(((top + (y * 3)) * sheet.Width) + left + (x * 3)) * 4];
 			Assert.True(Gray(1, 0) > Gray(0, 0));
 			Assert.True(Gray(0, 0) > Gray(0, 1) || Gray(0, 1) == 32);
 		}
@@ -401,7 +400,7 @@ namespace DatExplorerIII.Tests
 
 				Assert.True(viewer.IsImage);
 				Assert.False(viewer.HasMessage);
-				Assert.NotNull(viewer.Image.Bitmap);
+				Assert.NotNull(viewer.Image.Picture);
 			}
 		}
 

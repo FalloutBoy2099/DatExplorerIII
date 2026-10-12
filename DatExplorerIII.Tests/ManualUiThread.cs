@@ -9,6 +9,14 @@ namespace DatExplorerIII.Tests
 	{
 		public List<ManualTimer> Created { get; } = new();
 
+		/// <summary>What the view models put on the clipboard.</summary>
+		public List<String> Clipboard { get; } = new();
+
+		public void SetClipboardText(String text)
+		{
+			Clipboard.Add(text);
+		}
+
 		public void Invoke(Action action)
 		{
 			action();

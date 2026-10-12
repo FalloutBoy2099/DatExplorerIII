@@ -502,7 +502,7 @@ namespace DatExplorerIII.Tests
 		public void TextViewer_ColorsOnlyMessageFiles()
 		{
 			Byte[] text = Encoding.ASCII.GetBytes("{1}{}{Hello}\r\n");
-			TextViewerViewModel viewer = new();
+			TextViewerViewModel viewer = new(new ManualUiThread());
 
 			viewer.Show(text, text.Length, ".msg");
 			Assert.True(viewer.IsHighlighted);
@@ -533,7 +533,7 @@ namespace DatExplorerIII.Tests
 		public void TextViewer_ChangingTheLanguage_SurvivesTheBoxThatEmptiesItsSelection()
 		{
 			Byte[] text = Encoding.ASCII.GetBytes("{1}{}{Hello}\r\n");
-			TextViewerViewModel viewer = new();
+			TextViewerViewModel viewer = new(new ManualUiThread());
 			viewer.Show(text, text.Length, ".msg");
 
 			// A combo box whose list is replaced gives up its selection and writes null in the property it is bound to.

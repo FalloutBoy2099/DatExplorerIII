@@ -93,7 +93,7 @@ namespace DatExplorerIII.ViewModels
 			CanCancel = canCancel;
 			WasCancelled = false;
 			IsBusy = true;
-			System.Windows.Input.CommandManager.InvalidateRequerySuggested();
+			CommandRequery.Invalidate();
 
 			using CancellationTokenSource cancellation = new();
 			_cancellation = cancellation;
@@ -125,7 +125,7 @@ namespace DatExplorerIII.ViewModels
 			{
 				_cancellation = null;
 				IsBusy = false;
-				System.Windows.Input.CommandManager.InvalidateRequerySuggested();
+				CommandRequery.Invalidate();
 			}
 		}
 	}

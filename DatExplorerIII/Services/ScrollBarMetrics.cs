@@ -3,13 +3,12 @@ namespace DatExplorerIII.Services
 	using System;
 	using System.ComponentModel;
 	using System.Globalization;
-	using System.Windows;
 	using System.Windows.Data;
 
 	/// <summary>
 	/// The size of the scroll bars: their width, and the smallest length of their slider (which the theme lets get tiny in a long
-	/// list). The scroll bars of the program read the width from the resources of the application and the smallest slider from
-	/// <see cref="Current"/>, so a change shows at once.
+	/// list). One instance lives in the resources of the scroll bars (ScrollBars.xaml), which bind to it, so a change shows at
+	/// once; whoever owns the resources gives it to the view models that change the sizes.
 	/// </summary>
 	public sealed class ScrollBarMetrics : INotifyPropertyChanged
 	{
@@ -20,12 +19,24 @@ namespace DatExplorerIII.Services
 		public const Int32 MinimumThumbLength = 20;
 		public const Int32 MaximumThumbLength = 160;
 
+		private Double _width = DefaultWidth;
 		private Double _minimumThumb = DefaultMinimumThumb;
 
-		/// <summary>The sizes the scroll bars use.</summary>
-		public static ScrollBarMetrics Current { get; } = new();
-
 		public event PropertyChangedEventHandler? PropertyChanged;
+
+		/// <summary>The width of the scroll bars, in device independent pixels.</summary>
+		public Double Width
+		{
+			get => _width;
+			private set
+			{
+				if (_width != value)
+				{
+					_width = value;
+					PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Width)));
+				}
+			}
+		}
 
 		/// <summary>The smallest length of the slider, in device independent pixels.</summary>
 		public Double MinimumThumb
@@ -44,14 +55,11 @@ namespace DatExplorerIII.Services
 		/// <summary>Keeps a number between the limits.</summary>
 		public static Int32 Clamp(Int32 value, Int32 minimum, Int32 maximum) => Math.Clamp(value, minimum, maximum);
 
-		/// <summary>Gives the scroll bars of the program this width and this smallest slider (in device independent pixels).</summary>
-		public static void Apply(Int32 width, Int32 minimumThumb)
+		/// <summary>Gives the scroll bars this width and this smallest slider (in device independent pixels), within the limits.</summary>
+		public void Update(Int32 width, Int32 minimumThumb)
 		{
-			Current.MinimumThumb = Clamp(minimumThumb, MinimumThumbLength, MaximumThumbLength);
-			if (Application.Current is { } application)
-			{
-				application.Resources["ScrollBarSize"] = (Double)Clamp(width, MinimumWidth, MaximumWidth);
-			}
+			Width = Clamp(width, MinimumWidth, MaximumWidth);
+			MinimumThumb = Clamp(minimumThumb, MinimumThumbLength, MaximumThumbLength);
 		}
 	}
 

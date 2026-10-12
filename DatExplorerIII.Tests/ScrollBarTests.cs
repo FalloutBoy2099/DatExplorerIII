@@ -7,7 +7,6 @@ namespace DatExplorerIII.Tests
 	using DatExplorerIII.ViewModels;
 
 	/// <summary>The size of the scroll bars: a slider that is never smaller than the user wants, and the settings that say so.</summary>
-	[Collection("ScrollBarSizes")]
 	public sealed class ScrollBarTests
 	{
 		private static Double Convert(Double viewport, Double minimum, Double maximum, Double trackLength, Double minimumThumb)
@@ -69,12 +68,24 @@ namespace DatExplorerIII.Tests
 			Assert.Equal(ScrollBarMetrics.MaximumWidth, ScrollBarMetrics.Clamp(500, ScrollBarMetrics.MinimumWidth, ScrollBarMetrics.MaximumWidth));
 			Assert.Equal(ScrollBarMetrics.MinimumWidth, ScrollBarMetrics.Clamp(-3, ScrollBarMetrics.MinimumWidth, ScrollBarMetrics.MaximumWidth));
 
-			ScrollBarMetrics.Apply(16, 5000);
-			Assert.Equal(ScrollBarMetrics.MaximumThumbLength, ScrollBarMetrics.Current.MinimumThumb);
-			ScrollBarMetrics.Apply(16, 1);
-			Assert.Equal(ScrollBarMetrics.MinimumThumbLength, ScrollBarMetrics.Current.MinimumThumb);
-			ScrollBarMetrics.Apply(ScrollBarMetrics.DefaultWidth, ScrollBarMetrics.DefaultMinimumThumb);
-			Assert.Equal(ScrollBarMetrics.DefaultMinimumThumb, ScrollBarMetrics.Current.MinimumThumb);
+			ScrollBarMetrics metrics = new();
+			Assert.Equal(ScrollBarMetrics.DefaultWidth, metrics.Width);
+			Assert.Equal(ScrollBarMetrics.DefaultMinimumThumb, metrics.MinimumThumb);
+
+			metrics.Update(16, 5000);
+			Assert.Equal(ScrollBarMetrics.MaximumThumbLength, metrics.MinimumThumb);
+			metrics.Update(16, 1);
+			Assert.Equal(ScrollBarMetrics.MinimumThumbLength, metrics.MinimumThumb);
+			metrics.Update(500, 40);
+			Assert.Equal(ScrollBarMetrics.MaximumWidth, metrics.Width);
+			metrics.Update(1, 40);
+			Assert.Equal(ScrollBarMetrics.MinimumWidth, metrics.Width);
+
+			// Two sets of sizes do not touch each other (no state is shared).
+			ScrollBarMetrics other = new();
+			other.Update(20, 100);
+			Assert.Equal(ScrollBarMetrics.MinimumWidth, metrics.Width);
+			Assert.Equal(20, other.Width);
 		}
 
 		[Fact]

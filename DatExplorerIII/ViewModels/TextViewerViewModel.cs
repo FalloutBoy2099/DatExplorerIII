@@ -4,8 +4,6 @@ namespace DatExplorerIII.ViewModels
 	using System.Collections.Generic;
 	using System.Globalization;
 	using System.Linq;
-	using System.Runtime.InteropServices;
-	using System.Windows;
 	using System.Windows.Input;
 	using Infrastructure;
 	using Models;
@@ -34,6 +32,7 @@ namespace DatExplorerIII.ViewModels
 		private Boolean _isScript;
 		private Boolean _isBiography;
 		private Boolean _isList;
+		private readonly IUiThread _uiThread;
 		private Boolean _tooLongForColors;
 		private String _note = String.Empty;
 
@@ -41,8 +40,9 @@ namespace DatExplorerIII.ViewModels
 		private Boolean _refreshingLanguage;
 		private IReadOnlyList<SyntaxSpan>? _syntaxSpans;
 
-		public TextViewerViewModel()
+		public TextViewerViewModel(IUiThread uiThread)
 		{
+			_uiThread = uiThread;
 			_options = TextEncodings.CreateOptions();
 			_selectedEncoding = _options[0];
 			CopyCommand = new RelayCommand(Copy, () => _text.Length > 0);
@@ -234,14 +234,7 @@ namespace DatExplorerIII.ViewModels
 
 		private void Copy()
 		{
-			try
-			{
-				Clipboard.SetText(_text);
-			}
-			catch (ExternalException)
-			{
-				// Another program holds the clipboard: nothing to do, the user can try again.
-			}
+			_uiThread.SetClipboardText(_text);
 		}
 	}
 }

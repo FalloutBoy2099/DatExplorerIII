@@ -245,7 +245,7 @@ namespace DatExplorerIII.Tests
 		[Fact]
 		public void Ssl_TheViewerColorsScriptsAndHeaders_ButNotOtherTexts()
 		{
-			TextViewerViewModel viewer = new();
+			TextViewerViewModel viewer = new(new ManualUiThread());
 			Byte[] source = Encoding.ASCII.GetBytes("procedure start begin end");
 
 			viewer.Show(source, source.Length, ".ssl");

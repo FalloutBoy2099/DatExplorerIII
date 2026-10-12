@@ -59,7 +59,7 @@ namespace DatExplorerIII.Tests
 		{
 			// Every line has a name and a comment (the line break joins the name of the next line): two parts.
 			Byte[] big = Encoding.ASCII.GetBytes(String.Concat(Enumerable.Repeat("a.frm ; c\r\n", (TextViewerViewModel.MaxColoredParts / 2) + 10)));
-			TextViewerViewModel viewer = new();
+			TextViewerViewModel viewer = new(new ManualUiThread());
 
 			viewer.Show(big, big.Length, ".lst");
 
@@ -76,7 +76,7 @@ namespace DatExplorerIII.Tests
 		[Fact]
 		public void TheViewer_ColorsLists_ButNotOtherTexts()
 		{
-			TextViewerViewModel viewer = new();
+			TextViewerViewModel viewer = new(new ManualUiThread());
 			Byte[] list = Encoding.ASCII.GetBytes("ART.FRM ; art\r\n");
 
 			viewer.Show(list, list.Length, ".lst");

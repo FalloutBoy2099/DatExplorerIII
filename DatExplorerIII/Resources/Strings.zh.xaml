@@ -402,8 +402,9 @@
     <sys:String x:Key="Str.ViewerPreviousFrame">上一帧</sys:String>
     <sys:String x:Key="Str.ViewerNextFrame">下一帧</sys:String>
     <sys:String x:Key="Str.ViewerPlay">播放</sys:String>
-    <sys:String x:Key="Str.ViewerStop">停止</sys:String>
     <sys:String x:Key="Str.ViewerPause">暂停</sys:String>
+    <sys:String x:Key="Str.ViewerVolume">音量</sys:String>
+    <sys:String x:Key="Str.ViewerLoop">循环播放</sys:String>
     <sys:String x:Key="Str.ViewerZoom">缩放：</sys:String>
     <sys:String x:Key="Str.ZoomFit">适应窗口</sys:String>
     <sys:String x:Key="Str.ViewerImageFrm">{0}×{1} · {2} 个方向 · 每个方向 {3} 帧 · {4} 帧/秒</sys:String>
