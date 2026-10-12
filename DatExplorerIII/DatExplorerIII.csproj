@@ -9,7 +9,7 @@
 		<LangVersion>latest</LangVersion>
 		<RootNamespace>DatExplorerIII</RootNamespace>
 		<AssemblyName>DatExplorerIII</AssemblyName>
-		<ApplicationIcon>Resources\zippedFile.ico</ApplicationIcon>
+		<ApplicationIcon>Resources\app.ico</ApplicationIcon>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
 		<Product>DatExplorerIII</Product>
 		<Company>Kain</Company>
@@ -25,7 +25,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Resource Include="Resources\zippedFile.ico" />
+		<Resource Include="Resources\app.ico" />
 		<!-- The icon of the .dat files is inside the program, so that a single executable is enough. -->
 		<EmbeddedResource Include="Resources\dat.ico" LogicalName="DatExplorerIII.dat.ico" />
 		<EmbeddedResource Include="Resources\Fallout.pal" LogicalName="DatExplorerIII.Fallout.pal" />
