@@ -42,6 +42,37 @@
             </DrawingBrush.Drawing>
         </DrawingBrush>
 
+        <!--  The menu of a text: what a read-only text can do (copy, select all, search, go to a line or to a message), in the language of the program.  -->
+        <ContextMenu x:Key="TextMenu" x:Shared="False">
+            <MenuItem
+                Command="ApplicationCommands.Copy"
+                CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                Header="{DynamicResource Str.TextCopy}"
+                InputGestureText="Ctrl+C" />
+            <MenuItem
+                Command="ApplicationCommands.SelectAll"
+                CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                Header="{DynamicResource Str.TextSelectAll}"
+                InputGestureText="Ctrl+A" />
+            <Separator />
+            <MenuItem
+                Command="{Binding FindCommand}"
+                Header="{DynamicResource Str.TextFind}"
+                InputGestureText="Ctrl+F" />
+            <MenuItem
+                Command="{Binding FindNextCommand}"
+                Header="{DynamicResource Str.TextFindNext}"
+                InputGestureText="F3" />
+            <MenuItem
+                Command="{Binding GoToLineCommand}"
+                Header="{DynamicResource Str.TextGoToLine}"
+                InputGestureText="Ctrl+G" />
+            <MenuItem
+                Command="{Binding GoToIdCommand}"
+                Header="{DynamicResource Str.TextGoToId}"
+                Visibility="{Binding IsMessageFile, Converter={StaticResource BoolToVisibility}}" />
+        </ContextMenu>
+
         <!--  The odd lines of a table are a little lighter than the even ones.  -->
         <Style
             x:Key="StripedRow"
@@ -196,14 +227,27 @@
             </WrapPanel>
 
             <TextBox
+                x:Name="PlainTextBox"
                 Grid.Row="1"
                 AcceptsReturn="True"
+                ContextMenu="{StaticResource TextMenu}"
                 FontFamily="Consolas"
                 HorizontalScrollBarVisibility="Auto"
                 IsReadOnly="True"
                 IsReadOnlyCaretVisible="True"
                 Text="{Binding Text, Mode=OneWay}"
                 VerticalScrollBarVisibility="Auto">
+                <TextBox.InputBindings>
+                    <KeyBinding
+                        Key="F"
+                        Command="{Binding FindCommand}"
+                        Modifiers="Control" />
+                    <KeyBinding Key="F3" Command="{Binding FindNextCommand}" />
+                    <KeyBinding
+                        Key="G"
+                        Command="{Binding GoToLineCommand}"
+                        Modifiers="Control" />
+                </TextBox.InputBindings>
                 <TextBox.Style>
                     <Style BasedOn="{StaticResource {x:Type TextBox}}" TargetType="TextBox">
                         <Setter Property="TextWrapping" Value="NoWrap" />
@@ -226,11 +270,23 @@
             <RichTextBox
                 x:Name="HighlightedBox"
                 Grid.Row="1"
+                ContextMenu="{StaticResource TextMenu}"
                 FontFamily="Consolas"
                 IsReadOnly="True"
                 IsReadOnlyCaretVisible="True"
                 VerticalScrollBarVisibility="Auto"
                 Visibility="{Binding IsHighlighted, Converter={StaticResource BoolToVisibility}}">
+                <RichTextBox.InputBindings>
+                    <KeyBinding
+                        Key="F"
+                        Command="{Binding FindCommand}"
+                        Modifiers="Control" />
+                    <KeyBinding Key="F3" Command="{Binding FindNextCommand}" />
+                    <KeyBinding
+                        Key="G"
+                        Command="{Binding GoToLineCommand}"
+                        Modifiers="Control" />
+                </RichTextBox.InputBindings>
                 <RichTextBox.Style>
                     <Style BasedOn="{StaticResource {x:Type RichTextBox}}" TargetType="RichTextBox">
                         <Setter Property="Padding" Value="{Binding Width, Source={StaticResource ScrollBarMetrics}, Converter={StaticResource ScrollBarPadding}, ConverterParameter='10,5,6,6|rb'}" />

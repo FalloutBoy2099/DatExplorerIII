@@ -4,6 +4,7 @@ namespace DatExplorerIII.ViewModels
 	using System.Collections.Generic;
 	using System.Globalization;
 	using System.Linq;
+	using System.Text.RegularExpressions;
 	using System.Windows.Input;
 	using Formats;
 	using Infrastructure;
@@ -15,11 +16,14 @@ namespace DatExplorerIII.ViewModels
 	/// </summary>
 	public sealed class TextViewerViewModel : ObservableObject
 	{
-		/// <summary>The longest text that is colored, in characters.</summary>
-		public const Int32 MaxColoredLength = 512 * 1024;
+		/// <summary>
+		/// The longest text that is colored, in characters (the viewer reads at most 4 MB of a file). The viewer adds the paragraphs
+		/// of a colored text a few at a time, so that a long one does not freeze the window: it only takes longer to be all there.
+		/// </summary>
+		public const Int32 MaxColoredLength = 4 * 1024 * 1024;
 
 		/// <summary>The most parts a colored text can have: the document of the viewer has a run for each.</summary>
-		public const Int32 MaxColoredParts = 50_000;
+		public const Int32 MaxColoredParts = 500_000;
 
 		private Byte[] _data = Array.Empty<Byte>();
 		private Int64 _fullSize;
@@ -40,6 +44,10 @@ namespace DatExplorerIII.ViewModels
 		private String? _noteTip;
 		private IReadOnlySet<Int32>? _missingLines;
 		private String? _noticeTip;
+		private String _findText = String.Empty;
+		private Int32 _cursor;
+		private Int32 _revealSerial;
+		private TextReveal? _reveal;
 
 		/// <summary>True while the list of encodings is replaced: the box that shows it then empties its selection, which must not be taken for a choice.</summary>
 		private Boolean _refreshingLanguage;
@@ -51,6 +59,10 @@ namespace DatExplorerIII.ViewModels
 			_options = TextEncodings.CreateOptions();
 			_selectedEncoding = _options[0];
 			CopyCommand = new RelayCommand(Copy, () => _text.Length > 0);
+			FindCommand = new RelayCommand(Find, () => CanSearch);
+			FindNextCommand = new RelayCommand(() => FindFrom(_findText), () => CanSearch && _findText.Length > 0);
+			GoToLineCommand = new RelayCommand(GoToLine, () => CanSearch);
+			GoToIdCommand = new RelayCommand(GoToId, () => CanSearch && _isMessageFile);
 			ShowProblemsCommand = new RelayCommand(
 				() => _problemsRequested?.Invoke(new MsgFileReport(SourcePath, MsgValidator.Validate(_text))),
 				() => CanShowProblems);
@@ -120,6 +132,123 @@ namespace DatExplorerIII.ViewModels
 		/// <summary>Lists the problems of the message file that is shown.</summary>
 		public ICommand ShowProblemsCommand { get; }
 
+		/// <summary>Asks for a text to find.</summary>
+		public ICommand FindCommand { get; }
+
+		/// <summary>Goes to the next place of the text that was asked for (and starts again from the top after the last one).</summary>
+		public ICommand FindNextCommand { get; }
+
+		public ICommand GoToLineCommand { get; }
+
+		/// <summary>Goes to a message of a message file by its number.</summary>
+		public ICommand GoToIdCommand { get; }
+
+		/// <summary>The text is a message file: it can be searched by the number of a message.</summary>
+		public Boolean IsMessageFile => _isMessageFile;
+
+		/// <summary>Asks the user for a text: the title, what is asked, the value to start with, and what tells if a value is acceptable (the message of the error, or null). Null: the user gave up.</summary>
+		public Func<String, String, String, Func<String, String?>?, String?>? Ask { get; set; }
+
+		/// <summary>Tells the user something (a search that found nothing).</summary>
+		public Action<String>? Inform { get; set; }
+
+		/// <summary>The part of the text that the view selects and scrolls to; changes each time a search or a go to has an answer.</summary>
+		public TextReveal? Reveal
+		{
+			get => _reveal;
+			private set => SetProperty(ref _reveal, value);
+		}
+
+		private Boolean CanSearch => Ask != null && _text.Length > 0;
+
+		private void Find()
+		{
+			String? answer = Ask?.Invoke(Loc.Get("Str.TextFind").TrimEnd('.'), Loc.Get("Str.TextFindLabel"), _findText, null);
+			if (String.IsNullOrEmpty(answer))
+			{
+				return;
+			}
+
+			_findText = answer;
+			FindFrom(answer);
+		}
+
+		/// <summary>Finds a text from the place where the last answer ended, and from the top when there is none after it.</summary>
+		private void FindFrom(String needle)
+		{
+			Int32 index = _text.IndexOf(needle, Math.Min(_cursor, _text.Length), StringComparison.OrdinalIgnoreCase);
+			if (index < 0 && _cursor > 0)
+			{
+				index = _text.IndexOf(needle, StringComparison.OrdinalIgnoreCase);
+			}
+
+			if (index < 0)
+			{
+				Inform?.Invoke(Loc.Get("Str.TextNotFound"));
+				return;
+			}
+
+			RevealPart(index, needle.Length);
+		}
+
+		private void GoToLine()
+		{
+			Int32 lines = 1 + _text.Count(character => character == '\n');
+			String? answer = Ask?.Invoke(
+				Loc.Get("Str.TextGoToLine").TrimEnd('.'),
+				Loc.Format("Str.TextGoToLineLabel", lines),
+				"1",
+				value => Int32.TryParse(value, NumberStyles.None, CultureInfo.CurrentCulture, out Int32 number) && number >= 1 && number <= lines ? null : Loc.Format("Str.TextLineRange", lines));
+			if (answer == null || !Int32.TryParse(answer, NumberStyles.None, CultureInfo.CurrentCulture, out Int32 line))
+			{
+				return;
+			}
+
+			Int32 start = 0;
+			for (Int32 skipped = 1; skipped < line; skipped++)
+			{
+				start = _text.IndexOf('\n', start) + 1;
+			}
+
+			Int32 end = _text.IndexOf('\n', start);
+			Int32 length = (end < 0 ? _text.Length : end) - start;
+			if (length > 0 && _text[start + length - 1] == '\r')
+			{
+				length--;
+			}
+
+			RevealPart(start, length);
+		}
+
+		private void GoToId()
+		{
+			String? answer = Ask?.Invoke(
+				Loc.Get("Str.TextGoToId").TrimEnd('.'),
+				Loc.Get("Str.TextGoToIdLabel"),
+				String.Empty,
+				value => UInt32.TryParse(value, NumberStyles.None, CultureInfo.CurrentCulture, out _) ? null : Loc.Get("Str.TextIdInvalid"));
+			if (answer == null || !UInt32.TryParse(answer, NumberStyles.None, CultureInfo.CurrentCulture, out UInt32 id))
+			{
+				return;
+			}
+
+			// The number of a message is the first part of a line: {id}{sound}{text} (a number may have leading zeros).
+			Match match = Regex.Match(_text, @"^[ \t]*(?<id>\{[ \t]*0*" + id.ToString(CultureInfo.InvariantCulture) + @"[ \t]*\})", RegexOptions.Multiline | RegexOptions.CultureInvariant);
+			if (!match.Success)
+			{
+				Inform?.Invoke(Loc.Get("Str.TextIdNotFound"));
+				return;
+			}
+
+			RevealPart(match.Groups["id"].Index, match.Groups["id"].Length);
+		}
+
+		private void RevealPart(Int32 start, Int32 length)
+		{
+			_cursor = start + Math.Max(length, 1);
+			Reveal = new TextReveal(start, length, ++_revealSerial);
+		}
+
 		/// <summary>A remark about the text: it is cut, it looks binary, it is empty.</summary>
 		public String Notice
 		{
@@ -168,6 +297,8 @@ namespace DatExplorerIII.ViewModels
 			_data = data;
 			_fullSize = fullSize;
 			_isMessageFile = String.Equals(extension, ".msg", StringComparison.OrdinalIgnoreCase);
+			_cursor = 0;
+			OnPropertyChanged(nameof(IsMessageFile));
 			OnPropertyChanged(nameof(CanShowProblems));
 			_isScript = String.Equals(extension, ".ssl", StringComparison.OrdinalIgnoreCase) || String.Equals(extension, ".h", StringComparison.OrdinalIgnoreCase);
 			_isBiography = String.Equals(extension, ".bio", StringComparison.OrdinalIgnoreCase);
@@ -235,6 +366,8 @@ namespace DatExplorerIII.ViewModels
 			_data = Array.Empty<Byte>();
 			_fullSize = 0;
 			_isMessageFile = false;
+			_cursor = 0;
+			OnPropertyChanged(nameof(IsMessageFile));
 			OnPropertyChanged(nameof(CanShowProblems));
 			_isScript = false;
 			_isBiography = false;

@@ -521,7 +521,7 @@ namespace DatExplorerIII.Tests
 			viewer.Show(Enumerable.Range(0, 400).Select(index => (Byte)(index % 5)).ToArray(), 400, ".msg");
 			Assert.False(viewer.IsHighlighted);
 
-			viewer.Show(Enumerable.Repeat((Byte)'a', MsgSyntax.MaxLength + 10).ToArray(), MsgSyntax.MaxLength + 10, ".msg");
+			viewer.Show(Enumerable.Repeat((Byte)'a', TextViewerViewModel.MaxColoredLength + 10).ToArray(), TextViewerViewModel.MaxColoredLength + 10, ".msg");
 			Assert.False(viewer.IsHighlighted);
 
 			viewer.Show(text, text.Length, ".msg");

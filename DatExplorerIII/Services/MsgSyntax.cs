@@ -9,9 +9,6 @@ namespace DatExplorerIII.Services
 	/// </summary>
 	public static class MsgSyntax
 	{
-		/// <summary>Longest text that gets colors: a larger one is shown as it is, because coloring it would be slow.</summary>
-		public const Int32 MaxLength = 512 * 1024;
-
 		/// <summary>The parts of a text, in order, with no gap and no overlap: together they cover the whole text.</summary>
 		public static IReadOnlyList<SyntaxSpan> Tokenize(String text)
 		{

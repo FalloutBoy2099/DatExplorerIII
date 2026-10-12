@@ -4,6 +4,7 @@ namespace DatExplorerIII.Views
 	using System.Collections.Generic;
 	using System.ComponentModel;
 	using System.Diagnostics;
+	using System.Linq;
 	using System.Windows;
 	using System.Windows.Documents;
 	using System.Windows.Threading;
@@ -50,6 +51,10 @@ namespace DatExplorerIII.Views
 			{
 				ApplyWrap(text.WrapLines);
 			}
+			else if (e.PropertyName == nameof(TextViewerViewModel.Reveal) && text.Reveal is { } reveal)
+			{
+				RevealPart(text, reveal);
+			}
 		}
 
 		/// <summary>How long the first paragraphs of a colored text may take to build and lay out before the text is shown, in milliseconds.</summary>
@@ -60,6 +65,9 @@ namespace DatExplorerIII.Views
 
 		/// <summary>Tells a text from the one that came after it: the batches of the text that was replaced stop.</summary>
 		private Int32 _highlightGeneration;
+
+		/// <summary>The paragraphs of the colored text that are not in the document yet (null: all of them are).</summary>
+		private IEnumerator<Paragraph>? _pendingParagraphs;
 
 		/// <summary>
 		/// Shows a colored text. The first lines are there at once; the others are added in the background, a few at a time (a
@@ -76,6 +84,7 @@ namespace DatExplorerIII.Views
 			Boolean more = AddParagraphs(document, paragraphs, FirstBatchMilliseconds);
 			HighlightedBox.Document = document;
 			ApplyWrap(text.WrapLines);
+			_pendingParagraphs = more ? paragraphs : null;
 			if (more)
 			{
 				Dispatcher.BeginInvoke(DispatcherPriority.Background, () => AddNextParagraphs(generation, document, paragraphs!));
@@ -94,6 +103,67 @@ namespace DatExplorerIII.Views
 			{
 				Dispatcher.BeginInvoke(DispatcherPriority.Background, () => AddNextParagraphs(generation, document, paragraphs));
 			}
+			else if (generation == _highlightGeneration)
+			{
+				_pendingParagraphs = null;
+			}
+		}
+
+		/// <summary>Selects a part of the text and scrolls to it, in the box that shows the text.</summary>
+		private void RevealPart(TextViewerViewModel text, TextReveal reveal)
+		{
+			if (!text.IsHighlighted)
+			{
+				PlainTextBox.Focus();
+				PlainTextBox.Select(reveal.Start, reveal.Length);
+				PlainTextBox.ScrollToLine(PlainTextBox.GetLineIndexFromCharacterIndex(reveal.Start));
+				return;
+			}
+
+			// The document has a paragraph for each line, and the last ones may not be there yet: they are made now.
+			String content = text.Text;
+			Int32 line = content.AsSpan(0, reveal.Start).Count('\n');
+			Int32 lineStart = reveal.Start == 0 ? 0 : content.LastIndexOf('\n', reveal.Start - 1) + 1;
+			FlowDocument document = HighlightedBox.Document;
+			while (document.Blocks.Count <= line && _pendingParagraphs != null)
+			{
+				if (!AddParagraphs(document, _pendingParagraphs, 200))
+				{
+					_pendingParagraphs = null;
+				}
+			}
+
+			Block? block = document.Blocks.Skip(line).FirstOrDefault();
+			if (block is not Paragraph paragraph)
+			{
+				return;
+			}
+
+			TextPointer start = PointerAt(paragraph, reveal.Start - lineStart);
+			TextPointer end = PointerAt(paragraph, reveal.Start - lineStart + reveal.Length);
+			HighlightedBox.Focus();
+			HighlightedBox.Selection.Select(start, end);
+			paragraph.BringIntoView();
+		}
+
+		/// <summary>The place of a column of a line (a paragraph) in the document.</summary>
+		private static TextPointer PointerAt(Paragraph paragraph, Int32 column)
+		{
+			Int32 remaining = column;
+			foreach (Inline inline in paragraph.Inlines)
+			{
+				if (inline is Run run)
+				{
+					if (remaining <= run.Text.Length)
+					{
+						return run.ContentStart.GetPositionAtOffset(remaining) ?? run.ContentEnd;
+					}
+
+					remaining -= run.Text.Length;
+				}
+			}
+
+			return paragraph.ContentEnd;
 		}
 
 		/// <summary>Adds paragraphs for the time that is given (at least one).</summary>

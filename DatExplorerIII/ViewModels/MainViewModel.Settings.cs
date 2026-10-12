@@ -56,6 +56,10 @@ namespace DatExplorerIII.ViewModels
 		{
 			ViewerViewModel viewer = new(_uiThread) { OtherArchives = OpenArchives, ShowSubtitles = _settings.Data.ShowSubtitles, DisabledMessageChecks = _settings.Data.DisabledMessageChecks, ProblemsRequested = ShowMessageReport };
 
+			// The search of a text asks what to find through the dialogs of the program.
+			viewer.Text.Ask = (title, label, initial, validate) => _dialogs.Prompt(title, label, initial, validate);
+			viewer.Text.Inform = message => _dialogs.ShowMessage(Title, message, DialogIcon.Information);
+
 			// The volume and the repeat are kept for the next sound, and for the next run.
 			viewer.Audio.Volume = _settings.Data.AudioVolume;
 			viewer.Audio.IsLooping = _settings.Data.AudioLoop;
