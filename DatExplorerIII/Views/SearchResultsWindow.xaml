@@ -2,6 +2,7 @@
     x:Class="DatExplorerIII.Views.SearchResultsWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:infrastructure="clr-namespace:DatExplorerIII.Infrastructure"
     Title="{DynamicResource Str.SearchResults}"
     Width="640"
     Height="420"
@@ -22,6 +23,18 @@
             Grid.Row="1"
             KeyDown="OnResultKeyDown"
             MouseDoubleClick="OnResultActivated">
+            <ListView.Resources>
+                <infrastructure:GridViewHeaderOffsetConverter x:Key="GridViewHeaderOffset" />
+
+                <!--  The vertical scroll bar starts under the headers of the columns, not along them.  -->
+                <Style BasedOn="{StaticResource {x:Type ScrollBar}}" TargetType="ScrollBar">
+                    <Style.Triggers>
+                        <Trigger Property="Orientation" Value="Vertical">
+                            <Setter Property="Margin" Value="{Binding View, RelativeSource={RelativeSource AncestorType=ListView}, Converter={StaticResource GridViewHeaderOffset}}" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </ListView.Resources>
             <ListView.View>
                 <GridView>
                     <GridViewColumn

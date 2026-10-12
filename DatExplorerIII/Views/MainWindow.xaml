@@ -49,6 +49,7 @@
         <infrastructure:InverseBooleanConverter x:Key="InverseBool" />
         <infrastructure:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVisibility" />
         <infrastructure:BooleanToOrientationConverter x:Key="BoolToOrientation" />
+        <infrastructure:GridViewHeaderOffsetConverter x:Key="GridViewHeaderOffset" />
 
         <!--  Dense layout, like the original application.  -->
         <sys:Double x:Key="ControlContentThemeFontSize">12</sys:Double>
@@ -211,6 +212,16 @@
             TargetType="ListView">
             <Setter Property="ItemTemplate" Value="{StaticResource ListItemTemplate}" />
             <Setter Property="ItemContainerStyle" Value="{StaticResource FileItemStyle}" />
+            <Style.Resources>
+                <!--  The vertical scroll bar starts under the headers of the columns (in the details view), not along them.  -->
+                <Style BasedOn="{StaticResource {x:Type ScrollBar}}" TargetType="ScrollBar">
+                    <Style.Triggers>
+                        <Trigger Property="Orientation" Value="Vertical">
+                            <Setter Property="Margin" Value="{Binding View, RelativeSource={RelativeSource AncestorType=ListView}, Converter={StaticResource GridViewHeaderOffset}}" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </Style.Resources>
             <Style.Triggers>
                 <DataTrigger Binding="{Binding ViewMode}" Value="Details">
                     <Setter Property="View" Value="{StaticResource DetailsView}" />

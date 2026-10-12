@@ -11,13 +11,27 @@
     WindowStartupLocation="CenterOwner">
 
     <Window.Resources>
-        <!--  A box of the settings: the options one under the other.  -->
+        <!--
+            A box of the settings: the options one under the other. The label is centered on the box (the theme draws it about two
+            pixels low).
+        -->
         <Style
             x:Key="OptionBox"
             BasedOn="{StaticResource {x:Type CheckBox}}"
             TargetType="CheckBox">
             <Setter Property="Margin" Value="0" />
             <Setter Property="MinHeight" Value="26" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Padding" Value="8,0,0,5" />
+        </Style>
+
+        <Style
+            x:Key="OptionRadio"
+            BasedOn="{StaticResource {x:Type RadioButton}}"
+            TargetType="RadioButton">
+            <Setter Property="MinHeight" Value="26" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Padding" Value="8,0,0,5" />
         </Style>
 
         <Style x:Key="GroupTitle" TargetType="TextBlock">
@@ -173,13 +187,15 @@
                         MinHeight="26"
                         Content="{DynamicResource Str.SettingsMethodText}"
                         GroupName="Method"
-                        IsChecked="{Binding IsTextMethod}" />
+                        IsChecked="{Binding IsTextMethod}"
+                        Style="{StaticResource OptionRadio}" />
                     <RadioButton
                         x:Name="MethodBinaryButton"
                         MinHeight="26"
                         Content="{DynamicResource Str.SettingsMethodBinary}"
                         GroupName="Method"
-                        IsChecked="{Binding IsBinaryMethod}" />
+                        IsChecked="{Binding IsBinaryMethod}"
+                        Style="{StaticResource OptionRadio}" />
                     <TextBlock
                         Margin="0,4,0,0"
                         Opacity="0.7"

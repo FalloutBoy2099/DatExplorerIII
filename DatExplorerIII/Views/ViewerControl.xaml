@@ -11,6 +11,7 @@
         <infrastructure:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVisibility" />
         <infrastructure:EnvelopeGeometryConverter x:Key="EnvelopeGeometry" />
         <infrastructure:FractionOfWidthConverter x:Key="FractionOfWidth" />
+        <infrastructure:RightMarginConverter x:Key="RightMargin" />
 
         <!--  The grid that shows through the transparent parts of a sprite  -->
         <DrawingBrush
@@ -76,6 +77,15 @@
             <Setter Property="Margin" Value="4,3" />
         </Style>
 
+        <!--  The label of a check box of a tool bar, centered on its box (the theme draws it about two pixels low).  -->
+        <Style
+            x:Key="ToolbarCheckBox"
+            BasedOn="{StaticResource {x:Type CheckBox}}"
+            TargetType="CheckBox">
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Padding" Value="8,0,0,5" />
+        </Style>
+
         <Style x:Key="ToolbarLabel" TargetType="TextBlock">
             <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="Margin" Value="0,0,6,0" />
@@ -132,7 +142,8 @@
                 <CheckBox
                     Margin="14,0,0,0"
                     Content="{DynamicResource Str.ViewerWrap}"
-                    IsChecked="{Binding WrapLines}" />
+                    IsChecked="{Binding WrapLines}"
+                    Style="{StaticResource ToolbarCheckBox}" />
                 <Button
                     Margin="14,0,0,0"
                     Command="{Binding CopyCommand, Mode=OneTime}"
@@ -581,7 +592,11 @@
             DataContext="{Binding Character}"
             VerticalScrollBarVisibility="Auto"
             Visibility="{Binding DataContext.IsCharacter, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}}">
-            <ItemsControl ItemTemplate="{StaticResource SectionTemplate}" ItemsSource="{Binding Sections}" />
+            <!--  The scroll bar is drawn over the content: the sheet stops where it starts.  -->
+            <ItemsControl
+                Margin="{Binding Width, Source={StaticResource ScrollBarMetrics}, Converter={StaticResource RightMargin}}"
+                ItemTemplate="{StaticResource SectionTemplate}"
+                ItemsSource="{Binding Sections}" />
         </ScrollViewer>
 
         <!--  Prototype of an object  -->
@@ -589,7 +604,11 @@
             DataContext="{Binding Prototype}"
             VerticalScrollBarVisibility="Auto"
             Visibility="{Binding DataContext.IsPrototype, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}}">
-            <ItemsControl ItemTemplate="{StaticResource SectionTemplate}" ItemsSource="{Binding Sections}" />
+            <!--  The scroll bar is drawn over the content: the sheet stops where it starts.  -->
+            <ItemsControl
+                Margin="{Binding Width, Source={StaticResource ScrollBarMetrics}, Converter={StaticResource RightMargin}}"
+                ItemTemplate="{StaticResource SectionTemplate}"
+                ItemsSource="{Binding Sections}" />
         </ScrollViewer>
 
         <!--  What a map holds  -->
@@ -597,7 +616,11 @@
             DataContext="{Binding Map}"
             VerticalScrollBarVisibility="Auto"
             Visibility="{Binding DataContext.IsMap, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}}">
-            <ItemsControl ItemTemplate="{StaticResource SectionTemplate}" ItemsSource="{Binding Sections}" />
+            <!--  The scroll bar is drawn over the content: the sheet stops where it starts.  -->
+            <ItemsControl
+                Margin="{Binding Width, Source={StaticResource ScrollBarMetrics}, Converter={StaticResource RightMargin}}"
+                ItemTemplate="{StaticResource SectionTemplate}"
+                ItemsSource="{Binding Sections}" />
         </ScrollViewer>
 
         <!--  Messages and dialogs  -->
