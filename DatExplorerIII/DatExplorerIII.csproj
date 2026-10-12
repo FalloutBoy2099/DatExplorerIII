@@ -20,8 +20,8 @@
 		<AnalysisLevel>latest</AnalysisLevel>
 		<!-- The built-in Fluent theme (ThemeMode) is still flagged as experimental. -->
 		<NoWarn>$(NoWarn);WPF0001</NoWarn>
-		<AssemblyVersion>2026.10.11.8</AssemblyVersion>
-		<FileVersion>2026.10.11.8</FileVersion>
+		<AssemblyVersion>2026.10.12.9</AssemblyVersion>
+		<FileVersion>2026.10.12.9</FileVersion>
 	</PropertyGroup>
 
 	<ItemGroup>
