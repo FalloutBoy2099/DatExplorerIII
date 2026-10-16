@@ -16,6 +16,7 @@
     <sys:String x:Key="Str.Save">Enregistrer</sys:String>
     <sys:String x:Key="Str.QuickSave">Enregistrement rapide</sys:String>
     <sys:String x:Key="Str.CloseDat">Fermer le DAT</sys:String>
+    <sys:String x:Key="Str.CloseAllDats">Fermer tous les DAT</sys:String>
     <sys:String x:Key="Str.Exit">Quitter</sys:String>
     <sys:String x:Key="Str.OpenItem">Ouvrir</sys:String>
     <sys:String x:Key="Str.ExtractFile">Extraire le fichier vers...</sys:String>
@@ -130,6 +131,9 @@
     <sys:String x:Key="Str.OverwriteFile">Le fichier {0} existe déjà.&#10;Le remplacer ?</sys:String>
     <sys:String x:Key="Str.ReplaceEntry">{0} existe déjà dans le DAT.&#10;Le remplacer ?</sys:String>
     <sys:String x:Key="Str.NothingToExtract">Il n'y a aucun fichier à extraire.</sys:String>
+    <sys:String x:Key="Str.ExtractModeQuestion">Comment extraire les fichiers ?</sys:String>
+    <sys:String x:Key="Str.ExtractKeepTree">Garder l'arborescence</sys:String>
+    <sys:String x:Key="Str.ExtractFlat">Sans arborescence</sys:String>
     <sys:String x:Key="Str.ExtractFailures">{0} fichier(s) n'ont pas pu être extraits :</sys:String>
     <sys:String x:Key="Str.ImportFailures">{0} fichier(s) n'ont pas pu être importés :</sys:String>
     <sys:String x:Key="Str.BlockedFile">Les programmes et les scripts ne sont pas lancés depuis un fichier DAT. Extrayez le fichier si vous voulez vraiment l'exécuter.</sys:String>
@@ -200,6 +204,7 @@
     <sys:String x:Key="Str.Err.FolderAlreadyExists">Le dossier {0} existe déjà.</sys:String>
     <sys:String x:Key="Str.Err.RootFolderRename">Le dossier racine ne peut pas être renommé.</sys:String>
     <sys:String x:Key="Str.Err.ArchiveTooLarge">L'archive dépasserait 4 Go, la limite du format DAT.</sys:String>
+    <sys:String x:Key="Str.Err.ReadOnlyFormat">Les archives de Temple of Elemental Evil peuvent être ouvertes et extraites, mais pas encore enregistrées.</sys:String>
     <sys:String x:Key="Str.Err.PathNotAllowed">Le chemin {0} sortirait du dossier de destination : il a été refusé.</sys:String>
     <sys:String x:Key="Str.Err.DamagedEntriesPresent">Les fichiers endommagés doivent être supprimés avant l'enregistrement de l'archive.</sys:String>
 
@@ -214,6 +219,7 @@
     <!--  Keyboard shortcuts  -->
     <sys:String x:Key="Str.GestureOpen">Ctrl+O</sys:String>
     <sys:String x:Key="Str.GestureSave">Ctrl+S</sys:String>
+    <sys:String x:Key="Str.GestureClose">Ctrl+W</sys:String>
     <sys:String x:Key="Str.GestureQuickSave">Ctrl+Maj+S</sys:String>
     <sys:String x:Key="Str.GestureExit">Alt+F4</sys:String>
     <sys:String x:Key="Str.GestureOpenItem">Entrée</sys:String>
@@ -241,9 +247,14 @@
     <sys:String x:Key="Str.WindowFrame">Cadre de la fenêtre</sys:String>
     <sys:String x:Key="Str.SingleInstance">Instance unique</sys:String>
     <sys:String x:Key="Str.BlockSeparators">Séparateurs entre les blocs</sys:String>
+    <sys:String x:Key="Str.ShowHiddenFolders">Afficher les dossiers cachés (cachés par Windows ou commençant par un point)</sys:String>
 
     <!--  Comparison of two archives  -->
     <sys:String x:Key="Str.DoubleClickOpens">Le double-clic ouvre</sys:String>
+    <sys:String x:Key="Str.WheelZoom">Zoom à la molette</sys:String>
+    <sys:String x:Key="Str.WheelNotch1">1 cran</sys:String>
+    <sys:String x:Key="Str.WheelNotch2">2 crans</sys:String>
+    <sys:String x:Key="Str.WheelNotch3">3 crans</sys:String>
     <sys:String x:Key="Str.Compare">Comparer deux DAT...</sys:String>
     <sys:String x:Key="Str.CompareClose">Quitter la comparaison</sys:String>
     <sys:String x:Key="Str.CompareTitle">Comparer deux archives DAT</sys:String>
@@ -438,6 +449,8 @@
     <sys:String x:Key="Str.ViewerDirection">Direction :</sys:String>
     <sys:String x:Key="Str.ViewerPreviousFrame">Image précédente</sys:String>
     <sys:String x:Key="Str.ViewerNextFrame">Image suivante</sys:String>
+    <sys:String x:Key="Str.ViewerPreviousDirection">Direction précédente</sys:String>
+    <sys:String x:Key="Str.ViewerNextDirection">Direction suivante</sys:String>
     <sys:String x:Key="Str.ViewerPlay">Lecture</sys:String>
     <sys:String x:Key="Str.ViewerPause">Pause</sys:String>
     <sys:String x:Key="Str.ViewerVolume">Volume</sys:String>

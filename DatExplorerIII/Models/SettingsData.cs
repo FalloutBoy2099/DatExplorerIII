@@ -50,6 +50,15 @@ namespace DatExplorerIII.Models
 		/// <summary>Whether a line shows the limit between the three blocks of the main window: folders, files, preview (on by default).</summary>
 		public Boolean BlockSeparatorsVisible { get; set; } = true;
 
+		/// <summary>Whether the files are extracted with no folders (the last choice of the extraction); false keeps the folders of the DAT.</summary>
+		public Boolean ExtractFlat { get; set; }
+
+		/// <summary>How many notches of the wheel of the mouse change the magnification of a picture by one step (1 to 3).</summary>
+		public Int32 WheelNotchesPerZoom { get; set; } = 3;
+
+		/// <summary>Whether a folder opened as an archive shows its hidden folders (hidden by Windows, or with a name that starts with a dot); off by default.</summary>
+		public Boolean ShowHiddenFolders { get; set; }
+
 		/// <summary>Comparison of two archives: the block of the folders and files above the block of the two archives (true), or beside it (false, the default).</summary>
 		public Boolean CompareGroupsStacked { get; set; }
 

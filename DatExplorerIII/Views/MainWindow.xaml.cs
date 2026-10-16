@@ -40,8 +40,8 @@ namespace DatExplorerIII.Views
 		}
 
 		/// <summary>
-		/// The recent files are added to the File menu each time it opens: a separator, a line for each file, and the line that
-		/// clears the list; then comes the separator before "Close". The lines of the last time are removed first.
+		/// The recent files are added to the File menu each time it opens: a separator, the line that
+		/// clears the list, a separator and a line for each file; then comes the separator before "Close". The lines of the last time are removed first.
 		/// </summary>
 		private void OnFileMenuOpened(Object sender, RoutedEventArgs e)
 		{
@@ -65,7 +65,13 @@ namespace DatExplorerIII.Views
 				return;
 			}
 
-			List<Control> lines = new() { new Separator { Tag = RecentTag } };
+			// The line that clears the list comes first, and a separator sets it apart from the files.
+			List<Control> lines = new()
+			{
+				new Separator { Tag = RecentTag },
+				new MenuItem { Header = (String)FindResource("Str.ClearRecent"), Command = _viewModel.ClearRecentCommand, Tag = RecentTag },
+				new Separator { Tag = RecentTag },
+			};
 			for (Int32 i = 0; i < files.Count; i++)
 			{
 				// The digit is the access key of the line (1 to 9, and 0 for the tenth); an underscore of the path is not one.
@@ -79,13 +85,6 @@ namespace DatExplorerIII.Views
 					Tag = RecentTag,
 				});
 			}
-
-			lines.Add(new MenuItem
-			{
-				Header = (String)FindResource("Str.ClearRecent"),
-				Command = _viewModel.ClearRecentCommand,
-				Tag = RecentTag,
-			});
 
 			// The list ends before the separator that comes before "Close".
 			Int32 index = FileMenu.Items.IndexOf(CloseSeparator);

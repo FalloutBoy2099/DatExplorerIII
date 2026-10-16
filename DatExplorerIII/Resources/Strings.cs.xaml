@@ -16,6 +16,7 @@
     <sys:String x:Key="Str.Save">Uložit</sys:String>
     <sys:String x:Key="Str.QuickSave">Rychlé uložení</sys:String>
     <sys:String x:Key="Str.CloseDat">Zavřít DAT</sys:String>
+    <sys:String x:Key="Str.CloseAllDats">Zavřít všechny DAT</sys:String>
     <sys:String x:Key="Str.Exit">Konec</sys:String>
     <sys:String x:Key="Str.OpenItem">Otevřít</sys:String>
     <sys:String x:Key="Str.ExtractFile">Rozbalit soubor do...</sys:String>
@@ -130,6 +131,9 @@
     <sys:String x:Key="Str.OverwriteFile">Soubor {0} již existuje.&#10;Přepsat jej?</sys:String>
     <sys:String x:Key="Str.ReplaceEntry">{0} již v DAT existuje.&#10;Nahradit jej?</sys:String>
     <sys:String x:Key="Str.NothingToExtract">Není co rozbalit.</sys:String>
+    <sys:String x:Key="Str.ExtractModeQuestion">Jak extrahovat soubory?</sys:String>
+    <sys:String x:Key="Str.ExtractKeepTree">Zachovat strukturu složek</sys:String>
+    <sys:String x:Key="Str.ExtractFlat">Bez struktury složek</sys:String>
     <sys:String x:Key="Str.ExtractFailures">Počet souborů, které se nepodařilo rozbalit: {0}. Seznam:</sys:String>
     <sys:String x:Key="Str.ImportFailures">Počet souborů, které se nepodařilo importovat: {0}. Seznam:</sys:String>
     <sys:String x:Key="Str.BlockedFile">Programy a skripty se ze souboru DAT nespouštějí. Pokud jej opravdu chcete spustit, nejprve jej rozbalte.</sys:String>
@@ -200,6 +204,7 @@
     <sys:String x:Key="Str.Err.FolderAlreadyExists">Složka {0} již existuje.</sys:String>
     <sys:String x:Key="Str.Err.RootFolderRename">Kořenovou složku nelze přejmenovat.</sys:String>
     <sys:String x:Key="Str.Err.ArchiveTooLarge">Archiv by překročil 4 GB, což je limit formátu DAT.</sys:String>
+    <sys:String x:Key="Str.Err.ReadOnlyFormat">Archivy hry Temple of Elemental Evil lze otevřít a extrahovat, ale zatím ne uložit.</sys:String>
     <sys:String x:Key="Str.Err.PathNotAllowed">Cesta {0} by vedla mimo cílovou složku a byla odmítnuta.</sys:String>
     <sys:String x:Key="Str.Err.DamagedEntriesPresent">Před uložením archivu je třeba odebrat poškozené soubory.</sys:String>
 
@@ -214,6 +219,7 @@
     <!--  Keyboard shortcuts  -->
     <sys:String x:Key="Str.GestureOpen">Ctrl+O</sys:String>
     <sys:String x:Key="Str.GestureSave">Ctrl+S</sys:String>
+    <sys:String x:Key="Str.GestureClose">Ctrl+W</sys:String>
     <sys:String x:Key="Str.GestureQuickSave">Ctrl+Shift+S</sys:String>
     <sys:String x:Key="Str.GestureExit">Alt+F4</sys:String>
     <sys:String x:Key="Str.GestureOpenItem">Enter</sys:String>
@@ -241,6 +247,7 @@
     <sys:String x:Key="Str.WindowFrame">Ohraničení okna</sys:String>
     <sys:String x:Key="Str.SingleInstance">Jediná instance</sys:String>
     <sys:String x:Key="Str.BlockSeparators">Oddělovače mezi bloky</sys:String>
+    <sys:String x:Key="Str.ShowHiddenFolders">Zobrazit skryté složky (skryté ve Windows nebo začínající tečkou)</sys:String>
 
     <!--  Comparison of two archives  -->
     <sys:String x:Key="Str.Compare">Porovnat dva DAT...</sys:String>
@@ -372,6 +379,10 @@
     <sys:String x:Key="Str.LipPhonemeValue">{0} · snímek {1} · kód 0x{2}</sys:String>
     <sys:String x:Key="Str.LipMarkerValue">typ {0} · pozice {1}</sys:String>
     <sys:String x:Key="Str.DoubleClickOpens">Dvojité kliknutí otevře</sys:String>
+    <sys:String x:Key="Str.WheelZoom">Zoom kolečkem myši</sys:String>
+    <sys:String x:Key="Str.WheelNotch1">1 krok</sys:String>
+    <sys:String x:Key="Str.WheelNotch2">2 kroky</sys:String>
+    <sys:String x:Key="Str.WheelNotch3">3 kroky</sys:String>
     <sys:String x:Key="Str.DoubleClickViewer">V prohlížeči</sys:String>
     <sys:String x:Key="Str.DoubleClickProgram">Ve výchozím programu</sys:String>
     <sys:String x:Key="Str.DoubleClickNothing">Nic</sys:String>
@@ -438,6 +449,8 @@
     <sys:String x:Key="Str.ViewerDirection">Směr:</sys:String>
     <sys:String x:Key="Str.ViewerPreviousFrame">Předchozí snímek</sys:String>
     <sys:String x:Key="Str.ViewerNextFrame">Další snímek</sys:String>
+    <sys:String x:Key="Str.ViewerPreviousDirection">Předchozí směr</sys:String>
+    <sys:String x:Key="Str.ViewerNextDirection">Další směr</sys:String>
     <sys:String x:Key="Str.ViewerPlay">Přehrát</sys:String>
     <sys:String x:Key="Str.ViewerPause">Pozastavit</sys:String>
     <sys:String x:Key="Str.ViewerVolume">Hlasitost</sys:String>

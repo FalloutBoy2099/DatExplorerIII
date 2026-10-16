@@ -268,6 +268,51 @@ namespace DatExplorerIII.Tests
 		}
 
 		[Fact]
+		public void Image_TheDirectionBox_ShowsTheFirstDirection_WhateverWasShownBefore()
+		{
+			RunOnUiThread(() =>
+			{
+				ImageViewerViewModel viewer = new(new ManualUiThread());
+				System.Windows.Controls.ComboBox box = new();
+				System.Windows.Controls.StackPanel panel = new() { DataContext = viewer, Children = { box } };
+				panel.SetBinding(System.Windows.UIElement.VisibilityProperty, new System.Windows.Data.Binding("HasDirections") { Converter = new System.Windows.Controls.BooleanToVisibilityConverter() });
+				box.SetBinding(System.Windows.Controls.ItemsControl.ItemsSourceProperty, new System.Windows.Data.Binding("Directions"));
+				box.SetBinding(System.Windows.Controls.Primitives.Selector.SelectedItemProperty, new System.Windows.Data.Binding("SelectedDirectionNumber"));
+				System.Windows.Window window = new() { Content = panel, ShowActivated = false, Left = -5000, Top = 0, Width = 300, Height = 200 };
+				window.Show();
+
+				void Pump()
+				{
+					for (Int32 i = 0; i < 4; i++)
+					{
+						window.UpdateLayout();
+						window.Dispatcher.Invoke(() => { }, System.Windows.Threading.DispatcherPriority.Background);
+					}
+				}
+
+				PaletteChoice[] gray = [new PaletteChoice("Gray", Palette.Grayscale())];
+				viewer.ShowAnimation(FrmReader.Read(BuildFrm(1, 3, 4, 4)), gray);
+				Pump();
+				viewer.ShowAnimation(FrmReader.Read(BuildFrm(6, 3, 4, 4)), gray);
+				Pump();
+				Assert.Equal(0, viewer.SelectedDirection);
+				Assert.Equal(1, box.SelectedItem);
+
+				viewer.SelectedDirection = 3;
+				Pump();
+				viewer.ShowAnimation(FrmReader.Read(BuildFrm(6, 3, 4, 4)), gray);
+				Pump();
+				Assert.Equal(1, box.SelectedItem);
+
+				viewer.ShowAnimation(FrmReader.Read(BuildFrm(4, 3, 4, 4)), gray);
+				Pump();
+				Assert.Equal(1, box.SelectedItem);
+				window.Close();
+				return Task.CompletedTask;
+			});
+		}
+
+		[Fact]
 		public void Image_Animation_AdvancesOnTheTicksOfTheTimerService_AndStopsWhenPaused()
 		{
 			RunOnUiThread(() =>

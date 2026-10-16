@@ -37,6 +37,7 @@ namespace DatExplorerIII.ViewModels
 		private IReadOnlyList<PaletteChoice> _paletteChoices = Array.Empty<PaletteChoice>();
 		private PaletteChoice? _selectedPalette;
 		private Int32 _direction;
+		private IReadOnlyList<Int32> _directions = Array.Empty<Int32>();
 		private Int32 _frame;
 		private Boolean _isPlaying;
 		private ZoomOption _selectedZoom;
@@ -66,6 +67,64 @@ namespace DatExplorerIII.ViewModels
 			PreviousCommand = new RelayCommand(() => NextFrame(false, -1), () => IsAnimated);
 			NextCommand = new RelayCommand(() => NextFrame(false, 1), () => IsAnimated);
 			NewEndingTextCommand = new RelayCommand(PickEndingText, () => EndingTextVisible);
+			PreviousDirectionCommand = new RelayCommand(() => StepDirection(-1), () => HasDirections);
+			NextDirectionCommand = new RelayCommand(() => StepDirection(1), () => HasDirections);
+		}
+
+		/// <summary>The previous direction (the last one after the first).</summary>
+		public ICommand PreviousDirectionCommand { get; }
+
+		/// <summary>The next direction (the first one after the last).</summary>
+		public ICommand NextDirectionCommand { get; }
+
+		/// <summary>Goes to the next (or previous) direction, round the circle.</summary>
+		private void StepDirection(Int32 step)
+		{
+			if (DirectionCount > 1)
+			{
+				SelectedDirection = (((_direction + step) % DirectionCount) + DirectionCount) % DirectionCount;
+			}
+		}
+
+		/// <summary>How many notches of the wheel make one step of magnification (a setting of the program: 1 to 3).</summary>
+		public static Int32 WheelNotchesPerZoom { get; set; } = 3;
+
+		/// <summary>A notch of a wheel, in the units of the mouse messages.</summary>
+		private const Int32 WheelNotch = 120;
+
+		/// <summary>What the wheel turned since the last step (a wheel that turns smoothly sends less than a notch at a time).</summary>
+		private Int32 _wheelRemainder;
+
+		/// <summary>Takes a turn of the wheel: after enough notches in the same way the magnification changes by one step.</summary>
+		public void Wheel(Int32 delta)
+		{
+			// A turn the other way starts again.
+			if (_wheelRemainder != 0 && Math.Sign(_wheelRemainder) != Math.Sign(delta))
+			{
+				_wheelRemainder = 0;
+			}
+
+			_wheelRemainder += delta;
+			Int32 needed = Math.Clamp(WheelNotchesPerZoom, 1, 3) * WheelNotch;
+			while (Math.Abs(_wheelRemainder) >= needed)
+			{
+				Int32 step = Math.Sign(_wheelRemainder);
+				_wheelRemainder -= step * needed;
+				StepZoom(step);
+			}
+		}
+
+		/// <summary>One step of magnification more (the wheel of the mouse turned up) or less; "fit" is the step under 1×.</summary>
+		public void StepZoom(Int32 step)
+		{
+			Int32 index = Math.Clamp(ZoomOptions.ToList().IndexOf(_selectedZoom) + step, 0, ZoomOptions.Count - 1);
+			SelectedZoom = ZoomOptions[index];
+		}
+
+		/// <summary>The picture at its real size (100%).</summary>
+		public void ActualSize()
+		{
+			SelectedZoom = ZoomOptions.First(option => option.Factor == 1);
 		}
 
 		/// <summary>Picks another text of the endings to show over the picture.</summary>
@@ -121,7 +180,7 @@ namespace DatExplorerIII.ViewModels
 		public Boolean HasDirections => DirectionCount > 1;
 
 		/// <summary>The numbers of the directions, from 1.</summary>
-		public IReadOnlyList<Int32> Directions => Enumerable.Range(1, DirectionCount).ToList();
+		public IReadOnlyList<Int32> Directions => _directions;
 
 		/// <summary>The direction shown, from 0.</summary>
 		public Int32 SelectedDirection
@@ -134,7 +193,31 @@ namespace DatExplorerIII.ViewModels
 					_direction = value;
 					_frame = 0;
 					OnPropertyChanged();
+					OnPropertyChanged(nameof(SelectedDirectionNumber));
 					RenderCurrent();
+				}
+				else if (value < 0)
+				{
+					// The box gave up its selection (its list was replaced): it gets the direction that is shown back.
+					OnPropertyChanged();
+				}
+			}
+		}
+
+		/// <summary>The direction shown as its number (from 1): the box of the directions holds these numbers.</summary>
+		public Int32 SelectedDirectionNumber
+		{
+			get => _direction + 1;
+			set
+			{
+				if (value >= 1)
+				{
+					SelectedDirection = value - 1;
+				}
+				else
+				{
+					// The box gave up its selection (its list was replaced): it gets the direction that is shown back.
+					OnPropertyChanged();
 				}
 			}
 		}
@@ -355,6 +438,11 @@ namespace DatExplorerIII.ViewModels
 
 		private void OnAnimationChanged()
 		{
+			// The list is the same object until the picture changes: a box that gets a new list forgets its selection.
+			if (_directions.Count != DirectionCount)
+			{
+				_directions = Enumerable.Range(1, DirectionCount).ToList();
+			}
 			OnPropertyChanged(nameof(PaletteChoices));
 			OnPropertyChanged(nameof(HasPaletteChoices));
 			OnPropertyChanged(nameof(SelectedPalette));
@@ -362,6 +450,7 @@ namespace DatExplorerIII.ViewModels
 			OnPropertyChanged(nameof(HasDirections));
 			OnPropertyChanged(nameof(Directions));
 			OnPropertyChanged(nameof(SelectedDirection));
+			OnPropertyChanged(nameof(SelectedDirectionNumber));
 			OnPropertyChanged(nameof(FrameCount));
 			OnPropertyChanged(nameof(IsAnimated));
 			OnPropertyChanged(nameof(CurrentFrame));

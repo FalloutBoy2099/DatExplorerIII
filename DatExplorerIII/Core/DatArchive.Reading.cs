@@ -543,15 +543,18 @@ namespace DatExplorerIII.Core
 		/// <param name="entries">Files to extract.</param>
 		/// <param name="destination">Destination folder.</param>
 		/// <param name="stripPrefix">Leading part of the archive folder that is not recreated on disk (empty to keep everything).</param>
+		/// <param name="flat">True to put every file straight in the destination, with no folders (a name already taken gets a number).</param>
 		public DatExtractResult Extract(
 			IReadOnlyList<DatEntry> entries,
 			String destination,
 			String stripPrefix,
 			IProgress<DatProgress>? progress = null,
-			CancellationToken cancellationToken = default)
+			CancellationToken cancellationToken = default,
+			Boolean flat = false)
 		{
 			String root = Path.GetFullPath(destination);
 			String rootWithSeparator = Path.EndsInDirectorySeparator(root) ? root : root + Path.DirectorySeparatorChar;
+			HashSet<String> taken = new(StringComparer.OrdinalIgnoreCase);
 			List<String> failures = new();
 			Int32 succeeded = 0;
 			DatProgressThrottle throttle = new(progress, entries.Count);
@@ -570,7 +573,13 @@ namespace DatExplorerIII.Core
 
 				try
 				{
-					String target = ResolveTarget(rootWithSeparator, entry, stripPrefix);
+					String target = ResolveTarget(rootWithSeparator, entry, stripPrefix, flat);
+					if (flat)
+					{
+						// Two files of different folders can have the same name: the second one is numbered, it does not replace the first.
+						target = NumberIfTaken(target, taken);
+					}
+
 					Byte[] data = ReadData(entry);
 					Directory.CreateDirectory(Path.GetDirectoryName(target)!);
 					File.WriteAllBytes(target, data);
@@ -589,16 +598,32 @@ namespace DatExplorerIII.Core
 		/// Returns where a file is extracted, refusing paths that would leave the destination folder.
 		/// </summary>
 		/// <exception cref="DatException">The path of the file is not allowed.</exception>
-		public static String GetExtractionPath(String destination, DatEntry entry, String stripPrefix)
+		public static String GetExtractionPath(String destination, DatEntry entry, String stripPrefix, Boolean flat = false)
 		{
 			String root = Path.GetFullPath(destination);
-			return ResolveTarget(Path.EndsInDirectorySeparator(root) ? root : root + Path.DirectorySeparatorChar, entry, stripPrefix);
+			return ResolveTarget(Path.EndsInDirectorySeparator(root) ? root : root + Path.DirectorySeparatorChar, entry, stripPrefix, flat);
 		}
 
-		internal static String ResolveTarget(String rootWithSeparator, DatEntry entry, String stripPrefix)
+		/// <summary>The path with a number before its extension when it is already in <paramref name="taken"/>; the path it returns is added to the set.</summary>
+		private static String NumberIfTaken(String path, HashSet<String> taken)
+		{
+			String result = path;
+			for (Int32 number = 2; !taken.Add(result); number++)
+			{
+				result = Path.Combine(Path.GetDirectoryName(path)!, Path.GetFileNameWithoutExtension(path) + " (" + number + ")" + Path.GetExtension(path));
+			}
+
+			return result;
+		}
+
+		internal static String ResolveTarget(String rootWithSeparator, DatEntry entry, String stripPrefix, Boolean flat = false)
 		{
 			String relative = entry.FullPath;
-			if (stripPrefix.Length > 0 && relative.StartsWith(stripPrefix, StringComparison.OrdinalIgnoreCase))
+			if (flat)
+			{
+				relative = relative.Substring(relative.LastIndexOfAny(['\\', '/']) + 1);
+			}
+			else if (stripPrefix.Length > 0 && relative.StartsWith(stripPrefix, StringComparison.OrdinalIgnoreCase))
 			{
 				relative = relative.Substring(stripPrefix.Length);
 			}

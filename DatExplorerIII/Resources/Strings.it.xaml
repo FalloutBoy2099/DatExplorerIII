@@ -16,6 +16,7 @@
     <sys:String x:Key="Str.Save">Salva</sys:String>
     <sys:String x:Key="Str.QuickSave">Salvataggio rapido</sys:String>
     <sys:String x:Key="Str.CloseDat">Chiudi DAT</sys:String>
+    <sys:String x:Key="Str.CloseAllDats">Chiudi tutti i DAT</sys:String>
     <sys:String x:Key="Str.Exit">Esci</sys:String>
     <sys:String x:Key="Str.OpenItem">Apri</sys:String>
     <sys:String x:Key="Str.ExtractFile">Estrai il file in...</sys:String>
@@ -130,6 +131,9 @@
     <sys:String x:Key="Str.OverwriteFile">Il file {0} esiste già.&#10;Sovrascriverlo?</sys:String>
     <sys:String x:Key="Str.ReplaceEntry">{0} esiste già nel DAT.&#10;Sostituirlo?</sys:String>
     <sys:String x:Key="Str.NothingToExtract">Non c'è nessun file da estrarre.</sys:String>
+    <sys:String x:Key="Str.ExtractModeQuestion">Come estrarre i file?</sys:String>
+    <sys:String x:Key="Str.ExtractKeepTree">Mantieni la struttura delle cartelle</sys:String>
+    <sys:String x:Key="Str.ExtractFlat">Senza struttura delle cartelle</sys:String>
     <sys:String x:Key="Str.ExtractFailures">Impossibile estrarre {0} file:</sys:String>
     <sys:String x:Key="Str.ImportFailures">Impossibile importare {0} file:</sys:String>
     <sys:String x:Key="Str.BlockedFile">I programmi e gli script non vengono avviati da un file DAT. Estrai il file se vuoi davvero eseguirlo.</sys:String>
@@ -200,6 +204,7 @@
     <sys:String x:Key="Str.Err.FolderAlreadyExists">La cartella {0} esiste già.</sys:String>
     <sys:String x:Key="Str.Err.RootFolderRename">La cartella radice non può essere rinominata.</sys:String>
     <sys:String x:Key="Str.Err.ArchiveTooLarge">L'archivio supererebbe 4 GB, il limite del formato DAT.</sys:String>
+    <sys:String x:Key="Str.Err.ReadOnlyFormat">Gli archivi di Temple of Elemental Evil si possono aprire ed estrarre, ma non ancora salvare.</sys:String>
     <sys:String x:Key="Str.Err.PathNotAllowed">Il percorso {0} uscirebbe dalla cartella di destinazione ed è stato rifiutato.</sys:String>
     <sys:String x:Key="Str.Err.DamagedEntriesPresent">I file danneggiati devono essere rimossi prima di salvare l'archivio.</sys:String>
 
@@ -214,6 +219,7 @@
     <!--  Keyboard shortcuts  -->
     <sys:String x:Key="Str.GestureOpen">Ctrl+O</sys:String>
     <sys:String x:Key="Str.GestureSave">Ctrl+S</sys:String>
+    <sys:String x:Key="Str.GestureClose">Ctrl+W</sys:String>
     <sys:String x:Key="Str.GestureQuickSave">Ctrl+Maiusc+S</sys:String>
     <sys:String x:Key="Str.GestureExit">Alt+F4</sys:String>
     <sys:String x:Key="Str.GestureOpenItem">Invio</sys:String>
@@ -241,6 +247,7 @@
     <sys:String x:Key="Str.WindowFrame">Bordo della finestra</sys:String>
     <sys:String x:Key="Str.SingleInstance">Istanza singola</sys:String>
     <sys:String x:Key="Str.BlockSeparators">Separatori tra i blocchi</sys:String>
+    <sys:String x:Key="Str.ShowHiddenFolders">Mostra le cartelle nascoste (nascoste da Windows o che iniziano con un punto)</sys:String>
 
     <!--  Comparison of two archives  -->
     <sys:String x:Key="Str.Compare">Confronta due DAT...</sys:String>
@@ -372,6 +379,10 @@
     <sys:String x:Key="Str.LipPhonemeValue">{0} · fotogramma {1} · codice 0x{2}</sys:String>
     <sys:String x:Key="Str.LipMarkerValue">tipo {0} · posizione {1}</sys:String>
     <sys:String x:Key="Str.DoubleClickOpens">Il doppio clic apre</sys:String>
+    <sys:String x:Key="Str.WheelZoom">Zoom con la rotellina</sys:String>
+    <sys:String x:Key="Str.WheelNotch1">1 scatto</sys:String>
+    <sys:String x:Key="Str.WheelNotch2">2 scatti</sys:String>
+    <sys:String x:Key="Str.WheelNotch3">3 scatti</sys:String>
     <sys:String x:Key="Str.DoubleClickViewer">Nel visualizzatore</sys:String>
     <sys:String x:Key="Str.DoubleClickProgram">Con il programma predefinito</sys:String>
     <sys:String x:Key="Str.DoubleClickNothing">Niente</sys:String>
@@ -438,6 +449,8 @@
     <sys:String x:Key="Str.ViewerDirection">Direzione:</sys:String>
     <sys:String x:Key="Str.ViewerPreviousFrame">Fotogramma precedente</sys:String>
     <sys:String x:Key="Str.ViewerNextFrame">Fotogramma successivo</sys:String>
+    <sys:String x:Key="Str.ViewerPreviousDirection">Direzione precedente</sys:String>
+    <sys:String x:Key="Str.ViewerNextDirection">Direzione successiva</sys:String>
     <sys:String x:Key="Str.ViewerPlay">Riproduci</sys:String>
     <sys:String x:Key="Str.ViewerPause">Pausa</sys:String>
     <sys:String x:Key="Str.ViewerVolume">Volume</sys:String>

@@ -83,6 +83,14 @@ namespace DatExplorerIII.Core
 
 		private static DatArchive ReadArcanumArchive(String filePath, FileStream stream, ArcanumFooter footer, Int64 length, DatOpenMode mode)
 		{
+			if (IsToeeIndex(stream, footer, length))
+			{
+				DatArchive toee = new(filePath, DatFormat.Toee);
+				toee.ReadToee(stream, footer, length, mode);
+				toee.FinishReading(mode);
+				return toee;
+			}
+
 			DatArchive arcanum = new(filePath, DatFormat.Arcanum);
 			arcanum.ReadArcanum(stream, footer, length, mode);
 			arcanum.FinishReading(mode);

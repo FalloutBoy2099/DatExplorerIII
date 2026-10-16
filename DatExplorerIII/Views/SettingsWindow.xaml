@@ -64,6 +64,11 @@
                         Content="{DynamicResource Str.BlockSeparators}"
                         IsChecked="{Binding BlockSeparatorsVisible}"
                         Style="{StaticResource OptionBox}" />
+                    <CheckBox
+                        x:Name="ShowHiddenFoldersBox"
+                        Content="{DynamicResource Str.ShowHiddenFolders}"
+                        IsChecked="{Binding ShowHiddenFolders}"
+                        Style="{StaticResource OptionBox}" />
                     <Separator Margin="0,6" />
                     <CheckBox
                         x:Name="SaveSizeBox"

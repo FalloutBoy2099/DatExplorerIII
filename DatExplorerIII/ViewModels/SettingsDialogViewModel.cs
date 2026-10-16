@@ -46,6 +46,7 @@ namespace DatExplorerIII.ViewModels
 			SingleInstance = data.SingleInstance;
 			WindowFrameVisible = data.WindowFrameVisible;
 			BlockSeparatorsVisible = data.BlockSeparatorsVisible;
+			ShowHiddenFolders = data.ShowHiddenFolders;
 			SaveWindowSize = data.SaveWindowSize;
 			SaveWindowPosition = data.SaveWindowPosition;
 			SaveBlockWidths = data.SaveBlockWidths;
@@ -79,6 +80,8 @@ namespace DatExplorerIII.ViewModels
 		public Boolean WindowFrameVisible { get; set; }
 
 		public Boolean BlockSeparatorsVisible { get; set; }
+
+		public Boolean ShowHiddenFolders { get; set; }
 
 		public Boolean SaveWindowSize { get; set; }
 

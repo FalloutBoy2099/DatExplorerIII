@@ -31,8 +31,9 @@ namespace DatExplorerIII.Core
 		/// </summary>
 		/// <param name="folderPath">The folder (for instance one named master.dat that holds the files of a DAT).</param>
 		/// <param name="format">The format the archive has when it is saved (it can be changed by <see cref="SaveAs"/>).</param>
+		/// <param name="showHidden">False to leave out the folders that Windows hides, and those whose name starts with a dot.</param>
 		/// <exception cref="DatException">The folder does not exist.</exception>
-		public static DatArchive OpenFolder(String folderPath, DatFormat format = DatFormat.Fallout2)
+		public static DatArchive OpenFolder(String folderPath, DatFormat format = DatFormat.Fallout2, Boolean showHidden = true)
 		{
 			if (String.IsNullOrWhiteSpace(folderPath))
 			{
@@ -46,12 +47,12 @@ namespace DatExplorerIII.Core
 			}
 
 			DatArchive archive = new(full, format) { _sourceFolder = full };
-			archive.AddFolderContent(full, String.Empty);
+			archive.AddFolderContent(full, String.Empty, showHidden);
 			archive._folderPristine = true;
 			return archive;
 		}
 
-		private void AddFolderContent(String disk, String directory)
+		private void AddFolderContent(String disk, String directory, Boolean showHidden)
 		{
 			IEnumerable<String> files;
 			IEnumerable<String> folders;
@@ -82,6 +83,12 @@ namespace DatExplorerIII.Core
 			{
 				String name = Path.GetFileName(folder);
 
+				// A hidden folder is left out, not skipped: the user chose not to see it.
+				if (!showHidden && (name.StartsWith('.') || (File.GetAttributes(folder) & FileAttributes.Hidden) != 0))
+				{
+					continue;
+				}
+
 				// A link to a folder could lead back to where it is: it is not followed.
 				if ((File.GetAttributes(folder) & FileAttributes.ReparsePoint) != 0)
 				{
@@ -100,7 +107,7 @@ namespace DatExplorerIII.Core
 					continue;
 				}
 
-				AddFolderContent(folder, directory + name + '\\');
+				AddFolderContent(folder, directory + name + '\\', showHidden);
 			}
 		}
 

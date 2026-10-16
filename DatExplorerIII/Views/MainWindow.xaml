@@ -33,6 +33,10 @@
             Command="{Binding QuickSaveCommand}"
             Modifiers="Ctrl+Shift" />
         <KeyBinding
+            Key="W"
+            Command="{Binding CloseDatCommand}"
+            Modifiers="Ctrl" />
+        <KeyBinding
             Key="F"
             Command="{Binding FocusSearchCommand}"
             Modifiers="Ctrl" />
@@ -563,7 +567,11 @@
                             Header="{DynamicResource Str.QuickSave}"
                             InputGestureText="{DynamicResource Str.GestureQuickSave}" />
                         <Separator x:Name="CloseSeparator" />
-                        <MenuItem Command="{Binding CloseDatCommand}" Header="{DynamicResource Str.CloseDat}" />
+                        <MenuItem
+                            Command="{Binding CloseDatCommand}"
+                            Header="{DynamicResource Str.CloseDat}"
+                            InputGestureText="{DynamicResource Str.GestureClose}" />
+                        <MenuItem Command="{Binding CloseAllDatsCommand}" Header="{DynamicResource Str.CloseAllDats}" />
                         <Separator />
                         <MenuItem
                             x:Name="ExitMenuItem"
@@ -656,6 +664,29 @@
                                 Header="{DynamicResource Str.DoubleClickNothing}"
                                 IsCheckable="True"
                                 IsChecked="{Binding IsDoubleClickNothing, Mode=OneWay}" />
+                        </MenuItem>
+                        <MenuItem>
+                            <MenuItem.Header>
+                                <TextBlock Margin="25.6,0,0,0" Text="{DynamicResource Str.WheelZoom}" />
+                            </MenuItem.Header>
+                            <MenuItem
+                                Command="{Binding SetWheelNotchesCommand}"
+                                CommandParameter="1"
+                                Header="{DynamicResource Str.WheelNotch1}"
+                                IsCheckable="True"
+                                IsChecked="{Binding IsWheelNotches1, Mode=OneWay}" />
+                            <MenuItem
+                                Command="{Binding SetWheelNotchesCommand}"
+                                CommandParameter="2"
+                                Header="{DynamicResource Str.WheelNotch2}"
+                                IsCheckable="True"
+                                IsChecked="{Binding IsWheelNotches2, Mode=OneWay}" />
+                            <MenuItem
+                                Command="{Binding SetWheelNotchesCommand}"
+                                CommandParameter="3"
+                                Header="{DynamicResource Str.WheelNotch3}"
+                                IsCheckable="True"
+                                IsChecked="{Binding IsWheelNotches3, Mode=OneWay}" />
                         </MenuItem>
                         <Separator />
                         <MenuItem>

@@ -72,6 +72,24 @@ namespace DatExplorerIII.ViewModels
 				return;
 			}
 
+			// The folders of the DAT are kept, or every file goes straight in the destination; the last choice is the default one.
+			Boolean flat = _settings.Data.ExtractFlat;
+			DialogButton[] modes =
+			[
+				new("tree", Loc.Get("Str.ExtractKeepTree"), IsDefault: !flat),
+				new("flat", Loc.Get("Str.ExtractFlat"), IsDefault: flat),
+				new("cancel", Loc.Get("Str.Cancel"), IsCancel: true),
+			];
+
+			String? mode = _dialogs.Choose(Title, Loc.Get("Str.ExtractModeQuestion"), DialogIcon.Question, modes);
+			if (mode is not ("tree" or "flat"))
+			{
+				return;
+			}
+
+			flat = mode == "flat";
+			_settings.Data.ExtractFlat = flat;
+
 			String? destination = _dialogs.PickFolder(Loc.Get("Str.SelectDestination"), _settings.Data.LastExtractFolder);
 			if (destination == null)
 			{
@@ -80,7 +98,7 @@ namespace DatExplorerIII.ViewModels
 
 			_settings.Data.LastExtractFolder = destination;
 
-			List<DatEntry>? selected = ResolveOverwrites(entries, destination, stripPrefix);
+			List<DatEntry>? selected = ResolveOverwrites(entries, destination, stripPrefix, flat);
 			if (selected == null)
 			{
 				return;
@@ -90,7 +108,7 @@ namespace DatExplorerIII.ViewModels
 			Boolean completed = await RunBusyAsync(
 				Loc.Get("Str.Extracting"),
 				true,
-				(progress, token) => Task.Run(() => result = document.Archive.Extract(selected, destination, stripPrefix, progress, token), token));
+				(progress, token) => Task.Run(() => result = document.Archive.Extract(selected, destination, stripPrefix, progress, token, flat), token));
 
 			if (completed && result != null)
 			{
@@ -102,17 +120,18 @@ namespace DatExplorerIII.ViewModels
 		/// <summary>
 		/// Asks what to do with the files that already exist. Returns the files to extract, or null when cancelled.
 		/// </summary>
-		private List<DatEntry>? ResolveOverwrites(IReadOnlyList<DatEntry> entries, String destination, String stripPrefix)
+		private List<DatEntry>? ResolveOverwrites(IReadOnlyList<DatEntry> entries, String destination, String stripPrefix, Boolean flat)
 		{
 			List<DatEntry> selected = new(entries.Count);
 			ConflictResolver resolver = new(_dialogs, Title);
+			HashSet<String> seen = new(StringComparer.OrdinalIgnoreCase);
 
 			foreach (DatEntry entry in entries)
 			{
 				String target;
 				try
 				{
-					target = DatArchive.GetExtractionPath(destination, entry, stripPrefix);
+					target = DatArchive.GetExtractionPath(destination, entry, stripPrefix, flat);
 				}
 				catch (DatException)
 				{
@@ -121,7 +140,8 @@ namespace DatExplorerIII.ViewModels
 					continue;
 				}
 
-				if (!File.Exists(target))
+				// Without folders, a name that comes twice is numbered by the extraction: only the first one can replace a file.
+				if (!seen.Add(target) || !File.Exists(target))
 				{
 					selected.Add(entry);
 					continue;

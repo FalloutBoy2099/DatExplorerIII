@@ -64,6 +64,7 @@ namespace DatExplorerIII.ViewModels
 			SaveCommand = new AsyncRelayCommand(() => SaveAsync(false), () => CanBrowse() && CurrentDocument?.ShouldSave == true);
 			QuickSaveCommand = new AsyncRelayCommand(() => SaveAsync(true), () => CanBrowse() && CurrentDocument?.CanQuickSave == true);
 			CloseDatCommand = new RelayCommand(CloseCurrentDocument, HasDocument);
+			CloseAllDatsCommand = new RelayCommand(CloseAllDocuments, () => CanBrowse() && Roots.Count > 0);
 			UpCommand = new RelayCommand(GoUp, () => CanBrowse() && SelectedFolder?.Parent != null);
 			RefreshCommand = new RelayCommand(RefreshItems, HasDocument);
 
@@ -92,6 +93,8 @@ namespace DatExplorerIII.ViewModels
 			ViewItemCommand = new AsyncRelayCommand(ViewSelectedItemAsync, _ => CanBrowse() && SelectedViewableEntry != null);
 			OpenExternalCommand = new AsyncRelayCommand(_ => OpenExternalAsync(SelectedItems.FirstOrDefault()), _ => CanBrowse() && SelectedItems.Count > 0);
 			SetDoubleClickCommand = new RelayCommand(parameter => SetDoubleClick((String)parameter!));
+			SetWheelNotchesCommand = new RelayCommand(parameter => SetWheelNotches(Int32.Parse((String)parameter!, System.Globalization.CultureInfo.InvariantCulture)));
+			ImageViewerViewModel.WheelNotchesPerZoom = WheelNotches;
 			AboutCommand = new RelayCommand(_dialogs.ShowAbout);
 			SettingsCommand = new AsyncRelayCommand(OpenSettingsAsync, () => !Busy.IsBusy);
 			Comparison = new ComparisonController(this, dialogs, settings, temp, uiThread);
@@ -130,6 +133,8 @@ namespace DatExplorerIII.ViewModels
 		public ICommand QuickSaveCommand { get; }
 
 		public ICommand CloseDatCommand { get; }
+
+		public ICommand CloseAllDatsCommand { get; }
 
 		public ICommand UpCommand { get; }
 
@@ -177,6 +182,8 @@ namespace DatExplorerIII.ViewModels
 		public ICommand OpenExternalCommand { get; }
 
 		public ICommand SetDoubleClickCommand { get; }
+
+		public ICommand SetWheelNotchesCommand { get; }
 
 		public ICommand SetViewModeCommand { get; }
 

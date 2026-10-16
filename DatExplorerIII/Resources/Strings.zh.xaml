@@ -16,6 +16,7 @@
     <sys:String x:Key="Str.Save">保存</sys:String>
     <sys:String x:Key="Str.QuickSave">快速保存</sys:String>
     <sys:String x:Key="Str.CloseDat">关闭 DAT</sys:String>
+    <sys:String x:Key="Str.CloseAllDats">关闭所有 DAT</sys:String>
     <sys:String x:Key="Str.Exit">退出</sys:String>
     <sys:String x:Key="Str.OpenItem">打开</sys:String>
     <sys:String x:Key="Str.ExtractFile">提取文件到...</sys:String>
@@ -130,6 +131,9 @@
     <sys:String x:Key="Str.OverwriteFile">文件 {0} 已存在。&#10;是否覆盖？</sys:String>
     <sys:String x:Key="Str.ReplaceEntry">DAT 中已存在 {0}。&#10;是否替换？</sys:String>
     <sys:String x:Key="Str.NothingToExtract">没有可提取的文件。</sys:String>
+    <sys:String x:Key="Str.ExtractModeQuestion">如何解压文件？</sys:String>
+    <sys:String x:Key="Str.ExtractKeepTree">保留文件夹结构</sys:String>
+    <sys:String x:Key="Str.ExtractFlat">不保留文件夹结构</sys:String>
     <sys:String x:Key="Str.ExtractFailures">有 {0} 个文件无法提取：</sys:String>
     <sys:String x:Key="Str.ImportFailures">有 {0} 个文件无法导入：</sys:String>
     <sys:String x:Key="Str.BlockedFile">不会从 DAT 文件中直接运行程序和脚本。如果确实要运行，请先提取该文件。</sys:String>
@@ -200,6 +204,7 @@
     <sys:String x:Key="Str.Err.FolderAlreadyExists">文件夹 {0} 已存在。</sys:String>
     <sys:String x:Key="Str.Err.RootFolderRename">无法重命名根文件夹。</sys:String>
     <sys:String x:Key="Str.Err.ArchiveTooLarge">归档将超过 4 GB，即 DAT 格式的上限。</sys:String>
+    <sys:String x:Key="Str.Err.ReadOnlyFormat">可以打开和解压 Temple of Elemental Evil 的存档，但暂时不能保存。</sys:String>
     <sys:String x:Key="Str.Err.PathNotAllowed">路径 {0} 会超出目标文件夹，已被拒绝。</sys:String>
     <sys:String x:Key="Str.Err.DamagedEntriesPresent">保存归档之前必须删除已损坏的文件。</sys:String>
 
@@ -214,6 +219,7 @@
     <!--  Keyboard shortcuts  -->
     <sys:String x:Key="Str.GestureOpen">Ctrl+O</sys:String>
     <sys:String x:Key="Str.GestureSave">Ctrl+S</sys:String>
+    <sys:String x:Key="Str.GestureClose">Ctrl+W</sys:String>
     <sys:String x:Key="Str.GestureQuickSave">Ctrl+Shift+S</sys:String>
     <sys:String x:Key="Str.GestureExit">Alt+F4</sys:String>
     <sys:String x:Key="Str.GestureOpenItem">回车</sys:String>
@@ -241,6 +247,7 @@
     <sys:String x:Key="Str.WindowFrame">窗口边框</sys:String>
     <sys:String x:Key="Str.SingleInstance">单实例运行</sys:String>
     <sys:String x:Key="Str.BlockSeparators">区块之间的分隔线</sys:String>
+    <sys:String x:Key="Str.ShowHiddenFolders">显示隐藏文件夹（Windows 隐藏或以点开头）</sys:String>
 
     <!--  Comparison of two archives  -->
     <sys:String x:Key="Str.Compare">比较两个 DAT...</sys:String>
@@ -372,6 +379,10 @@
     <sys:String x:Key="Str.LipPhonemeValue">{0} · 帧 {1} · 代码 0x{2}</sys:String>
     <sys:String x:Key="Str.LipMarkerValue">类型 {0} · 位置 {1}</sys:String>
     <sys:String x:Key="Str.DoubleClickOpens">双击时打开方式</sys:String>
+    <sys:String x:Key="Str.WheelZoom">鼠标滚轮缩放</sys:String>
+    <sys:String x:Key="Str.WheelNotch1">1 格</sys:String>
+    <sys:String x:Key="Str.WheelNotch2">2 格</sys:String>
+    <sys:String x:Key="Str.WheelNotch3">3 格</sys:String>
     <sys:String x:Key="Str.DoubleClickViewer">在查看器中</sys:String>
     <sys:String x:Key="Str.DoubleClickProgram">用默认程序</sys:String>
     <sys:String x:Key="Str.DoubleClickNothing">无操作</sys:String>
@@ -438,6 +449,8 @@
     <sys:String x:Key="Str.ViewerDirection">方向：</sys:String>
     <sys:String x:Key="Str.ViewerPreviousFrame">上一帧</sys:String>
     <sys:String x:Key="Str.ViewerNextFrame">下一帧</sys:String>
+    <sys:String x:Key="Str.ViewerPreviousDirection">上一个方向</sys:String>
+    <sys:String x:Key="Str.ViewerNextDirection">下一个方向</sys:String>
     <sys:String x:Key="Str.ViewerPlay">播放</sys:String>
     <sys:String x:Key="Str.ViewerPause">暂停</sys:String>
     <sys:String x:Key="Str.ViewerVolume">音量</sys:String>

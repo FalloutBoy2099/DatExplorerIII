@@ -79,7 +79,7 @@ namespace DatExplorerIII.ViewModels
 			{
 				try
 				{
-					archive = await Task.Run(() => DatArchive.OpenFolder(fullPath));
+					archive = await Task.Run(() => DatArchive.OpenFolder(fullPath, DatFormat.Fallout2, _settings.Data.ShowHiddenFolders));
 				}
 				catch (DatException exception)
 				{
@@ -281,6 +281,30 @@ namespace DatExplorerIII.ViewModels
 			Roots.Add(document.Root);
 			document.Root.IsExpanded = true;
 			SelectFolder(document.Root);
+		}
+
+		/// <summary>Closes every DAT that is open, after one confirmation when some have changes that are not saved.</summary>
+		private void CloseAllDocuments()
+		{
+			if (Roots.Count == 0)
+			{
+				return;
+			}
+
+			if (Roots.Any(root => root.Document.ShouldSave) && !_dialogs.Confirm(Title, Loc.Get("Str.QuitUnsaved"), DialogIcon.Warning))
+			{
+				return;
+			}
+
+			List<FolderNode> roots = Roots.ToList();
+			SelectedFolder = null;
+			foreach (FolderNode root in roots)
+			{
+				Roots.Remove(root);
+				root.Document.Archive.Dispose();
+			}
+
+			StatusText = Loc.Get("Str.Ready");
 		}
 
 		private void CloseCurrentDocument()

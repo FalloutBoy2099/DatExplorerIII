@@ -16,6 +16,7 @@
     <sys:String x:Key="Str.Save">Сохранить</sys:String>
     <sys:String x:Key="Str.QuickSave">Быстрое сохранение</sys:String>
     <sys:String x:Key="Str.CloseDat">Закрыть DAT</sys:String>
+    <sys:String x:Key="Str.CloseAllDats">Закрыть все DAT</sys:String>
     <sys:String x:Key="Str.Exit">Выход</sys:String>
     <sys:String x:Key="Str.OpenItem">Открыть</sys:String>
     <sys:String x:Key="Str.ExtractFile">Извлечь файл в ...</sys:String>
@@ -130,6 +131,9 @@
     <sys:String x:Key="Str.OverwriteFile">Файл {0} уже существует.&#10;Перезаписать файл?</sys:String>
     <sys:String x:Key="Str.ReplaceEntry">Файл {0} уже существует в DAT.&#10;Перезаписать файл?</sys:String>
     <sys:String x:Key="Str.NothingToExtract">Нет файлов для извлечения.</sys:String>
+    <sys:String x:Key="Str.ExtractModeQuestion">Как извлечь файлы?</sys:String>
+    <sys:String x:Key="Str.ExtractKeepTree">Сохранить структуру папок</sys:String>
+    <sys:String x:Key="Str.ExtractFlat">Без структуры папок</sys:String>
     <sys:String x:Key="Str.ExtractFailures">Не удалось извлечь файлов: {0}</sys:String>
     <sys:String x:Key="Str.ImportFailures">Не удалось импортировать файлов: {0}</sys:String>
     <sys:String x:Key="Str.BlockedFile">Программы и скрипты не запускаются из DAT файла. Извлеките файл, если вы действительно хотите его запустить.</sys:String>
@@ -200,6 +204,7 @@
     <sys:String x:Key="Str.Err.FolderAlreadyExists">Папка {0} уже существует.</sys:String>
     <sys:String x:Key="Str.Err.RootFolderRename">Корневую папку нельзя переименовать.</sys:String>
     <sys:String x:Key="Str.Err.ArchiveTooLarge">Размер архива превысил бы 4 ГБ, предел формата DAT.</sys:String>
+    <sys:String x:Key="Str.Err.ReadOnlyFormat">Архивы Temple of Elemental Evil можно открывать и извлекать, но пока нельзя сохранять.</sys:String>
     <sys:String x:Key="Str.Err.PathNotAllowed">Путь {0} вышел бы за пределы папки назначения и был отклонен.</sys:String>
     <sys:String x:Key="Str.Err.DamagedEntriesPresent">Перед сохранением архива необходимо удалить поврежденные файлы.</sys:String>
 
@@ -214,6 +219,7 @@
     <!--  Keyboard shortcuts  -->
     <sys:String x:Key="Str.GestureOpen">Ctrl+O</sys:String>
     <sys:String x:Key="Str.GestureSave">Ctrl+S</sys:String>
+    <sys:String x:Key="Str.GestureClose">Ctrl+W</sys:String>
     <sys:String x:Key="Str.GestureQuickSave">Ctrl+Shift+S</sys:String>
     <sys:String x:Key="Str.GestureExit">Alt+F4</sys:String>
     <sys:String x:Key="Str.GestureOpenItem">Enter</sys:String>
@@ -241,6 +247,7 @@
     <sys:String x:Key="Str.WindowFrame">Рамка окна</sys:String>
     <sys:String x:Key="Str.SingleInstance">Один экземпляр программы</sys:String>
     <sys:String x:Key="Str.BlockSeparators">Разделители между блоками</sys:String>
+    <sys:String x:Key="Str.ShowHiddenFolders">Показывать скрытые папки (скрытые в Windows или начинающиеся с точки)</sys:String>
 
     <!--  Comparison of two archives  -->
     <sys:String x:Key="Str.Compare">Сравнить два DAT...</sys:String>
@@ -372,6 +379,10 @@
     <sys:String x:Key="Str.LipPhonemeValue">{0} · изображение {1} · код 0x{2}</sys:String>
     <sys:String x:Key="Str.LipMarkerValue">тип {0} · позиция {1}</sys:String>
     <sys:String x:Key="Str.DoubleClickOpens">Двойной щелчок открывает</sys:String>
+    <sys:String x:Key="Str.WheelZoom">Масштаб колесиком мыши</sys:String>
+    <sys:String x:Key="Str.WheelNotch1">1 щелчок</sys:String>
+    <sys:String x:Key="Str.WheelNotch2">2 щелчка</sys:String>
+    <sys:String x:Key="Str.WheelNotch3">3 щелчка</sys:String>
     <sys:String x:Key="Str.DoubleClickViewer">В окне просмотра</sys:String>
     <sys:String x:Key="Str.DoubleClickProgram">Программой по умолчанию</sys:String>
     <sys:String x:Key="Str.DoubleClickNothing">Ничего</sys:String>
@@ -438,6 +449,8 @@
     <sys:String x:Key="Str.ViewerDirection">Направление:</sys:String>
     <sys:String x:Key="Str.ViewerPreviousFrame">Предыдущий кадр</sys:String>
     <sys:String x:Key="Str.ViewerNextFrame">Следующий кадр</sys:String>
+    <sys:String x:Key="Str.ViewerPreviousDirection">Предыдущее направление</sys:String>
+    <sys:String x:Key="Str.ViewerNextDirection">Следующее направление</sys:String>
     <sys:String x:Key="Str.ViewerPlay">Воспроизвести</sys:String>
     <sys:String x:Key="Str.ViewerPause">Пауза</sys:String>
     <sys:String x:Key="Str.ViewerVolume">Громкость</sys:String>

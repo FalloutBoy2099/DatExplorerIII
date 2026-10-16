@@ -7,6 +7,7 @@ namespace DatExplorerIII.Views
 	using System.Linq;
 	using System.Windows;
 	using System.Windows.Documents;
+	using System.Windows.Input;
 	using System.Windows.Threading;
 	using System.Windows.Controls;
 	using System.Windows.Controls.Primitives;
@@ -220,6 +221,26 @@ namespace DatExplorerIII.Views
 				{
 					column.ElementStyle = (Style)FindResource("WrapCell");
 				}
+			}
+		}
+
+		/// <summary>The wheel of the mouse magnifies the picture (up) or reduces it (down).</summary>
+		private void OnImageWheel(Object sender, MouseWheelEventArgs e)
+		{
+			if (((FrameworkElement)sender).DataContext is ImageViewerViewModel image && e.Delta != 0)
+			{
+				image.Wheel(e.Delta);
+				e.Handled = true;
+			}
+		}
+
+		/// <summary>The button of the wheel shows the picture at its real size (100%).</summary>
+		private void OnImageMouseDown(Object sender, MouseButtonEventArgs e)
+		{
+			if (e.ChangedButton == MouseButton.Middle && ((FrameworkElement)sender).DataContext is ImageViewerViewModel image)
+			{
+				image.ActualSize();
+				e.Handled = true;
 			}
 		}
 

@@ -16,6 +16,7 @@
     <sys:String x:Key="Str.Save">Zapisz</sys:String>
     <sys:String x:Key="Str.QuickSave">Szybki zapis</sys:String>
     <sys:String x:Key="Str.CloseDat">Zamknij DAT</sys:String>
+    <sys:String x:Key="Str.CloseAllDats">Zamknij wszystkie DAT</sys:String>
     <sys:String x:Key="Str.Exit">Zakończ</sys:String>
     <sys:String x:Key="Str.OpenItem">Otwórz</sys:String>
     <sys:String x:Key="Str.ExtractFile">Wyodrębnij plik do...</sys:String>
@@ -130,6 +131,9 @@
     <sys:String x:Key="Str.OverwriteFile">Plik {0} już istnieje.&#10;Zastąpić go?</sys:String>
     <sys:String x:Key="Str.ReplaceEntry">{0} już istnieje w archiwum DAT.&#10;Zastąpić?</sys:String>
     <sys:String x:Key="Str.NothingToExtract">Brak plików do wyodrębnienia.</sys:String>
+    <sys:String x:Key="Str.ExtractModeQuestion">Jak wyodrębnić pliki?</sys:String>
+    <sys:String x:Key="Str.ExtractKeepTree">Zachowaj strukturę folderów</sys:String>
+    <sys:String x:Key="Str.ExtractFlat">Bez struktury folderów</sys:String>
     <sys:String x:Key="Str.ExtractFailures">Pliki, których nie udało się wyodrębnić ({0}):</sys:String>
     <sys:String x:Key="Str.ImportFailures">Pliki, których nie udało się zaimportować ({0}):</sys:String>
     <sys:String x:Key="Str.BlockedFile">Programy i skrypty nie są uruchamiane z pliku DAT. Wyodrębnij plik, jeśli naprawdę chcesz go uruchomić.</sys:String>
@@ -200,6 +204,7 @@
     <sys:String x:Key="Str.Err.FolderAlreadyExists">Folder {0} już istnieje.</sys:String>
     <sys:String x:Key="Str.Err.RootFolderRename">Nie można zmienić nazwy folderu głównego.</sys:String>
     <sys:String x:Key="Str.Err.ArchiveTooLarge">Archiwum przekroczyłoby 4 GB, czyli limit formatu DAT.</sys:String>
+    <sys:String x:Key="Str.Err.ReadOnlyFormat">Archiwa Temple of Elemental Evil można otwierać i wyodrębniać, ale na razie nie zapisywać.</sys:String>
     <sys:String x:Key="Str.Err.PathNotAllowed">Ścieżka {0} wychodziłaby poza folder docelowy i została odrzucona.</sys:String>
     <sys:String x:Key="Str.Err.DamagedEntriesPresent">Przed zapisaniem archiwum należy usunąć uszkodzone pliki.</sys:String>
 
@@ -214,6 +219,7 @@
     <!--  Keyboard shortcuts  -->
     <sys:String x:Key="Str.GestureOpen">Ctrl+O</sys:String>
     <sys:String x:Key="Str.GestureSave">Ctrl+S</sys:String>
+    <sys:String x:Key="Str.GestureClose">Ctrl+W</sys:String>
     <sys:String x:Key="Str.GestureQuickSave">Ctrl+Shift+S</sys:String>
     <sys:String x:Key="Str.GestureExit">Alt+F4</sys:String>
     <sys:String x:Key="Str.GestureOpenItem">Enter</sys:String>
@@ -241,6 +247,7 @@
     <sys:String x:Key="Str.WindowFrame">Obramowanie okna</sys:String>
     <sys:String x:Key="Str.SingleInstance">Pojedyncze wystąpienie</sys:String>
     <sys:String x:Key="Str.BlockSeparators">Separatory między blokami</sys:String>
+    <sys:String x:Key="Str.ShowHiddenFolders">Pokaż ukryte foldery (ukryte w Windows lub zaczynające się od kropki)</sys:String>
 
     <!--  Comparison of two archives  -->
     <sys:String x:Key="Str.Compare">Porównaj dwa DAT...</sys:String>
@@ -372,6 +379,10 @@
     <sys:String x:Key="Str.LipPhonemeValue">{0} · klatka {1} · kod 0x{2}</sys:String>
     <sys:String x:Key="Str.LipMarkerValue">typ {0} · pozycja {1}</sys:String>
     <sys:String x:Key="Str.DoubleClickOpens">Dwukrotne kliknięcie otwiera</sys:String>
+    <sys:String x:Key="Str.WheelZoom">Powiększanie kółkiem myszy</sys:String>
+    <sys:String x:Key="Str.WheelNotch1">1 ząbek</sys:String>
+    <sys:String x:Key="Str.WheelNotch2">2 ząbki</sys:String>
+    <sys:String x:Key="Str.WheelNotch3">3 ząbki</sys:String>
     <sys:String x:Key="Str.DoubleClickViewer">W podglądzie</sys:String>
     <sys:String x:Key="Str.DoubleClickProgram">W programie domyślnym</sys:String>
     <sys:String x:Key="Str.DoubleClickNothing">Nic</sys:String>
@@ -438,6 +449,8 @@
     <sys:String x:Key="Str.ViewerDirection">Kierunek:</sys:String>
     <sys:String x:Key="Str.ViewerPreviousFrame">Poprzednia klatka</sys:String>
     <sys:String x:Key="Str.ViewerNextFrame">Następna klatka</sys:String>
+    <sys:String x:Key="Str.ViewerPreviousDirection">Poprzedni kierunek</sys:String>
+    <sys:String x:Key="Str.ViewerNextDirection">Następny kierunek</sys:String>
     <sys:String x:Key="Str.ViewerPlay">Odtwórz</sys:String>
     <sys:String x:Key="Str.ViewerPause">Wstrzymaj</sys:String>
     <sys:String x:Key="Str.ViewerVolume">Głośność</sys:String>

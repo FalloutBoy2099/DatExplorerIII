@@ -16,6 +16,7 @@
     <sys:String x:Key="Str.Save">Spara</sys:String>
     <sys:String x:Key="Str.QuickSave">Snabbspara</sys:String>
     <sys:String x:Key="Str.CloseDat">Stäng DAT</sys:String>
+    <sys:String x:Key="Str.CloseAllDats">Stäng alla DAT</sys:String>
     <sys:String x:Key="Str.Exit">Avsluta</sys:String>
     <sys:String x:Key="Str.OpenItem">Öppna</sys:String>
     <sys:String x:Key="Str.ExtractFile">Extrahera fil till...</sys:String>
@@ -130,6 +131,9 @@
     <sys:String x:Key="Str.OverwriteFile">Filen {0} finns redan.&#10;Vill du skriva över den?</sys:String>
     <sys:String x:Key="Str.ReplaceEntry">{0} finns redan i DAT-filen.&#10;Vill du ersätta den?</sys:String>
     <sys:String x:Key="Str.NothingToExtract">Det finns ingen fil att extrahera.</sys:String>
+    <sys:String x:Key="Str.ExtractModeQuestion">Hur ska filerna extraheras?</sys:String>
+    <sys:String x:Key="Str.ExtractKeepTree">Behåll mappstrukturen</sys:String>
+    <sys:String x:Key="Str.ExtractFlat">Utan mappstruktur</sys:String>
     <sys:String x:Key="Str.ExtractFailures">{0} fil(er) kunde inte extraheras:</sys:String>
     <sys:String x:Key="Str.ImportFailures">{0} fil(er) kunde inte importeras:</sys:String>
     <sys:String x:Key="Str.BlockedFile">Program och skript startas inte från en DAT-fil. Extrahera filen om du verkligen vill köra den.</sys:String>
@@ -200,6 +204,7 @@
     <sys:String x:Key="Str.Err.FolderAlreadyExists">Mappen {0} finns redan.</sys:String>
     <sys:String x:Key="Str.Err.RootFolderRename">Rotmappen kan inte byta namn.</sys:String>
     <sys:String x:Key="Str.Err.ArchiveTooLarge">Arkivet skulle överskrida 4 GB, gränsen för DAT-formatet.</sys:String>
+    <sys:String x:Key="Str.Err.ReadOnlyFormat">Arkiv från Temple of Elemental Evil kan öppnas och extraheras, men ännu inte sparas.</sys:String>
     <sys:String x:Key="Str.Err.PathNotAllowed">Sökvägen {0} skulle hamna utanför målmappen och avvisades.</sys:String>
     <sys:String x:Key="Str.Err.DamagedEntriesPresent">De skadade filerna måste tas bort innan arkivet sparas.</sys:String>
 
@@ -214,6 +219,7 @@
     <!--  Keyboard shortcuts  -->
     <sys:String x:Key="Str.GestureOpen">Ctrl+O</sys:String>
     <sys:String x:Key="Str.GestureSave">Ctrl+S</sys:String>
+    <sys:String x:Key="Str.GestureClose">Ctrl+W</sys:String>
     <sys:String x:Key="Str.GestureQuickSave">Ctrl+Skift+S</sys:String>
     <sys:String x:Key="Str.GestureExit">Alt+F4</sys:String>
     <sys:String x:Key="Str.GestureOpenItem">Retur</sys:String>
@@ -241,6 +247,7 @@
     <sys:String x:Key="Str.WindowFrame">Fönsterram</sys:String>
     <sys:String x:Key="Str.SingleInstance">Endast en instans</sys:String>
     <sys:String x:Key="Str.BlockSeparators">Avgränsare mellan blocken</sys:String>
+    <sys:String x:Key="Str.ShowHiddenFolders">Visa dolda mappar (dolda i Windows eller som börjar med punkt)</sys:String>
 
     <!--  Comparison of two archives  -->
     <sys:String x:Key="Str.Compare">Jämför två DAT...</sys:String>
@@ -372,6 +379,10 @@
     <sys:String x:Key="Str.LipPhonemeValue">{0} · bild {1} · kod 0x{2}</sys:String>
     <sys:String x:Key="Str.LipMarkerValue">typ {0} · position {1}</sys:String>
     <sys:String x:Key="Str.DoubleClickOpens">Dubbelklick öppnar</sys:String>
+    <sys:String x:Key="Str.WheelZoom">Zoom med mushjulet</sys:String>
+    <sys:String x:Key="Str.WheelNotch1">1 steg</sys:String>
+    <sys:String x:Key="Str.WheelNotch2">2 steg</sys:String>
+    <sys:String x:Key="Str.WheelNotch3">3 steg</sys:String>
     <sys:String x:Key="Str.DoubleClickViewer">I visaren</sys:String>
     <sys:String x:Key="Str.DoubleClickProgram">Med standardprogrammet</sys:String>
     <sys:String x:Key="Str.DoubleClickNothing">Inget</sys:String>
@@ -438,6 +449,8 @@
     <sys:String x:Key="Str.ViewerDirection">Riktning:</sys:String>
     <sys:String x:Key="Str.ViewerPreviousFrame">Föregående bildruta</sys:String>
     <sys:String x:Key="Str.ViewerNextFrame">Nästa bildruta</sys:String>
+    <sys:String x:Key="Str.ViewerPreviousDirection">Föregående riktning</sys:String>
+    <sys:String x:Key="Str.ViewerNextDirection">Nästa riktning</sys:String>
     <sys:String x:Key="Str.ViewerPlay">Spela upp</sys:String>
     <sys:String x:Key="Str.ViewerPause">Paus</sys:String>
     <sys:String x:Key="Str.ViewerVolume">Volym</sys:String>

@@ -102,6 +102,25 @@ namespace DatExplorerIII.ViewModels
 
 		public Boolean IsDoubleClickNothing => DoubleClickDisabled;
 
+		/// <summary>How many notches of the wheel of the mouse change the magnification of a picture by one step (1 to 3).</summary>
+		public Int32 WheelNotches => Math.Clamp(_settings.Data.WheelNotchesPerZoom, 1, 3);
+
+		public Boolean IsWheelNotches1 => WheelNotches == 1;
+
+		public Boolean IsWheelNotches2 => WheelNotches == 2;
+
+		public Boolean IsWheelNotches3 => WheelNotches == 3;
+
+		private void SetWheelNotches(Int32 notches)
+		{
+			_settings.Data.WheelNotchesPerZoom = Math.Clamp(notches, 1, 3);
+			ImageViewerViewModel.WheelNotchesPerZoom = WheelNotches;
+			OnPropertyChanged(nameof(WheelNotches));
+			OnPropertyChanged(nameof(IsWheelNotches1));
+			OnPropertyChanged(nameof(IsWheelNotches2));
+			OnPropertyChanged(nameof(IsWheelNotches3));
+		}
+
 		/// <summary>Chooses what a double click on a file does: "Viewer", "Program" or "None".</summary>
 		private void SetDoubleClick(String mode)
 		{

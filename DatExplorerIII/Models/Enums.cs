@@ -82,6 +82,9 @@ namespace DatExplorerIII.Models
 
 		/// <summary>Damaged files must be removed before the archive can be saved.</summary>
 		DamagedEntriesPresent,
+
+		/// <summary>The format of the archive can be read but not written (Temple of Elemental Evil).</summary>
+		ReadOnlyFormat,
 	}
 
 	/// <summary>
@@ -92,6 +95,9 @@ namespace DatExplorerIII.Models
 		Fallout1 = 1,
 		Fallout2 = 2,
 		Arcanum = 3,
+
+		/// <summary>Temple of Elemental Evil: the footer of Arcanum, and an index that is a tree of folders. It is read, not written.</summary>
+		Toee = 4,
 	}
 
 	/// <summary>

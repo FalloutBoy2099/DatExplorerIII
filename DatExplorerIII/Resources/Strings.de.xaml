@@ -16,6 +16,7 @@
     <sys:String x:Key="Str.Save">Speichern</sys:String>
     <sys:String x:Key="Str.QuickSave">Schnellspeichern</sys:String>
     <sys:String x:Key="Str.CloseDat">DAT schließen</sys:String>
+    <sys:String x:Key="Str.CloseAllDats">Alle DAT schließen</sys:String>
     <sys:String x:Key="Str.Exit">Beenden</sys:String>
     <sys:String x:Key="Str.OpenItem">Öffnen</sys:String>
     <sys:String x:Key="Str.ExtractFile">Datei extrahieren nach...</sys:String>
@@ -130,6 +131,9 @@
     <sys:String x:Key="Str.OverwriteFile">Die Datei {0} existiert bereits.&#10;Überschreiben?</sys:String>
     <sys:String x:Key="Str.ReplaceEntry">{0} existiert bereits in der DAT.&#10;Ersetzen?</sys:String>
     <sys:String x:Key="Str.NothingToExtract">Es gibt keine Datei zum Extrahieren.</sys:String>
+    <sys:String x:Key="Str.ExtractModeQuestion">Wie sollen die Dateien extrahiert werden?</sys:String>
+    <sys:String x:Key="Str.ExtractKeepTree">Ordnerstruktur beibehalten</sys:String>
+    <sys:String x:Key="Str.ExtractFlat">Ohne Ordnerstruktur</sys:String>
     <sys:String x:Key="Str.ExtractFailures">{0} Datei(en) konnten nicht extrahiert werden:</sys:String>
     <sys:String x:Key="Str.ImportFailures">{0} Datei(en) konnten nicht importiert werden:</sys:String>
     <sys:String x:Key="Str.BlockedFile">Programme und Skripte werden nicht aus einer DAT-Datei gestartet. Extrahieren Sie die Datei, wenn Sie sie wirklich ausführen möchten.</sys:String>
@@ -200,6 +204,7 @@
     <sys:String x:Key="Str.Err.FolderAlreadyExists">Der Ordner {0} existiert bereits.</sys:String>
     <sys:String x:Key="Str.Err.RootFolderRename">Der Stammordner kann nicht umbenannt werden.</sys:String>
     <sys:String x:Key="Str.Err.ArchiveTooLarge">Das Archiv würde 4 GB überschreiten, die Grenze des DAT-Formats.</sys:String>
+    <sys:String x:Key="Str.Err.ReadOnlyFormat">Archive von Temple of Elemental Evil können geöffnet und extrahiert, aber noch nicht gespeichert werden.</sys:String>
     <sys:String x:Key="Str.Err.PathNotAllowed">Der Pfad {0} würde den Zielordner verlassen und wurde abgelehnt.</sys:String>
     <sys:String x:Key="Str.Err.DamagedEntriesPresent">Die beschädigten Dateien müssen entfernt werden, bevor das Archiv gespeichert wird.</sys:String>
 
@@ -214,6 +219,7 @@
     <!--  Keyboard shortcuts  -->
     <sys:String x:Key="Str.GestureOpen">Strg+O</sys:String>
     <sys:String x:Key="Str.GestureSave">Strg+S</sys:String>
+    <sys:String x:Key="Str.GestureClose">Strg+W</sys:String>
     <sys:String x:Key="Str.GestureQuickSave">Strg+Umschalt+S</sys:String>
     <sys:String x:Key="Str.GestureExit">Alt+F4</sys:String>
     <sys:String x:Key="Str.GestureOpenItem">Eingabe</sys:String>
@@ -241,6 +247,7 @@
     <sys:String x:Key="Str.WindowFrame">Fensterrahmen</sys:String>
     <sys:String x:Key="Str.SingleInstance">Nur eine Instanz</sys:String>
     <sys:String x:Key="Str.BlockSeparators">Trennlinien zwischen den Bereichen</sys:String>
+    <sys:String x:Key="Str.ShowHiddenFolders">Versteckte Ordner anzeigen (von Windows versteckt oder mit Punkt am Anfang)</sys:String>
 
     <!--  Comparison of two archives  -->
     <sys:String x:Key="Str.Compare">Zwei DATs vergleichen...</sys:String>
@@ -372,6 +379,10 @@
     <sys:String x:Key="Str.LipPhonemeValue">{0} · Bild {1} · Code 0x{2}</sys:String>
     <sys:String x:Key="Str.LipMarkerValue">Typ {0} · Position {1}</sys:String>
     <sys:String x:Key="Str.DoubleClickOpens">Doppelklick öffnet</sys:String>
+    <sys:String x:Key="Str.WheelZoom">Zoom mit dem Mausrad</sys:String>
+    <sys:String x:Key="Str.WheelNotch1">1 Raste</sys:String>
+    <sys:String x:Key="Str.WheelNotch2">2 Rasten</sys:String>
+    <sys:String x:Key="Str.WheelNotch3">3 Rasten</sys:String>
     <sys:String x:Key="Str.DoubleClickViewer">Im Anzeigefenster</sys:String>
     <sys:String x:Key="Str.DoubleClickProgram">Mit dem Standardprogramm</sys:String>
     <sys:String x:Key="Str.DoubleClickNothing">Nichts</sys:String>
@@ -438,6 +449,8 @@
     <sys:String x:Key="Str.ViewerDirection">Richtung:</sys:String>
     <sys:String x:Key="Str.ViewerPreviousFrame">Vorheriges Bild</sys:String>
     <sys:String x:Key="Str.ViewerNextFrame">Nächstes Bild</sys:String>
+    <sys:String x:Key="Str.ViewerPreviousDirection">Vorherige Richtung</sys:String>
+    <sys:String x:Key="Str.ViewerNextDirection">Nächste Richtung</sys:String>
     <sys:String x:Key="Str.ViewerPlay">Wiedergabe</sys:String>
     <sys:String x:Key="Str.ViewerPause">Pause</sys:String>
     <sys:String x:Key="Str.ViewerVolume">Lautstärke</sys:String>

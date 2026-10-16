@@ -49,7 +49,7 @@ namespace DatExplorerIII.Tests
 		{
 			Assert.Equal(
 				[
-					"ViewDetails", "ViewList", "-", "ViewIcons", "-", "PreviewPane", "-", "DoubleClickOpens", "-",
+					"ViewDetails", "ViewList", "-", "ViewIcons", "-", "PreviewPane", "-", "DoubleClickOpens", "WheelZoom", "-",
 					"CompareLayout", "-", "Up", "Refresh",
 				],
 				Lines("Str.View"));
@@ -60,7 +60,7 @@ namespace DatExplorerIII.Tests
 		{
 			Assert.Equal(
 				[
-					"Open", "OpenFolder", "New", "-", "Save", "SaveAs", "QuickSave", "-", "CloseDat", "-", "Exit",
+					"Open", "OpenFolder", "New", "-", "Save", "SaveAs", "QuickSave", "-", "CloseDat", "CloseAllDats", "-", "Exit",
 				],
 				Lines("Str.File"));
 		}

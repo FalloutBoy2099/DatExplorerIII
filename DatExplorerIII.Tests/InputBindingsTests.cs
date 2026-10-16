@@ -26,7 +26,7 @@ namespace DatExplorerIII.Tests
 				.ToList();
 
 			// Window, search box, tree and list: the shortcuts of the program.
-			Assert.True(names.Count == 15, "Found only " + names.Count + " key bindings.");
+			Assert.True(names.Count == 16, "Found only " + names.Count + " key bindings.");
 			foreach (String name in names)
 			{
 				Assert.True(

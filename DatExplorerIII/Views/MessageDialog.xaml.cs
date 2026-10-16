@@ -17,7 +17,9 @@ namespace DatExplorerIII.Views
 			TitleBarTheme.Attach(this);
 
 			Title = title;
-			MessageText.Text = message;
+
+			// A long path has no space to wrap at: a zero width space after each separator lets the text go on the next line instead of being cut.
+			MessageText.Text = message.Replace("\\", "\\​", StringComparison.Ordinal).Replace("/", "/​", StringComparison.Ordinal);
 			IconText.Text = GetGlyph(icon);
 			IconText.Visibility = icon == DialogIcon.None ? Visibility.Collapsed : Visibility.Visible;
 

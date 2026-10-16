@@ -16,6 +16,7 @@
     <sys:String x:Key="Str.Save">Save</sys:String>
     <sys:String x:Key="Str.QuickSave">Quick save</sys:String>
     <sys:String x:Key="Str.CloseDat">Close DAT</sys:String>
+    <sys:String x:Key="Str.CloseAllDats">Close all DATs</sys:String>
     <sys:String x:Key="Str.Exit">Exit</sys:String>
     <sys:String x:Key="Str.OpenItem">Open</sys:String>
     <sys:String x:Key="Str.ExtractFile">Extract file to...</sys:String>
@@ -130,6 +131,9 @@
     <sys:String x:Key="Str.OverwriteFile">The file {0} already exists.&#10;Overwrite it?</sys:String>
     <sys:String x:Key="Str.ReplaceEntry">{0} already exists in the DAT.&#10;Replace it?</sys:String>
     <sys:String x:Key="Str.NothingToExtract">There is no file to extract.</sys:String>
+    <sys:String x:Key="Str.ExtractModeQuestion">How should the files be extracted?</sys:String>
+    <sys:String x:Key="Str.ExtractKeepTree">Keep the folder structure</sys:String>
+    <sys:String x:Key="Str.ExtractFlat">Without folder structure</sys:String>
     <sys:String x:Key="Str.ExtractFailures">{0} file(s) could not be extracted:</sys:String>
     <sys:String x:Key="Str.ImportFailures">{0} file(s) could not be imported:</sys:String>
     <sys:String x:Key="Str.BlockedFile">Programs and scripts are not started from a DAT file. Extract the file if you really want to run it.</sys:String>
@@ -200,6 +204,7 @@
     <sys:String x:Key="Str.Err.FolderAlreadyExists">The folder {0} already exists.</sys:String>
     <sys:String x:Key="Str.Err.RootFolderRename">The root folder cannot be renamed.</sys:String>
     <sys:String x:Key="Str.Err.ArchiveTooLarge">The archive would exceed 4 GB, the limit of the DAT format.</sys:String>
+    <sys:String x:Key="Str.Err.ReadOnlyFormat">The archives of Temple of Elemental Evil can be opened and extracted, but not saved yet.</sys:String>
     <sys:String x:Key="Str.Err.PathNotAllowed">The path {0} would leave the destination folder and was refused.</sys:String>
     <sys:String x:Key="Str.Err.DamagedEntriesPresent">The damaged files must be removed before the archive is saved.</sys:String>
 
@@ -214,6 +219,7 @@
     <!--  Keyboard shortcuts  -->
     <sys:String x:Key="Str.GestureOpen">Ctrl+O</sys:String>
     <sys:String x:Key="Str.GestureSave">Ctrl+S</sys:String>
+    <sys:String x:Key="Str.GestureClose">Ctrl+W</sys:String>
     <sys:String x:Key="Str.GestureQuickSave">Ctrl+Shift+S</sys:String>
     <sys:String x:Key="Str.GestureExit">Alt+F4</sys:String>
     <sys:String x:Key="Str.GestureOpenItem">Enter</sys:String>
@@ -241,9 +247,14 @@
     <sys:String x:Key="Str.WindowFrame">Window border</sys:String>
     <sys:String x:Key="Str.SingleInstance">Single instance</sys:String>
     <sys:String x:Key="Str.BlockSeparators">Separators between the blocks</sys:String>
+    <sys:String x:Key="Str.ShowHiddenFolders">Show hidden folders (hidden by Windows or starting with a dot)</sys:String>
 
     <!--  Comparison of two archives  -->
     <sys:String x:Key="Str.DoubleClickOpens">Double-click opens</sys:String>
+    <sys:String x:Key="Str.WheelZoom">Mouse wheel zoom</sys:String>
+    <sys:String x:Key="Str.WheelNotch1">1 notch</sys:String>
+    <sys:String x:Key="Str.WheelNotch2">2 notches</sys:String>
+    <sys:String x:Key="Str.WheelNotch3">3 notches</sys:String>
     <sys:String x:Key="Str.Compare">Compare two DATs...</sys:String>
     <sys:String x:Key="Str.CompareClose">Leave the comparison</sys:String>
     <sys:String x:Key="Str.CompareTitle">Compare two DAT archives</sys:String>
@@ -438,6 +449,8 @@
     <sys:String x:Key="Str.ViewerDirection">Direction:</sys:String>
     <sys:String x:Key="Str.ViewerPreviousFrame">Previous frame</sys:String>
     <sys:String x:Key="Str.ViewerNextFrame">Next frame</sys:String>
+    <sys:String x:Key="Str.ViewerPreviousDirection">Previous direction</sys:String>
+    <sys:String x:Key="Str.ViewerNextDirection">Next direction</sys:String>
     <sys:String x:Key="Str.ViewerPlay">Play</sys:String>
     <sys:String x:Key="Str.ViewerPause">Pause</sys:String>
     <sys:String x:Key="Str.ViewerVolume">Volume</sys:String>

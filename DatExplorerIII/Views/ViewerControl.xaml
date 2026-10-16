@@ -73,16 +73,31 @@
                 Visibility="{Binding IsMessageFile, Converter={StaticResource BoolToVisibility}}" />
         </ContextMenu>
 
-        <!--  The odd lines of a table are a little lighter than the even ones.  -->
+        <!--  The odd lines of a table are a little different from the even ones: a faint gray that shows on a light and on a dark theme (the theme brush is too close to the background).  -->
+        <SolidColorBrush x:Key="StripeBrush" Color="#26808080" />
         <Style
             x:Key="StripedRow"
             BasedOn="{StaticResource {x:Type DataGridRow}}"
             TargetType="DataGridRow">
+            <!--  The rows are drawn on the background of the window: without it the even ones are white on a dark theme.  -->
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
+            <Setter Property="MinHeight" Value="0" />
             <Style.Triggers>
                 <Trigger Property="ItemsControl.AlternationIndex" Value="1">
-                    <Setter Property="Background" Value="{DynamicResource SubtleFillColorTertiaryBrush}" />
+                    <Setter Property="Background" Value="{StaticResource StripeBrush}" />
                 </Trigger>
             </Style.Triggers>
+        </Style>
+
+        <!--  A cell of a table: as high as its text (the theme gives the cells room that a table of thousands of lines cannot afford).  -->
+        <Style
+            x:Key="CompactCell"
+            BasedOn="{StaticResource {x:Type DataGridCell}}"
+            TargetType="DataGridCell">
+            <Setter Property="MinHeight" Value="0" />
+            <Setter Property="Padding" Value="4,1" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
         </Style>
 
         <!--  A group of lines of a sheet (a character, a prototype)  -->
@@ -102,7 +117,7 @@
                                     <Style TargetType="Border">
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding (ItemsControl.AlternationIndex), RelativeSource={RelativeSource AncestorType=ContentPresenter}}" Value="1">
-                                                <Setter Property="Background" Value="{DynamicResource SubtleFillColorTertiaryBrush}" />
+                                                <Setter Property="Background" Value="{StaticResource StripeBrush}" />
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -129,8 +144,8 @@
         <!--  The text of a cell of a table can go on several lines  -->
         <Style x:Key="WrapCell" TargetType="TextBlock">
             <Setter Property="TextWrapping" Value="Wrap" />
-            <Setter Property="VerticalAlignment" Value="Top" />
-            <Setter Property="Margin" Value="4,3" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Margin" Value="0" />
         </Style>
 
         <!--  The label of a check box of a tool bar, centered on its box (the theme draws it about two pixels low).  -->
@@ -342,53 +357,6 @@
                             SelectedItem="{Binding SelectedPalette}" />
                     </StackPanel>
 
-                    <StackPanel
-                        Margin="0,0,14,4"
-                        Orientation="Horizontal"
-                        Visibility="{Binding HasDirections, Converter={StaticResource BoolToVisibility}}">
-                        <TextBlock Style="{StaticResource ToolbarLabel}" Text="{DynamicResource Str.ViewerDirection}" />
-                        <ComboBox
-                            MinWidth="56"
-                            ItemsSource="{Binding Directions}"
-                            SelectedIndex="{Binding SelectedDirection}" />
-                    </StackPanel>
-
-                    <StackPanel
-                        Margin="0,0,14,4"
-                        Orientation="Horizontal"
-                        Visibility="{Binding IsAnimated, Converter={StaticResource BoolToVisibility}}">
-                        <Button Command="{Binding PreviousCommand, Mode=OneTime}" ToolTip="{DynamicResource Str.ViewerPreviousFrame}">
-                            <TextBlock FontFamily="{StaticResource IconFont}" Text="&#xE892;" />
-                        </Button>
-                        <Button
-                            Margin="4,0,0,0"
-                            Command="{Binding PlayCommand, Mode=OneTime}"
-                            ToolTip="{DynamicResource Str.ViewerPlay}">
-                            <TextBlock FontFamily="{StaticResource IconFont}">
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="Text" Value="&#xE768;" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsPlaying}" Value="True">
-                                                <Setter Property="Text" Value="&#xE769;" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
-                        </Button>
-                        <Button
-                            Margin="4,0,0,0"
-                            Command="{Binding NextCommand, Mode=OneTime}"
-                            ToolTip="{DynamicResource Str.ViewerNextFrame}">
-                            <TextBlock FontFamily="{StaticResource IconFont}" Text="&#xE893;" />
-                        </Button>
-                        <TextBlock
-                            Margin="8,0,0,0"
-                            VerticalAlignment="Center"
-                            Text="{Binding FrameLabel}" />
-                    </StackPanel>
-
                     <StackPanel Margin="0,0,14,4" Orientation="Horizontal">
                         <TextBlock Style="{StaticResource ToolbarLabel}" Text="{DynamicResource Str.ViewerZoom}" />
                         <ComboBox
@@ -462,7 +430,9 @@
                 Grid.Row="1"
                 Background="{StaticResource CheckerBrush}"
                 BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
-                BorderThickness="1">
+                BorderThickness="1"
+                PreviewMouseDown="OnImageMouseDown"
+                PreviewMouseWheel="OnImageWheel">
                 <Grid>
                     <Viewbox
                         Stretch="Uniform"
@@ -493,6 +463,7 @@
                         </Grid>
                     </Viewbox>
                     <ScrollViewer
+                        behaviors:RightDragScroll.IsEnabled="True"
                         HorizontalScrollBarVisibility="Auto"
                         VerticalScrollBarVisibility="Auto"
                         Visibility="{Binding IsFit, Converter={StaticResource InverseBoolToVisibility}}">
@@ -529,12 +500,75 @@
                 </Grid>
             </Border>
 
-            <TextBlock
-                Grid.Row="2"
-                Margin="0,6,0,0"
-                Opacity="0.7"
-                Text="{Binding Info}"
-                TextTrimming="CharacterEllipsis" />
+            <StackPanel Grid.Row="2" Margin="0,6,0,0">
+                <!--  The direction and the animation are under the picture; the palette and the magnification are above it.  -->
+                <WrapPanel>
+                    <StackPanel
+                        Margin="0,0,14,4"
+                        Orientation="Horizontal"
+                        Visibility="{Binding HasDirections, Converter={StaticResource BoolToVisibility}}">
+                        <TextBlock Style="{StaticResource ToolbarLabel}" Text="{DynamicResource Str.ViewerDirection}" />
+                        <ComboBox
+                            MinWidth="56"
+                            ItemsSource="{Binding Directions}"
+                            SelectedItem="{Binding SelectedDirectionNumber}" />
+                        <Button
+                            Margin="4,0,0,0"
+                            Command="{Binding PreviousDirectionCommand, Mode=OneTime}"
+                            ToolTip="{DynamicResource Str.ViewerPreviousDirection}">
+                            <TextBlock FontFamily="{StaticResource IconFont}" Text="&#xE76B;" />
+                        </Button>
+                        <Button
+                            Margin="4,0,0,0"
+                            Command="{Binding NextDirectionCommand, Mode=OneTime}"
+                            ToolTip="{DynamicResource Str.ViewerNextDirection}">
+                            <TextBlock FontFamily="{StaticResource IconFont}" Text="&#xE76C;" />
+                        </Button>
+                    </StackPanel>
+
+                    <StackPanel
+                        Margin="0,0,14,4"
+                        Orientation="Horizontal"
+                        Visibility="{Binding IsAnimated, Converter={StaticResource BoolToVisibility}}">
+                        <Button Command="{Binding PreviousCommand, Mode=OneTime}" ToolTip="{DynamicResource Str.ViewerPreviousFrame}">
+                            <TextBlock FontFamily="{StaticResource IconFont}" Text="&#xE892;" />
+                        </Button>
+                        <Button
+                            Margin="4,0,0,0"
+                            Command="{Binding PlayCommand, Mode=OneTime}"
+                            ToolTip="{DynamicResource Str.ViewerPlay}">
+                            <TextBlock FontFamily="{StaticResource IconFont}">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Text" Value="&#xE768;" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsPlaying}" Value="True">
+                                                <Setter Property="Text" Value="&#xE769;" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Button>
+                        <Button
+                            Margin="4,0,0,0"
+                            Command="{Binding NextCommand, Mode=OneTime}"
+                            ToolTip="{DynamicResource Str.ViewerNextFrame}">
+                            <TextBlock FontFamily="{StaticResource IconFont}" Text="&#xE893;" />
+                        </Button>
+                        <TextBlock
+                            Margin="8,0,0,0"
+                            VerticalAlignment="Center"
+                            Text="{Binding FrameLabel}" />
+                    </StackPanel>
+
+                </WrapPanel>
+                <TextBlock
+                    Margin="0,2,0,0"
+                    Opacity="0.7"
+                    Text="{Binding Info}"
+                    TextTrimming="CharacterEllipsis" />
+            </StackPanel>
         </Grid>
 
         <!--  Sound: laid out like a movie, the button and the choice of the channels on top, the information at the bottom.  -->
@@ -861,7 +895,9 @@
                 AutoGenerateColumns="True"
                 AutoGeneratingColumn="OnAutoGeneratingColumn"
                 CanUserAddRows="False"
+                Background="Transparent"
                 CanUserDeleteRows="False"
+                CellStyle="{StaticResource CompactCell}"
                 GridLinesVisibility="Horizontal"
                 HeadersVisibility="Column"
                 IsReadOnly="True"

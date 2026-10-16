@@ -103,6 +103,7 @@ namespace DatExplorerIII.ViewModels
 			IsSingleInstance = model.SingleInstance;
 			IsWindowFrameVisible = model.WindowFrameVisible;
 			IsBlockSeparatorsVisible = model.BlockSeparatorsVisible;
+			_settings.Data.ShowHiddenFolders = model.ShowHiddenFolders;
 			_settings.Data.SaveWindowSize = model.SaveWindowSize;
 			_settings.Data.SaveWindowPosition = model.SaveWindowPosition;
 			_settings.Data.SaveBlockWidths = model.SaveBlockWidths;
