@@ -17,6 +17,8 @@
     <sys:String x:Key="Str.QuickSave">Snabbspara</sys:String>
     <sys:String x:Key="Str.CloseDat">Stäng DAT</sys:String>
     <sys:String x:Key="Str.CloseAllDats">Stäng alla DAT</sys:String>
+    <sys:String x:Key="Str.MoveDatUp">Flytta DAT uppåt</sys:String>
+    <sys:String x:Key="Str.MoveDatDown">Flytta DAT nedåt</sys:String>
     <sys:String x:Key="Str.Exit">Avsluta</sys:String>
     <sys:String x:Key="Str.OpenItem">Öppna</sys:String>
     <sys:String x:Key="Str.ExtractFile">Extrahera fil till...</sys:String>
@@ -104,7 +106,7 @@
     <sys:String x:Key="Str.Cancel">Avbryt</sys:String>
     <sys:String x:Key="Str.Close">Stäng</sys:String>
     <sys:String x:Key="Str.ErrorTitle">Fel</sys:String>
-    <sys:String x:Key="Str.DatFilter">DAT-filer (*.dat, *.patch0-9)|*.dat;*.patch0;*.patch1;*.patch2;*.patch3;*.patch4;*.patch5;*.patch6;*.patch7;*.patch8;*.patch9|Alla filer (*.*)|*.*</sys:String>
+    <sys:String x:Key="Str.DatFilter">DAT-filer (*.dat, *.patch0-9, *.zip)|*.dat;*.patch0;*.patch1;*.patch2;*.patch3;*.patch4;*.patch5;*.patch6;*.patch7;*.patch8;*.patch9;*.zip|Alla filer (*.*)|*.*</sys:String>
     <sys:String x:Key="Str.SelectDestination">Välj målmapp</sys:String>
     <sys:String x:Key="Str.AlreadyOpen">Den här DAT-filen är redan öppen.</sys:String>
     <sys:String x:Key="Str.RecentMissing">Filen {0} finns inte längre. Den togs bort från listan över senaste filer.</sys:String>
@@ -204,7 +206,7 @@
     <sys:String x:Key="Str.Err.FolderAlreadyExists">Mappen {0} finns redan.</sys:String>
     <sys:String x:Key="Str.Err.RootFolderRename">Rotmappen kan inte byta namn.</sys:String>
     <sys:String x:Key="Str.Err.ArchiveTooLarge">Arkivet skulle överskrida 4 GB, gränsen för DAT-formatet.</sys:String>
-    <sys:String x:Key="Str.Err.ReadOnlyFormat">Arkiv från Temple of Elemental Evil kan öppnas och extraheras, men ännu inte sparas.</sys:String>
+    <sys:String x:Key="Str.Err.ReadOnlyFormat">Arkiv från Temple of Elemental Evil och ZIP-filer kan öppnas och extraheras, men ännu inte sparas.</sys:String>
     <sys:String x:Key="Str.Err.PathNotAllowed">Sökvägen {0} skulle hamna utanför målmappen och avvisades.</sys:String>
     <sys:String x:Key="Str.Err.DamagedEntriesPresent">De skadade filerna måste tas bort innan arkivet sparas.</sys:String>
 
@@ -367,6 +369,8 @@
     <sys:String x:Key="Str.TableVariable">Variabel</sys:String>
     <sys:String x:Key="Str.TableValue">Startvärde</sys:String>
     <sys:String x:Key="Str.TableComment">Kommentar</sys:String>
+    <sys:String x:Key="Str.TableShowLineComments">Radkommentarer</sys:String>
+    <sys:String x:Key="Str.TableShowBlockComments">Kommentarer mellan rader</sys:String>
     <sys:String x:Key="Str.TableFrame">Bildruta</sys:String>
     <sys:String x:Key="Str.LipSectionFile">Läppsynkronisering</sys:String>
     <sys:String x:Key="Str.LipVersion">Version</sys:String>
@@ -394,6 +398,7 @@
     <sys:String x:Key="Str.LowercaseNothing">Alla namn är redan skrivna med gemener.</sys:String>
     <sys:String x:Key="Str.LowercaseDone">{0} namn gjordes till gemener.</sys:String>
     <sys:String x:Key="Str.ViewerDecompiled">Dekompilerad från .int</sys:String>
+    <sys:String x:Key="Str.ViewerScr">Skript från Arcanum (.scr), visat som text: villkoret och åtgärderna på varje rad.</sys:String>
     <sys:String x:Key="Str.ViewerDecompiledWarnings" xml:space="preserve"> · {0} varning(ar)</sys:String>
     <sys:String x:Key="Str.ViewerScriptError">Det går inte att dekompilera det här skriptet: {0}</sys:String>
     <sys:String x:Key="Str.ViewerNotColored">För lång för syntaxmarkering</sys:String>

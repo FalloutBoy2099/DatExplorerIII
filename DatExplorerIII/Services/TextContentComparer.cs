@@ -39,10 +39,11 @@ namespace DatExplorerIII.Services
 			return IsText(fileName) || IsScript(fileName);
 		}
 
-		/// <summary>Whether a file is a compiled script of Fallout.</summary>
+		/// <summary>Whether a file is a compiled script: of Fallout (.int) or of Arcanum (.scr), compared as the text it is shown as.</summary>
 		public static Boolean IsScript(String fileName)
 		{
-			return String.Equals(Path.GetExtension(fileName), ".int", StringComparison.OrdinalIgnoreCase);
+			String extension = Path.GetExtension(fileName);
+			return String.Equals(extension, ".int", StringComparison.OrdinalIgnoreCase) || String.Equals(extension, ".scr", StringComparison.OrdinalIgnoreCase);
 		}
 
 		/// <summary>

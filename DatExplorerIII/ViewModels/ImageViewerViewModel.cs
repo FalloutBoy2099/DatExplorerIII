@@ -59,8 +59,11 @@ namespace DatExplorerIII.ViewModels
 				new ZoomOption("4×", 4),
 				new ZoomOption("6×", 6),
 				new ZoomOption("8×", 8),
+				new ZoomOption("10×", 10),
+				new ZoomOption("12×", 12),
+				new ZoomOption("16×", 16),
 			];
-			_selectedZoom = ZoomOptions[1];
+			_selectedZoom = ZoomOptions.First(option => option.Factor == 1);
 
 			_timer.Tick += (_, _) => NextFrame(true);
 			PlayCommand = new RelayCommand(TogglePlay, () => IsAnimated);
@@ -89,6 +92,9 @@ namespace DatExplorerIII.ViewModels
 		/// <summary>How many notches of the wheel make one step of magnification (a setting of the program: 1 to 3).</summary>
 		public static Int32 WheelNotchesPerZoom { get; set; } = 3;
 
+		/// <summary>The notches for this viewer alone (the tests, which run side by side, must not share the setting of the program).</summary>
+		internal Int32? WheelNotchesOverride { get; set; }
+
 		/// <summary>A notch of a wheel, in the units of the mouse messages.</summary>
 		private const Int32 WheelNotch = 120;
 
@@ -105,7 +111,7 @@ namespace DatExplorerIII.ViewModels
 			}
 
 			_wheelRemainder += delta;
-			Int32 needed = Math.Clamp(WheelNotchesPerZoom, 1, 3) * WheelNotch;
+			Int32 needed = Math.Clamp(WheelNotchesOverride ?? WheelNotchesPerZoom, 1, 3) * WheelNotch;
 			while (Math.Abs(_wheelRemainder) >= needed)
 			{
 				Int32 step = Math.Sign(_wheelRemainder);
@@ -114,11 +120,21 @@ namespace DatExplorerIII.ViewModels
 			}
 		}
 
-		/// <summary>One step of magnification more (the wheel of the mouse turned up) or less; "fit" is the step under 1×.</summary>
+		/// <summary>
+		/// One step of magnification more (the wheel of the mouse turned up) or less, among the magnifications of the list. "Fit" is
+		/// not one of the steps: from it the wheel goes to 1×.
+		/// </summary>
 		public void StepZoom(Int32 step)
 		{
-			Int32 index = Math.Clamp(ZoomOptions.ToList().IndexOf(_selectedZoom) + step, 0, ZoomOptions.Count - 1);
-			SelectedZoom = ZoomOptions[index];
+			if (IsFit)
+			{
+				ActualSize();
+				return;
+			}
+
+			List<ZoomOption> steps = ZoomOptions.Where(option => option.Factor > 0).ToList();
+			Int32 index = Math.Clamp(steps.IndexOf(_selectedZoom) + step, 0, steps.Count - 1);
+			SelectedZoom = steps[index];
 		}
 
 		/// <summary>The picture at its real size (100%).</summary>
@@ -267,9 +283,12 @@ namespace DatExplorerIII.ViewModels
 		public Boolean IsFit => _selectedZoom.Factor == 0;
 
 		/// <summary>The width of the picture at the chosen magnification.</summary>
-		public Double DisplayWidth => (_picture?.Width ?? 0) * Math.Max(_selectedZoom.Factor, 1);
+		public Double DisplayWidth => (_picture?.Width ?? 0) * ScaleShown;
 
-		public Double DisplayHeight => (_picture?.Height ?? 0) * Math.Max(_selectedZoom.Factor, 1);
+		public Double DisplayHeight => (_picture?.Height ?? 0) * ScaleShown;
+
+		/// <summary>The magnification of the picture when it is not fitted to the window.</summary>
+		private Double ScaleShown => _selectedZoom.Factor > 0 ? _selectedZoom.Factor : 1;
 
 		public String Info
 		{

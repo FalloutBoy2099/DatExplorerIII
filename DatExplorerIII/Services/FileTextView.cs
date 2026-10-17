@@ -70,6 +70,11 @@ namespace DatExplorerIII.Services
 						lines = SplitLines(ScriptDecompiler.DecompileLeniently(data, new ScriptDecompilerOptions { Game = game }).Text);
 						return FileTextResult.Lines;
 
+					case FileViewerKind.Text when Path.GetExtension(fileName).Equals(".scr", StringComparison.OrdinalIgnoreCase):
+						// A script of Arcanum is compared as the text it is shown as.
+						lines = SplitLines(ScrText.Render(data));
+						return FileTextResult.Lines;
+
 					case FileViewerKind.Text:
 						DecodedText decoded = TextDecoder.Decode(data);
 						if (decoded.LooksBinary)

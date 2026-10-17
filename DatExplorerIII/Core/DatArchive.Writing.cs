@@ -126,9 +126,9 @@ namespace DatExplorerIII.Core
 				throw new DatException(DatErrorKind.DamagedEntriesPresent, "The damaged files must be removed before the archive is saved.");
 			}
 
-			if (Format == DatFormat.Toee)
+			if (Format is DatFormat.Toee or DatFormat.Zip)
 			{
-				throw new DatException(DatErrorKind.ReadOnlyFormat, "The archives of Temple of Elemental Evil cannot be saved yet.");
+				throw new DatException(DatErrorKind.ReadOnlyFormat, "This kind of archive cannot be saved yet.");
 			}
 
 			ValidateForSaving();

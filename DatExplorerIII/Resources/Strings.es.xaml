@@ -17,6 +17,8 @@
     <sys:String x:Key="Str.QuickSave">Guardado rápido</sys:String>
     <sys:String x:Key="Str.CloseDat">Cerrar DAT</sys:String>
     <sys:String x:Key="Str.CloseAllDats">Cerrar todos los DAT</sys:String>
+    <sys:String x:Key="Str.MoveDatUp">Subir el DAT</sys:String>
+    <sys:String x:Key="Str.MoveDatDown">Bajar el DAT</sys:String>
     <sys:String x:Key="Str.Exit">Salir</sys:String>
     <sys:String x:Key="Str.OpenItem">Abrir</sys:String>
     <sys:String x:Key="Str.ExtractFile">Extraer archivo a...</sys:String>
@@ -104,7 +106,7 @@
     <sys:String x:Key="Str.Cancel">Cancelar</sys:String>
     <sys:String x:Key="Str.Close">Cerrar</sys:String>
     <sys:String x:Key="Str.ErrorTitle">Error</sys:String>
-    <sys:String x:Key="Str.DatFilter">Archivos DAT (*.dat, *.patch0-9)|*.dat;*.patch0;*.patch1;*.patch2;*.patch3;*.patch4;*.patch5;*.patch6;*.patch7;*.patch8;*.patch9|Todos los archivos (*.*)|*.*</sys:String>
+    <sys:String x:Key="Str.DatFilter">Archivos DAT (*.dat, *.patch0-9, *.zip)|*.dat;*.patch0;*.patch1;*.patch2;*.patch3;*.patch4;*.patch5;*.patch6;*.patch7;*.patch8;*.patch9;*.zip|Todos los archivos (*.*)|*.*</sys:String>
     <sys:String x:Key="Str.SelectDestination">Seleccione la carpeta de destino</sys:String>
     <sys:String x:Key="Str.AlreadyOpen">Este archivo DAT ya está abierto.</sys:String>
     <sys:String x:Key="Str.RecentMissing">El archivo {0} ya no existe. Se quitó de los archivos recientes.</sys:String>
@@ -204,7 +206,7 @@
     <sys:String x:Key="Str.Err.FolderAlreadyExists">La carpeta {0} ya existe.</sys:String>
     <sys:String x:Key="Str.Err.RootFolderRename">La carpeta raíz no se puede renombrar.</sys:String>
     <sys:String x:Key="Str.Err.ArchiveTooLarge">El archivo DAT superaría los 4 GB, el límite del formato DAT.</sys:String>
-    <sys:String x:Key="Str.Err.ReadOnlyFormat">Los archivos de Temple of Elemental Evil se pueden abrir y extraer, pero todavía no guardar.</sys:String>
+    <sys:String x:Key="Str.Err.ReadOnlyFormat">Los archivos de Temple of Elemental Evil y los ZIP se pueden abrir y extraer, pero todavía no guardar.</sys:String>
     <sys:String x:Key="Str.Err.PathNotAllowed">La ruta {0} saldría de la carpeta de destino y fue rechazada.</sys:String>
     <sys:String x:Key="Str.Err.DamagedEntriesPresent">Los archivos dañados deben eliminarse antes de guardar el archivo DAT.</sys:String>
 
@@ -367,6 +369,8 @@
     <sys:String x:Key="Str.TableVariable">Variable</sys:String>
     <sys:String x:Key="Str.TableValue">Valor inicial</sys:String>
     <sys:String x:Key="Str.TableComment">Comentario</sys:String>
+    <sys:String x:Key="Str.TableShowLineComments">Comentarios de línea</sys:String>
+    <sys:String x:Key="Str.TableShowBlockComments">Comentarios entre líneas</sys:String>
     <sys:String x:Key="Str.TableFrame">Fotograma</sys:String>
     <sys:String x:Key="Str.LipSectionFile">Sincronización labial</sys:String>
     <sys:String x:Key="Str.LipVersion">Versión</sys:String>
@@ -394,6 +398,7 @@
     <sys:String x:Key="Str.LowercaseNothing">Todos los nombres ya están en minúsculas.</sys:String>
     <sys:String x:Key="Str.LowercaseDone">{0} nombres convertidos a minúsculas.</sys:String>
     <sys:String x:Key="Str.ViewerDecompiled">Descompilado del archivo .int</sys:String>
+    <sys:String x:Key="Str.ViewerScr">Script de Arcanum (.scr) mostrado como texto: la condición y las acciones de cada línea.</sys:String>
     <sys:String x:Key="Str.ViewerDecompiledWarnings" xml:space="preserve"> · {0} advertencia(s)</sys:String>
     <sys:String x:Key="Str.ViewerScriptError">Este script no se puede descompilar: {0}</sys:String>
     <sys:String x:Key="Str.ViewerNotColored">Demasiado largo para resaltar la sintaxis</sys:String>

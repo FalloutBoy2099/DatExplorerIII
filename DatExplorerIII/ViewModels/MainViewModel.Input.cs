@@ -68,8 +68,8 @@ namespace DatExplorerIII.ViewModels
 		private void CreateInputCommands()
 		{
 			OpenDroppedCommand = new AsyncRelayCommand(
-				parameter => OpenDroppedAsync(PathsOf(parameter).Where(DatFiles.IsDatFile).ToList()),
-				parameter => PathsOf(parameter).Any(DatFiles.IsDatFile));
+				parameter => OpenDroppedAsync(PathsOf(parameter).Where(DatFiles.IsArchiveFile).ToList()),
+				parameter => PathsOf(parameter).Any(DatFiles.IsArchiveFile));
 			ImportDroppedCommand = new AsyncRelayCommand(
 				parameter => ImportDroppedAsync(PathsOf(parameter)),
 				parameter => PathsOf(parameter).Count > 0);

@@ -56,6 +56,12 @@ namespace DatExplorerIII.Models
 		/// <summary>How many notches of the wheel of the mouse change the magnification of a picture by one step (1 to 3).</summary>
 		public Int32 WheelNotchesPerZoom { get; set; } = 3;
 
+		/// <summary>Message files and dialogs: whether the comments at the end of the lines are shown (a column).</summary>
+		public Boolean ShowLineComments { get; set; }
+
+		/// <summary>Message files and dialogs: whether the comments between the lines are shown.</summary>
+		public Boolean ShowBlockComments { get; set; }
+
 		/// <summary>Whether a folder opened as an archive shows its hidden folders (hidden by Windows, or with a name that starts with a dot); off by default.</summary>
 		public Boolean ShowHiddenFolders { get; set; }
 

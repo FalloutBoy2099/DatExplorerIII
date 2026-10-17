@@ -98,6 +98,9 @@ namespace DatExplorerIII.Models
 
 		/// <summary>Temple of Elemental Evil: the footer of Arcanum, and an index that is a tree of folders. It is read, not written.</summary>
 		Toee = 4,
+
+		/// <summary>A ZIP file, browsed like an archive. It is read, not written.</summary>
+		Zip = 5,
 	}
 
 	/// <summary>

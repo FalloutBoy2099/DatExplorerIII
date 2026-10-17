@@ -17,6 +17,8 @@
     <sys:String x:Key="Str.QuickSave">快速保存</sys:String>
     <sys:String x:Key="Str.CloseDat">关闭 DAT</sys:String>
     <sys:String x:Key="Str.CloseAllDats">关闭所有 DAT</sys:String>
+    <sys:String x:Key="Str.MoveDatUp">上移 DAT</sys:String>
+    <sys:String x:Key="Str.MoveDatDown">下移 DAT</sys:String>
     <sys:String x:Key="Str.Exit">退出</sys:String>
     <sys:String x:Key="Str.OpenItem">打开</sys:String>
     <sys:String x:Key="Str.ExtractFile">提取文件到...</sys:String>
@@ -104,7 +106,7 @@
     <sys:String x:Key="Str.Cancel">取消</sys:String>
     <sys:String x:Key="Str.Close">关闭</sys:String>
     <sys:String x:Key="Str.ErrorTitle">错误</sys:String>
-    <sys:String x:Key="Str.DatFilter">DAT 文件 (*.dat, *.patch0-9)|*.dat;*.patch0;*.patch1;*.patch2;*.patch3;*.patch4;*.patch5;*.patch6;*.patch7;*.patch8;*.patch9|所有文件 (*.*)|*.*</sys:String>
+    <sys:String x:Key="Str.DatFilter">DAT 文件 (*.dat, *.patch0-9, *.zip)|*.dat;*.patch0;*.patch1;*.patch2;*.patch3;*.patch4;*.patch5;*.patch6;*.patch7;*.patch8;*.patch9;*.zip|所有文件 (*.*)|*.*</sys:String>
     <sys:String x:Key="Str.SelectDestination">选择目标文件夹</sys:String>
     <sys:String x:Key="Str.AlreadyOpen">此 DAT 文件已经打开。</sys:String>
     <sys:String x:Key="Str.RecentMissing">文件 {0} 已不存在，已从最近使用的文件中移除。</sys:String>
@@ -204,7 +206,7 @@
     <sys:String x:Key="Str.Err.FolderAlreadyExists">文件夹 {0} 已存在。</sys:String>
     <sys:String x:Key="Str.Err.RootFolderRename">无法重命名根文件夹。</sys:String>
     <sys:String x:Key="Str.Err.ArchiveTooLarge">归档将超过 4 GB，即 DAT 格式的上限。</sys:String>
-    <sys:String x:Key="Str.Err.ReadOnlyFormat">可以打开和解压 Temple of Elemental Evil 的存档，但暂时不能保存。</sys:String>
+    <sys:String x:Key="Str.Err.ReadOnlyFormat">可以打开和解压 Temple of Elemental Evil 存档和 ZIP 文件，但暂时不能保存。</sys:String>
     <sys:String x:Key="Str.Err.PathNotAllowed">路径 {0} 会超出目标文件夹，已被拒绝。</sys:String>
     <sys:String x:Key="Str.Err.DamagedEntriesPresent">保存归档之前必须删除已损坏的文件。</sys:String>
 
@@ -367,6 +369,8 @@
     <sys:String x:Key="Str.TableVariable">变量</sys:String>
     <sys:String x:Key="Str.TableValue">初始值</sys:String>
     <sys:String x:Key="Str.TableComment">注释</sys:String>
+    <sys:String x:Key="Str.TableShowLineComments">行内注释</sys:String>
+    <sys:String x:Key="Str.TableShowBlockComments">行间注释</sys:String>
     <sys:String x:Key="Str.TableFrame">帧</sys:String>
     <sys:String x:Key="Str.LipSectionFile">口型同步</sys:String>
     <sys:String x:Key="Str.LipVersion">版本</sys:String>
@@ -394,6 +398,7 @@
     <sys:String x:Key="Str.LowercaseNothing">所有名称均已是小写。</sys:String>
     <sys:String x:Key="Str.LowercaseDone">已将 {0} 个名称转换为小写。</sys:String>
     <sys:String x:Key="Str.ViewerDecompiled">由 .int 反编译</sys:String>
+    <sys:String x:Key="Str.ViewerScr">Arcanum 脚本 (.scr)，以文本显示：每一行的条件和动作。</sys:String>
     <sys:String x:Key="Str.ViewerDecompiledWarnings" xml:space="preserve"> · {0} 条警告</sys:String>
     <sys:String x:Key="Str.ViewerScriptError">无法反编译此脚本：{0}</sys:String>
     <sys:String x:Key="Str.ViewerNotColored">过长，无法着色</sys:String>

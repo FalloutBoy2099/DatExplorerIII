@@ -307,6 +307,37 @@ namespace DatExplorerIII.ViewModels
 			StatusText = Loc.Get("Str.Ready");
 		}
 
+		private Boolean CanMoveCurrentDocument(Int32 step)
+		{
+			if (!CanBrowse() || CurrentDocument == null)
+			{
+				return false;
+			}
+
+			Int32 target = Roots.IndexOf(CurrentDocument.Root) + step;
+			return target >= 0 && target < Roots.Count;
+		}
+
+		/// <summary>Moves the DAT that is selected one place up (-1) or down (1) in the list of the open ones; it stays selected.</summary>
+		private void MoveCurrentDocument(Int32 step)
+		{
+			if (!CanMoveCurrentDocument(step) || CurrentDocument is not { } document)
+			{
+				return;
+			}
+
+			FolderNode? selected = SelectedFolder;
+			Int32 index = Roots.IndexOf(document.Root);
+
+			// The tree forgets what is selected when an item moves: the folder is selected again.
+			SelectedFolder = null;
+			Roots.Move(index, index + step);
+			if (selected != null)
+			{
+				SelectFolder(selected);
+			}
+		}
+
 		private void CloseCurrentDocument()
 		{
 			DatDocument? document = CurrentDocument;

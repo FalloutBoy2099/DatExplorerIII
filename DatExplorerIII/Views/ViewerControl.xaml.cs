@@ -212,6 +212,13 @@ namespace DatExplorerIII.Views
 				return;
 			}
 
+			// The mark of the lines that are comments is not for the user: the lines are colored by it.
+			if (e.PropertyName == "IsComment")
+			{
+				e.Cancel = true;
+				return;
+			}
+
 			e.Column.Header = table.GetHeader(e.PropertyName);
 			if (e.Column is DataGridTextColumn column)
 			{

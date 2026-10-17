@@ -963,6 +963,9 @@
                                     Header="{DynamicResource Str.Lowercase}"
                                     ToolTip="{DynamicResource Str.LowercaseTip}" />
                                 <Separator />
+                                <MenuItem Command="{Binding MoveDatUpCommand}" Header="{DynamicResource Str.MoveDatUp}" />
+                                <MenuItem Command="{Binding MoveDatDownCommand}" Header="{DynamicResource Str.MoveDatDown}" />
+                                <Separator />
                                 <MenuItem Command="{Binding CloseDatCommand}" Header="{DynamicResource Str.CloseDat}" />
                             </ContextMenu>
                         </TreeView.ContextMenu>

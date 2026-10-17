@@ -341,6 +341,12 @@ namespace DatExplorerIII.ViewModels
 						break;
 					}
 
+					if (Path.GetExtension(entry.Name).Equals(".scr", StringComparison.OrdinalIgnoreCase))
+					{
+						ShowScr(data);
+						break;
+					}
+
 					Byte[] shown = data.Length > MaxTextBytes ? data.AsSpan(0, MaxTextBytes).ToArray() : data;
 					Text.SourcePath = entry.FullPath;
 
@@ -459,6 +465,21 @@ namespace DatExplorerIII.ViewModels
 				Show(FileViewerKind.Text, String.Empty);
 			}
 			catch (ScriptFormatException exception) when (!token.IsCancellationRequested)
+			{
+				Show(null, Loc.Format("Str.ViewerScriptError", exception.Message));
+			}
+		}
+
+		/// <summary>Shows a script of Arcanum (.scr) as text, with the colors of a source, like a decompiled script.</summary>
+		private void ShowScr(Byte[] data)
+		{
+			try
+			{
+				Byte[] text = System.Text.Encoding.UTF8.GetBytes(ScrText.Render(data));
+				Text.Show(text, text.Length, ".ssl", Loc.Get("Str.ViewerScr"));
+				Show(FileViewerKind.Text, String.Empty);
+			}
+			catch (ScrLib.ScrFormatException exception)
 			{
 				Show(null, Loc.Format("Str.ViewerScriptError", exception.Message));
 			}

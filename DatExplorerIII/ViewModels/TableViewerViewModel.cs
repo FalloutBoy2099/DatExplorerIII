@@ -28,6 +28,9 @@ namespace DatExplorerIII.ViewModels
 		internal const String CommentColumn = "Comment";
 		internal const String FrameColumn = "Frame";
 
+		/// <summary>A column that is not shown: true for a line that is a comment between the lines of the file (the table colors it).</summary>
+		internal const String IsCommentColumn = "IsComment";
+
 		private static readonly Dictionary<String, String> HeaderKeys = new()
 		{
 			[NumberColumn] = "Str.TableNumber",
@@ -50,6 +53,45 @@ namespace DatExplorerIII.ViewModels
 		private DataView? _rows;
 		private String _status = String.Empty;
 		private String _notice = String.Empty;
+		private Boolean _showLineComments;
+		private Boolean _showBlockComments;
+
+		/// <summary>Whether the comments at the end of the lines of the file are shown (a column).</summary>
+		public Boolean ShowLineComments
+		{
+			get => _showLineComments;
+			set
+			{
+				if (SetProperty(ref _showLineComments, value))
+				{
+					RefreshComments();
+				}
+			}
+		}
+
+		/// <summary>Whether the comments between the lines of the file are shown (a line of the table for each).</summary>
+		public Boolean ShowBlockComments
+		{
+			get => _showBlockComments;
+			set
+			{
+				if (SetProperty(ref _showBlockComments, value))
+				{
+					RefreshComments();
+				}
+			}
+		}
+
+		/// <summary>The kinds of file that can have comments (message files and dialogs) offer the choice to show them.</summary>
+		public Boolean HasComments => _messages != null || _dialog != null;
+
+		private void RefreshComments()
+		{
+			if (HasComments)
+			{
+				Build();
+			}
+		}
 
 		/// <summary>The lines of the table.</summary>
 		public DataView? Rows
@@ -87,6 +129,7 @@ namespace DatExplorerIII.ViewModels
 		{
 			Clear();
 			_messages = messages;
+			OnPropertyChanged(nameof(HasComments));
 			Build();
 		}
 
@@ -94,6 +137,7 @@ namespace DatExplorerIII.ViewModels
 		{
 			Clear();
 			_dialog = dialog;
+			OnPropertyChanged(nameof(HasComments));
 			Build();
 		}
 
@@ -117,6 +161,7 @@ namespace DatExplorerIII.ViewModels
 			_dialog = null;
 			_variables = null;
 			_subtitles = null;
+			OnPropertyChanged(nameof(HasComments));
 			Rows = null;
 			Status = String.Empty;
 			Notice = String.Empty;
@@ -131,6 +176,55 @@ namespace DatExplorerIII.ViewModels
 			}
 		}
 
+		/// <summary>The mark of the lines that are comments: a column of the table only when the comments between the lines are shown.</summary>
+		private void AddIsCommentColumn(DataTable table)
+		{
+			if (_showBlockComments)
+			{
+				table.Columns.Add(IsCommentColumn, typeof(Boolean));
+			}
+		}
+
+		/// <summary>The cells of a line of an entry, with the mark that says it is not a comment when the table has that column.</summary>
+		private Object[] WithMark(Object[] cells)
+		{
+			return _showBlockComments ? [.. cells, false] : cells;
+		}
+
+		/// <summary>
+		/// Adds the lines of the entries, and, when they are shown, the comments between them where they stand in the file. A comment
+		/// is a line with no number whose text is the comment, in the column of the text.
+		/// </summary>
+		private void AddRows(DataTable table, Int32 count, IReadOnlyList<FileComment> comments, Func<Int32, Object[]> entryCells)
+		{
+			Int32 next = 0;
+
+			void AddComments(Int32 entriesBefore)
+			{
+				while (next < comments.Count && comments[next].EntriesBefore <= entriesBefore)
+				{
+					if (_showBlockComments)
+					{
+						Object[] cells = new Object[table.Columns.Count];
+						Array.Fill(cells, DBNull.Value);
+						cells[table.Columns.IndexOf(TextColumn)] = "// " + comments[next].Text;
+						cells[table.Columns.IndexOf(IsCommentColumn)] = true;
+						table.Rows.Add(cells);
+					}
+
+					next++;
+				}
+			}
+
+			for (Int32 index = 0; index < count; index++)
+			{
+				AddComments(index);
+				table.Rows.Add(entryCells(index));
+			}
+
+			AddComments(count);
+		}
+
 		private void Build()
 		{
 			DataTable table = new();
@@ -142,10 +236,17 @@ namespace DatExplorerIII.ViewModels
 			if (_messages != null)
 			{
 				table.Columns.Add(TextColumn, typeof(String));
-				foreach (MesEntry entry in _messages.Entries)
+				if (_showLineComments)
 				{
-					table.Rows.Add(entry.Number, entry.Text);
+					table.Columns.Add(CommentColumn, typeof(String));
 				}
+
+				AddIsCommentColumn(table);
+				AddRows(table, _messages.Entries.Count, _messages.Comments, index =>
+				{
+					MesEntry entry = _messages.Entries[index];
+					return WithMark(_showLineComments ? [entry.Number, entry.Text, entry.Comment] : [entry.Number, entry.Text]);
+				});
 
 				count = _messages.Entries.Count;
 				skipped = _messages.SkippedCount;
@@ -189,13 +290,21 @@ namespace DatExplorerIII.ViewModels
 				table.Columns.Add(TestColumn, typeof(String));
 				table.Columns.Add(GotoColumn, typeof(String));
 				table.Columns.Add(EffectColumn, typeof(String));
+				if (_showLineComments)
+				{
+					table.Columns.Add(CommentColumn, typeof(String));
+				}
+
+				AddIsCommentColumn(table);
 
 				String npc = Loc.Get("Str.TableKindNpc");
 				String option = Loc.Get("Str.TableKindOption");
-				foreach (DlgEntry entry in dialog.Entries)
+				AddRows(table, dialog.Entries.Count, dialog.Comments, index =>
 				{
-					table.Rows.Add(entry.Number, entry.IsPlayerOption ? option : npc, entry.Text, entry.Text2, entry.Iq, entry.Test, entry.Goto, entry.Effect);
-				}
+					DlgEntry entry = dialog.Entries[index];
+					Object[] cells = [entry.Number, entry.IsPlayerOption ? option : npc, entry.Text, entry.Text2, entry.Iq, entry.Test, entry.Goto, entry.Effect];
+					return WithMark(_showLineComments ? [.. cells, entry.Comment] : cells);
+				});
 
 				count = dialog.Entries.Count;
 				skipped = dialog.SkippedCount;

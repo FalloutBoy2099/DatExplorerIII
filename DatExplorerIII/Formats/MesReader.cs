@@ -2,6 +2,7 @@ namespace DatExplorerIII.Formats
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Linq;
 	using Models;
 	using Services;
 
@@ -25,8 +26,10 @@ namespace DatExplorerIII.Formats
 		/// <summary>Reads the messages of a text that is already decoded.</summary>
 		public static MesFile Parse(String text, String encodingName = "")
 		{
-			List<String> values = BraceText.ReadValues(text);
+			List<BraceText.Item> items = BraceText.ReadItems(text);
+			List<String> values = items.Where(item => !item.IsComment).Select(item => item.Text).ToList();
 			List<MesEntry> entries = new(values.Count / 2);
+			List<Int32> lastValues = new(values.Count / 2);
 			Int32 skipped = 0;
 
 			// The values go by pairs; a value that is not a number cannot start a message, so it is skipped alone and the
@@ -42,6 +45,7 @@ namespace DatExplorerIII.Formats
 				else if (index + 1 < values.Count && BraceText.TryReadNumber(values[index], out Int32 number))
 				{
 					entries.Add(new MesEntry(number, values[index + 1]));
+					lastValues.Add(index + 1);
 					index += 2;
 				}
 				else
@@ -51,7 +55,17 @@ namespace DatExplorerIII.Formats
 				}
 			}
 
-			return new MesFile(entries, skipped, encodingName);
+			// The comments: at the end of a line of a message, or between the messages.
+			(String?[] lineComments, List<FileComment> between) = BraceText.AssignComments(items, lastValues);
+			for (Int32 i = 0; i < entries.Count; i++)
+			{
+				if (lineComments[i] is { } comment)
+				{
+					entries[i] = entries[i] with { Comment = comment };
+				}
+			}
+
+			return new MesFile(entries, skipped, encodingName) { Comments = between };
 		}
 	}
 }

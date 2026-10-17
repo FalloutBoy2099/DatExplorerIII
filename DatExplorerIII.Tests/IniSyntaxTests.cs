@@ -48,5 +48,25 @@ namespace DatExplorerIII.Tests
 			Assert.Equal("Hello|", Of(SyntaxKind.String));
 			Assert.Equal("; comment|; trailing|", Of(SyntaxKind.Comment));
 		}
+
+		[Fact]
+		public void HashComments_AreTheLinesThatStartWithAHash_OfATextThatIsNotAnIni()
+		{
+			const String text = "# header\r\nA story.\r\n  # indented\r\nItem #3 is here.\r\n";
+
+			Assert.True(HashCommentSyntax.HasComments(text));
+			Assert.False(HashCommentSyntax.HasComments("Item #3 only.\n"));
+
+			var spans = HashCommentSyntax.Tokenize(text);
+			Int32 position = 0;
+			foreach (SyntaxSpan span in spans)
+			{
+				Assert.Equal(position, span.Start);
+				position += span.Length;
+			}
+
+			Assert.Equal(text.Length, position);
+			Assert.Equal("# header|# indented|", String.Concat(spans.Where(span => span.Kind == SyntaxKind.Comment).Select(span => text.Substring(span.Start, span.Length) + "|")));
+		}
 	}
 }

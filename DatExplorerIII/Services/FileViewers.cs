@@ -32,9 +32,9 @@ namespace DatExplorerIII.Services
 				return false;
 			}
 
-			// A compiled script is shown as the source it decompiles to, but what it holds is not text.
+			// A compiled script (.int, .scr) is shown as the source it decompiles to, but what it holds is not text.
 			String extension = Path.GetExtension(fileName);
-			return (kind == FileViewerKind.Text && !extension.Equals(".int", StringComparison.OrdinalIgnoreCase)) || extension.Equals(".gam", StringComparison.OrdinalIgnoreCase) || extension.Equals(".sve", StringComparison.OrdinalIgnoreCase);
+			return (kind == FileViewerKind.Text && !extension.Equals(".int", StringComparison.OrdinalIgnoreCase) && !extension.Equals(".scr", StringComparison.OrdinalIgnoreCase)) || extension.Equals(".gam", StringComparison.OrdinalIgnoreCase) || extension.Equals(".sve", StringComparison.OrdinalIgnoreCase);
 		}
 
 		public static Boolean IsViewable(String fileName)
@@ -64,7 +64,7 @@ namespace DatExplorerIII.Services
 			Dictionary<String, FileViewerKind> kinds = new(StringComparer.OrdinalIgnoreCase);
 
 			// Texts: lists, dialogs, game variables, scripts and configuration files.
-			foreach (String extension in new[] { ".lst", ".txt", ".msg", ".bio", ".cfg", ".ini", ".log", ".ssl", ".int", ".h", ".csv", ".xml", ".json", ".md", ".bat", ".cmd", ".ps1", ".vbs" })
+			foreach (String extension in new[] { ".lst", ".txt", ".msg", ".bio", ".cfg", ".ini", ".log", ".ssl", ".int", ".scr", ".lua", ".h", ".csv", ".xml", ".json", ".md", ".bat", ".cmd", ".ps1", ".vbs" })
 			{
 				kinds[extension] = FileViewerKind.Text;
 			}

@@ -17,6 +17,8 @@
     <sys:String x:Key="Str.QuickSave">Rychlé uložení</sys:String>
     <sys:String x:Key="Str.CloseDat">Zavřít DAT</sys:String>
     <sys:String x:Key="Str.CloseAllDats">Zavřít všechny DAT</sys:String>
+    <sys:String x:Key="Str.MoveDatUp">Posunout DAT nahoru</sys:String>
+    <sys:String x:Key="Str.MoveDatDown">Posunout DAT dolů</sys:String>
     <sys:String x:Key="Str.Exit">Konec</sys:String>
     <sys:String x:Key="Str.OpenItem">Otevřít</sys:String>
     <sys:String x:Key="Str.ExtractFile">Rozbalit soubor do...</sys:String>
@@ -104,7 +106,7 @@
     <sys:String x:Key="Str.Cancel">Zrušit</sys:String>
     <sys:String x:Key="Str.Close">Zavřít</sys:String>
     <sys:String x:Key="Str.ErrorTitle">Chyba</sys:String>
-    <sys:String x:Key="Str.DatFilter">Soubory DAT (*.dat, *.patch0-9)|*.dat;*.patch0;*.patch1;*.patch2;*.patch3;*.patch4;*.patch5;*.patch6;*.patch7;*.patch8;*.patch9|Všechny soubory (*.*)|*.*</sys:String>
+    <sys:String x:Key="Str.DatFilter">Soubory DAT (*.dat, *.patch0-9, *.zip)|*.dat;*.patch0;*.patch1;*.patch2;*.patch3;*.patch4;*.patch5;*.patch6;*.patch7;*.patch8;*.patch9;*.zip|Všechny soubory (*.*)|*.*</sys:String>
     <sys:String x:Key="Str.SelectDestination">Vyberte cílovou složku</sys:String>
     <sys:String x:Key="Str.AlreadyOpen">Tento soubor DAT je již otevřen.</sys:String>
     <sys:String x:Key="Str.RecentMissing">Soubor {0} již neexistuje. Byl odebrán ze seznamu nedávných souborů.</sys:String>
@@ -204,7 +206,7 @@
     <sys:String x:Key="Str.Err.FolderAlreadyExists">Složka {0} již existuje.</sys:String>
     <sys:String x:Key="Str.Err.RootFolderRename">Kořenovou složku nelze přejmenovat.</sys:String>
     <sys:String x:Key="Str.Err.ArchiveTooLarge">Archiv by překročil 4 GB, což je limit formátu DAT.</sys:String>
-    <sys:String x:Key="Str.Err.ReadOnlyFormat">Archivy hry Temple of Elemental Evil lze otevřít a extrahovat, ale zatím ne uložit.</sys:String>
+    <sys:String x:Key="Str.Err.ReadOnlyFormat">Archivy Temple of Elemental Evil a soubory ZIP lze otevřít a extrahovat, ale zatím ne uložit.</sys:String>
     <sys:String x:Key="Str.Err.PathNotAllowed">Cesta {0} by vedla mimo cílovou složku a byla odmítnuta.</sys:String>
     <sys:String x:Key="Str.Err.DamagedEntriesPresent">Před uložením archivu je třeba odebrat poškozené soubory.</sys:String>
 
@@ -367,6 +369,8 @@
     <sys:String x:Key="Str.TableVariable">Proměnná</sys:String>
     <sys:String x:Key="Str.TableValue">Počáteční hodnota</sys:String>
     <sys:String x:Key="Str.TableComment">Komentář</sys:String>
+    <sys:String x:Key="Str.TableShowLineComments">Komentáře na řádcích</sys:String>
+    <sys:String x:Key="Str.TableShowBlockComments">Komentáře mezi řádky</sys:String>
     <sys:String x:Key="Str.TableFrame">Snímek</sys:String>
     <sys:String x:Key="Str.LipSectionFile">Synchronizace rtů</sys:String>
     <sys:String x:Key="Str.LipVersion">Verze</sys:String>
@@ -394,6 +398,7 @@
     <sys:String x:Key="Str.LowercaseNothing">Všechny názvy jsou již psány malými písmeny.</sys:String>
     <sys:String x:Key="Str.LowercaseDone">Názvy převedené na malá písmena: {0}.</sys:String>
     <sys:String x:Key="Str.ViewerDecompiled">Dekompilováno z .int</sys:String>
+    <sys:String x:Key="Str.ViewerScr">Skript Arcanum (.scr) zobrazený jako text: podmínka a akce každého řádku.</sys:String>
     <sys:String x:Key="Str.ViewerDecompiledWarnings" xml:space="preserve"> · varování: {0}</sys:String>
     <sys:String x:Key="Str.ViewerScriptError">Tento skript nelze dekompilovat: {0}</sys:String>
     <sys:String x:Key="Str.ViewerNotColored">Příliš dlouhé pro zvýraznění</sys:String>

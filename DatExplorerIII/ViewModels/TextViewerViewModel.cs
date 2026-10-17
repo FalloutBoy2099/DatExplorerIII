@@ -39,6 +39,7 @@ namespace DatExplorerIII.ViewModels
 		private Boolean _isBiography;
 		private Boolean _isList;
 		private Boolean _mayBeIni;
+		private Boolean _isLua;
 		private readonly IUiThread _uiThread;
 		private Boolean _tooLongForColors;
 		private String _note = String.Empty;
@@ -304,6 +305,7 @@ namespace DatExplorerIII.ViewModels
 			_isScript = String.Equals(extension, ".ssl", StringComparison.OrdinalIgnoreCase) || String.Equals(extension, ".h", StringComparison.OrdinalIgnoreCase);
 			_isBiography = String.Equals(extension, ".bio", StringComparison.OrdinalIgnoreCase);
 			_isList = String.Equals(extension, ".lst", StringComparison.OrdinalIgnoreCase);
+			_isLua = String.Equals(extension, ".lua", StringComparison.OrdinalIgnoreCase);
 			_mayBeIni = extension != null && (extension.Equals(".txt", StringComparison.OrdinalIgnoreCase) || extension.Equals(".ini", StringComparison.OrdinalIgnoreCase) || extension.Equals(".cfg", StringComparison.OrdinalIgnoreCase));
 			_note = note ?? String.Empty;
 			_noteTip = null;
@@ -374,6 +376,7 @@ namespace DatExplorerIII.ViewModels
 			_isScript = false;
 			_isBiography = false;
 			_isList = false;
+			_isLua = false;
 			_mayBeIni = false;
 			_note = String.Empty;
 			_noteTip = null;
@@ -460,12 +463,17 @@ namespace DatExplorerIII.ViewModels
 		private IReadOnlyList<SyntaxSpan>? Colorize(DecodedText decoded)
 		{
 			_tooLongForColors = false;
-			Func<String, IReadOnlyList<SyntaxSpan>>? tokenize = _isMessageFile ? MsgSyntax.Tokenize : _isScript ? SslSyntax.Tokenize : _isBiography ? BioSyntax.Tokenize : _isList ? (text => LstSyntax.Tokenize(text, _missingLines)) : null;
+			Func<String, IReadOnlyList<SyntaxSpan>>? tokenize = _isMessageFile ? MsgSyntax.Tokenize : _isScript ? SslSyntax.Tokenize : _isBiography ? BioSyntax.Tokenize : _isLua ? LuaSyntax.Tokenize : _isList ? (text => LstSyntax.Tokenize(text, _missingLines)) : null;
 
 			// Some text files are configurations in the INI form: the content tells, not the extension.
 			if (tokenize == null && _mayBeIni && !decoded.LooksBinary && decoded.Text.Length <= MaxColoredLength && IniSyntax.LooksLikeIni(decoded.Text))
 			{
 				tokenize = IniSyntax.Tokenize;
+			}
+			else if (tokenize == null && _mayBeIni && !decoded.LooksBinary && decoded.Text.Length <= MaxColoredLength && HashCommentSyntax.HasComments(decoded.Text))
+			{
+				// Another text file with comments: the lines that start with a # (the other texts are not colored).
+				tokenize = HashCommentSyntax.Tokenize;
 			}
 
 			if (decoded.LooksBinary || tokenize == null)

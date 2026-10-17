@@ -313,6 +313,33 @@ namespace DatExplorerIII.Tests
 		}
 
 		[Fact]
+		public void Image_TheWheel_StepsTheMagnificationFrom1To16_WithoutFit()
+		{
+			ImageViewerViewModel viewer = new(new ManualUiThread()) { WheelNotchesOverride = 1 };
+			Assert.Equal(1, viewer.SelectedZoom.Factor);
+
+			// Fit is not a step: the wheel stays at 1x going down.
+			viewer.Wheel(-120);
+			Assert.Equal(1, viewer.SelectedZoom.Factor);
+			Assert.False(viewer.IsFit);
+
+			viewer.Wheel(120);
+			Assert.Equal(2, viewer.SelectedZoom.Factor);
+
+			for (Int32 i = 0; i < 10; i++)
+			{
+				viewer.Wheel(120);
+			}
+
+			Assert.Equal(16, viewer.SelectedZoom.Factor);
+
+			// From fit (chosen in the box), the wheel goes to 1x.
+			viewer.SelectedZoom = viewer.ZoomOptions.First(option => option.Factor == 0);
+			viewer.Wheel(120);
+			Assert.Equal(1, viewer.SelectedZoom.Factor);
+		}
+
+		[Fact]
 		public void Image_Animation_AdvancesOnTheTicksOfTheTimerService_AndStopsWhenPaused()
 		{
 			RunOnUiThread(() =>

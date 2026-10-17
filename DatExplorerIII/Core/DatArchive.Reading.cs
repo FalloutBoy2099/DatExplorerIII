@@ -90,6 +90,11 @@ namespace DatExplorerIII.Core
 
 			try
 			{
+				if (IsZipFile(stream, length))
+				{
+					return ReadZipArchive(filePath, stream, length);
+				}
+
 				if (TryReadArcanumFooter(stream, length, out ArcanumFooter arcanumFooter))
 				{
 					return ReadArcanumArchive(filePath, stream, arcanumFooter, length, mode);
@@ -450,6 +455,11 @@ namespace DatExplorerIII.Core
 			if (entry.IsNew)
 			{
 				return File.ReadAllBytes(entry.SourceFile!);
+			}
+
+			if (Format == DatFormat.Zip)
+			{
+				return ReadZipData(entry);
 			}
 
 			Byte[] stored = ReadStored(entry);

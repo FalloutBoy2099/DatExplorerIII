@@ -17,6 +17,8 @@
     <sys:String x:Key="Str.QuickSave">Schnellspeichern</sys:String>
     <sys:String x:Key="Str.CloseDat">DAT schließen</sys:String>
     <sys:String x:Key="Str.CloseAllDats">Alle DAT schließen</sys:String>
+    <sys:String x:Key="Str.MoveDatUp">DAT nach oben</sys:String>
+    <sys:String x:Key="Str.MoveDatDown">DAT nach unten</sys:String>
     <sys:String x:Key="Str.Exit">Beenden</sys:String>
     <sys:String x:Key="Str.OpenItem">Öffnen</sys:String>
     <sys:String x:Key="Str.ExtractFile">Datei extrahieren nach...</sys:String>
@@ -104,7 +106,7 @@
     <sys:String x:Key="Str.Cancel">Abbrechen</sys:String>
     <sys:String x:Key="Str.Close">Schließen</sys:String>
     <sys:String x:Key="Str.ErrorTitle">Fehler</sys:String>
-    <sys:String x:Key="Str.DatFilter">DAT-Dateien (*.dat, *.patch0-9)|*.dat;*.patch0;*.patch1;*.patch2;*.patch3;*.patch4;*.patch5;*.patch6;*.patch7;*.patch8;*.patch9|Alle Dateien (*.*)|*.*</sys:String>
+    <sys:String x:Key="Str.DatFilter">DAT-Dateien (*.dat, *.patch0-9, *.zip)|*.dat;*.patch0;*.patch1;*.patch2;*.patch3;*.patch4;*.patch5;*.patch6;*.patch7;*.patch8;*.patch9;*.zip|Alle Dateien (*.*)|*.*</sys:String>
     <sys:String x:Key="Str.SelectDestination">Zielordner auswählen</sys:String>
     <sys:String x:Key="Str.AlreadyOpen">Diese DAT-Datei ist bereits geöffnet.</sys:String>
     <sys:String x:Key="Str.RecentMissing">Die Datei {0} existiert nicht mehr. Sie wurde aus der Liste der zuletzt geöffneten Dateien entfernt.</sys:String>
@@ -204,7 +206,7 @@
     <sys:String x:Key="Str.Err.FolderAlreadyExists">Der Ordner {0} existiert bereits.</sys:String>
     <sys:String x:Key="Str.Err.RootFolderRename">Der Stammordner kann nicht umbenannt werden.</sys:String>
     <sys:String x:Key="Str.Err.ArchiveTooLarge">Das Archiv würde 4 GB überschreiten, die Grenze des DAT-Formats.</sys:String>
-    <sys:String x:Key="Str.Err.ReadOnlyFormat">Archive von Temple of Elemental Evil können geöffnet und extrahiert, aber noch nicht gespeichert werden.</sys:String>
+    <sys:String x:Key="Str.Err.ReadOnlyFormat">Archive von Temple of Elemental Evil und ZIP-Dateien können geöffnet und extrahiert, aber noch nicht gespeichert werden.</sys:String>
     <sys:String x:Key="Str.Err.PathNotAllowed">Der Pfad {0} würde den Zielordner verlassen und wurde abgelehnt.</sys:String>
     <sys:String x:Key="Str.Err.DamagedEntriesPresent">Die beschädigten Dateien müssen entfernt werden, bevor das Archiv gespeichert wird.</sys:String>
 
@@ -367,6 +369,8 @@
     <sys:String x:Key="Str.TableVariable">Variable</sys:String>
     <sys:String x:Key="Str.TableValue">Anfangswert</sys:String>
     <sys:String x:Key="Str.TableComment">Kommentar</sys:String>
+    <sys:String x:Key="Str.TableShowLineComments">Zeilenkommentare</sys:String>
+    <sys:String x:Key="Str.TableShowBlockComments">Kommentare zwischen Zeilen</sys:String>
     <sys:String x:Key="Str.TableFrame">Bild</sys:String>
     <sys:String x:Key="Str.LipSectionFile">Lippensynchronisation</sys:String>
     <sys:String x:Key="Str.LipVersion">Version</sys:String>
@@ -394,6 +398,7 @@
     <sys:String x:Key="Str.LowercaseNothing">Alle Namen sind bereits in Kleinbuchstaben.</sys:String>
     <sys:String x:Key="Str.LowercaseDone">{0} Namen in Kleinbuchstaben umgewandelt.</sys:String>
     <sys:String x:Key="Str.ViewerDecompiled">Aus der .int-Datei dekompiliert</sys:String>
+    <sys:String x:Key="Str.ViewerScr">Skript von Arcanum (.scr), als Text angezeigt: die Bedingung und die Aktionen jeder Zeile.</sys:String>
     <sys:String x:Key="Str.ViewerDecompiledWarnings" xml:space="preserve"> · {0} Warnung(en)</sys:String>
     <sys:String x:Key="Str.ViewerScriptError">Dieses Skript kann nicht dekompiliert werden: {0}</sys:String>
     <sys:String x:Key="Str.ViewerNotColored">Zu lang für die Syntaxhervorhebung</sys:String>

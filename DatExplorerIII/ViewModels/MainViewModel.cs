@@ -65,6 +65,8 @@ namespace DatExplorerIII.ViewModels
 			QuickSaveCommand = new AsyncRelayCommand(() => SaveAsync(true), () => CanBrowse() && CurrentDocument?.CanQuickSave == true);
 			CloseDatCommand = new RelayCommand(CloseCurrentDocument, HasDocument);
 			CloseAllDatsCommand = new RelayCommand(CloseAllDocuments, () => CanBrowse() && Roots.Count > 0);
+			MoveDatUpCommand = new RelayCommand(() => MoveCurrentDocument(-1), () => CanMoveCurrentDocument(-1));
+			MoveDatDownCommand = new RelayCommand(() => MoveCurrentDocument(1), () => CanMoveCurrentDocument(1));
 			UpCommand = new RelayCommand(GoUp, () => CanBrowse() && SelectedFolder?.Parent != null);
 			RefreshCommand = new RelayCommand(RefreshItems, HasDocument);
 
@@ -135,6 +137,12 @@ namespace DatExplorerIII.ViewModels
 		public ICommand CloseDatCommand { get; }
 
 		public ICommand CloseAllDatsCommand { get; }
+
+		/// <summary>Moves the DAT that is selected up in the list of the open ones (disabled for the first one).</summary>
+		public ICommand MoveDatUpCommand { get; }
+
+		/// <summary>Moves the DAT that is selected down in the list of the open ones (disabled for the last one).</summary>
+		public ICommand MoveDatDownCommand { get; }
 
 		public ICommand UpCommand { get; }
 

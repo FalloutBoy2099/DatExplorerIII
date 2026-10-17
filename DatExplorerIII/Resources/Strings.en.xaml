@@ -17,6 +17,8 @@
     <sys:String x:Key="Str.QuickSave">Quick save</sys:String>
     <sys:String x:Key="Str.CloseDat">Close DAT</sys:String>
     <sys:String x:Key="Str.CloseAllDats">Close all DATs</sys:String>
+    <sys:String x:Key="Str.MoveDatUp">Move DAT up</sys:String>
+    <sys:String x:Key="Str.MoveDatDown">Move DAT down</sys:String>
     <sys:String x:Key="Str.Exit">Exit</sys:String>
     <sys:String x:Key="Str.OpenItem">Open</sys:String>
     <sys:String x:Key="Str.ExtractFile">Extract file to...</sys:String>
@@ -104,7 +106,7 @@
     <sys:String x:Key="Str.Cancel">Cancel</sys:String>
     <sys:String x:Key="Str.Close">Close</sys:String>
     <sys:String x:Key="Str.ErrorTitle">Error</sys:String>
-    <sys:String x:Key="Str.DatFilter">DAT files (*.dat, *.patch0-9)|*.dat;*.patch0;*.patch1;*.patch2;*.patch3;*.patch4;*.patch5;*.patch6;*.patch7;*.patch8;*.patch9|All files (*.*)|*.*</sys:String>
+    <sys:String x:Key="Str.DatFilter">DAT files (*.dat, *.patch0-9, *.zip)|*.dat;*.patch0;*.patch1;*.patch2;*.patch3;*.patch4;*.patch5;*.patch6;*.patch7;*.patch8;*.patch9;*.zip|All files (*.*)|*.*</sys:String>
     <sys:String x:Key="Str.SelectDestination">Select the destination folder</sys:String>
     <sys:String x:Key="Str.AlreadyOpen">This DAT file is already open.</sys:String>
     <sys:String x:Key="Str.RecentMissing">The file {0} no longer exists. It was removed from the recent files.</sys:String>
@@ -204,7 +206,7 @@
     <sys:String x:Key="Str.Err.FolderAlreadyExists">The folder {0} already exists.</sys:String>
     <sys:String x:Key="Str.Err.RootFolderRename">The root folder cannot be renamed.</sys:String>
     <sys:String x:Key="Str.Err.ArchiveTooLarge">The archive would exceed 4 GB, the limit of the DAT format.</sys:String>
-    <sys:String x:Key="Str.Err.ReadOnlyFormat">The archives of Temple of Elemental Evil can be opened and extracted, but not saved yet.</sys:String>
+    <sys:String x:Key="Str.Err.ReadOnlyFormat">Archives of Temple of Elemental Evil and ZIP files can be opened and extracted, but not saved yet.</sys:String>
     <sys:String x:Key="Str.Err.PathNotAllowed">The path {0} would leave the destination folder and was refused.</sys:String>
     <sys:String x:Key="Str.Err.DamagedEntriesPresent">The damaged files must be removed before the archive is saved.</sys:String>
 
@@ -372,6 +374,8 @@
     <sys:String x:Key="Str.TableVariable">Variable</sys:String>
     <sys:String x:Key="Str.TableValue">Initial value</sys:String>
     <sys:String x:Key="Str.TableComment">Comment</sys:String>
+    <sys:String x:Key="Str.TableShowLineComments">Line comments</sys:String>
+    <sys:String x:Key="Str.TableShowBlockComments">Comments between lines</sys:String>
     <sys:String x:Key="Str.TableFrame">Frame</sys:String>
     <sys:String x:Key="Str.LipSectionFile">Lip synchronization</sys:String>
     <sys:String x:Key="Str.LipVersion">Version</sys:String>
@@ -394,6 +398,7 @@
     <sys:String x:Key="Str.LowercaseNothing">All the names are already in lower case.</sys:String>
     <sys:String x:Key="Str.LowercaseDone">{0} names put in lower case.</sys:String>
     <sys:String x:Key="Str.ViewerDecompiled">Source rebuilt from the compiled script</sys:String>
+    <sys:String x:Key="Str.ViewerScr">Script of Arcanum (.scr), shown as text: the condition and the actions of each line.</sys:String>
     <sys:String x:Key="Str.ViewerDecompiledWarnings" xml:space="preserve"> · {0} warning(s)</sys:String>
     <sys:String x:Key="Str.ViewerScriptError">This script cannot be decompiled: {0}</sys:String>
     <sys:String x:Key="Str.ViewerNotColored">Too long to be colored</sys:String>

@@ -60,6 +60,21 @@ namespace DatExplorerIII.ViewModels
 			viewer.Text.Ask = (title, label, initial, validate) => _dialogs.Prompt(title, label, initial, validate);
 			viewer.Text.Inform = message => _dialogs.ShowMessage(Title, message, DialogIcon.Information);
 
+			// The comments of the message files and of the dialogs that are shown are kept for the next file, and for the next run.
+			viewer.Table.ShowLineComments = _settings.Data.ShowLineComments;
+			viewer.Table.ShowBlockComments = _settings.Data.ShowBlockComments;
+			viewer.Table.PropertyChanged += (_, args) =>
+			{
+				if (args.PropertyName == nameof(TableViewerViewModel.ShowLineComments))
+				{
+					_settings.Data.ShowLineComments = viewer.Table.ShowLineComments;
+				}
+				else if (args.PropertyName == nameof(TableViewerViewModel.ShowBlockComments))
+				{
+					_settings.Data.ShowBlockComments = viewer.Table.ShowBlockComments;
+				}
+			};
+
 			// The volume and the repeat are kept for the next sound, and for the next run.
 			viewer.Audio.Volume = _settings.Data.AudioVolume;
 			viewer.Audio.IsLooping = _settings.Data.AudioLoop;

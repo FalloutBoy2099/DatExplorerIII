@@ -15,6 +15,9 @@ namespace DatExplorerIII.Models
 	/// <param name="Effect">What happens when the line is reached or the answer chosen.</param>
 	public sealed record DlgEntry(Int32 Number, String Text, String Text2, String Iq, String Test, String Goto, String Effect)
 	{
+		/// <summary>The comment (after two slashes) at the end of the line; empty when there is none.</summary>
+		public String Comment { get; init; } = String.Empty;
+
 		/// <summary>True for an answer of the player, false for what a character says.</summary>
 		public Boolean IsPlayerOption => Iq.Trim().Length > 0;
 	}
@@ -25,5 +28,9 @@ namespace DatExplorerIII.Models
 	/// <param name="Entries">The lines, in the order of the file.</param>
 	/// <param name="SkippedCount">How many groups of braces did not make a line (a missing field, a number that is not a number).</param>
 	/// <param name="EncodingName">The encoding the file was read with.</param>
-	public sealed record DlgFile(IReadOnlyList<DlgEntry> Entries, Int32 SkippedCount, String EncodingName);
+	public sealed record DlgFile(IReadOnlyList<DlgEntry> Entries, Int32 SkippedCount, String EncodingName)
+	{
+		/// <summary>The comments on lines of their own, in the order of the file.</summary>
+		public IReadOnlyList<FileComment> Comments { get; init; } = [];
+	}
 }

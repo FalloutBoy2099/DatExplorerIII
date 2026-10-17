@@ -41,7 +41,7 @@ namespace DatExplorerIII.ViewModels
 
 			if (CurrentDocument == null)
 			{
-				await OpenFilesAsync(paths.Where(DatFiles.IsDatFile));
+				await OpenFilesAsync(paths.Where(DatFiles.IsArchiveFile));
 				return;
 			}
 

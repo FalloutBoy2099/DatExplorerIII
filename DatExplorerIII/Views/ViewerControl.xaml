@@ -87,6 +87,11 @@
                 <Trigger Property="ItemsControl.AlternationIndex" Value="1">
                     <Setter Property="Background" Value="{StaticResource StripeBrush}" />
                 </Trigger>
+                <!--  A comment between the lines of the file (a message file, a dialog): in the color of the comments, in italics.  -->
+                <DataTrigger Binding="{Binding IsComment}" Value="True">
+                    <Setter Property="Foreground" Value="{DynamicResource SystemFillColorSuccessBrush}" />
+                    <Setter Property="FontStyle" Value="Italic" />
+                </DataTrigger>
             </Style.Triggers>
         </Style>
 
@@ -905,12 +910,34 @@
                 RowStyle="{StaticResource StripedRow}"
                 SelectionUnit="FullRow" />
 
-            <TextBlock
-                Grid.Row="2"
-                Margin="0,6,0,0"
-                Opacity="0.7"
-                Text="{Binding Status}"
-                TextTrimming="CharacterEllipsis" />
+            <Grid Grid.Row="2" Margin="0,6,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock
+                    VerticalAlignment="Center"
+                    Opacity="0.7"
+                    Text="{Binding Status}"
+                    TextTrimming="CharacterEllipsis" />
+
+                <!--  The comments of the file (two slashes): at the end of the lines, and between them.  -->
+                <StackPanel
+                    Grid.Column="1"
+                    Orientation="Horizontal"
+                    Visibility="{Binding HasComments, Converter={StaticResource BoolToVisibility}}">
+                    <CheckBox
+                        Margin="12,0,0,0"
+                        Content="{DynamicResource Str.TableShowLineComments}"
+                        IsChecked="{Binding ShowLineComments}"
+                        Style="{StaticResource ToolbarCheckBox}" />
+                    <CheckBox
+                        Margin="12,0,0,0"
+                        Content="{DynamicResource Str.TableShowBlockComments}"
+                        IsChecked="{Binding ShowBlockComments}"
+                        Style="{StaticResource ToolbarCheckBox}" />
+                </StackPanel>
+            </Grid>
         </Grid>
     </Grid>
 

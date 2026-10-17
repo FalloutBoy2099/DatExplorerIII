@@ -133,6 +133,8 @@ namespace DatExplorerIII.Core
 		{
 			lock (_streamLock)
 			{
+				_zip?.Dispose();
+				_zip = null;
 				_stream?.Dispose();
 				_stream = null;
 			}

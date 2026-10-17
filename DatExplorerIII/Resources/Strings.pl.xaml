@@ -17,6 +17,8 @@
     <sys:String x:Key="Str.QuickSave">Szybki zapis</sys:String>
     <sys:String x:Key="Str.CloseDat">Zamknij DAT</sys:String>
     <sys:String x:Key="Str.CloseAllDats">Zamknij wszystkie DAT</sys:String>
+    <sys:String x:Key="Str.MoveDatUp">Przesuń DAT w górę</sys:String>
+    <sys:String x:Key="Str.MoveDatDown">Przesuń DAT w dół</sys:String>
     <sys:String x:Key="Str.Exit">Zakończ</sys:String>
     <sys:String x:Key="Str.OpenItem">Otwórz</sys:String>
     <sys:String x:Key="Str.ExtractFile">Wyodrębnij plik do...</sys:String>
@@ -104,7 +106,7 @@
     <sys:String x:Key="Str.Cancel">Anuluj</sys:String>
     <sys:String x:Key="Str.Close">Zamknij</sys:String>
     <sys:String x:Key="Str.ErrorTitle">Błąd</sys:String>
-    <sys:String x:Key="Str.DatFilter">Pliki DAT (*.dat, *.patch0-9)|*.dat;*.patch0;*.patch1;*.patch2;*.patch3;*.patch4;*.patch5;*.patch6;*.patch7;*.patch8;*.patch9|Wszystkie pliki (*.*)|*.*</sys:String>
+    <sys:String x:Key="Str.DatFilter">Pliki DAT (*.dat, *.patch0-9, *.zip)|*.dat;*.patch0;*.patch1;*.patch2;*.patch3;*.patch4;*.patch5;*.patch6;*.patch7;*.patch8;*.patch9;*.zip|Wszystkie pliki (*.*)|*.*</sys:String>
     <sys:String x:Key="Str.SelectDestination">Wybierz folder docelowy</sys:String>
     <sys:String x:Key="Str.AlreadyOpen">Ten plik DAT jest już otwarty.</sys:String>
     <sys:String x:Key="Str.RecentMissing">Plik {0} już nie istnieje. Został usunięty z listy ostatnich plików.</sys:String>
@@ -204,7 +206,7 @@
     <sys:String x:Key="Str.Err.FolderAlreadyExists">Folder {0} już istnieje.</sys:String>
     <sys:String x:Key="Str.Err.RootFolderRename">Nie można zmienić nazwy folderu głównego.</sys:String>
     <sys:String x:Key="Str.Err.ArchiveTooLarge">Archiwum przekroczyłoby 4 GB, czyli limit formatu DAT.</sys:String>
-    <sys:String x:Key="Str.Err.ReadOnlyFormat">Archiwa Temple of Elemental Evil można otwierać i wyodrębniać, ale na razie nie zapisywać.</sys:String>
+    <sys:String x:Key="Str.Err.ReadOnlyFormat">Archiwa Temple of Elemental Evil i pliki ZIP można otwierać i wyodrębniać, ale na razie nie zapisywać.</sys:String>
     <sys:String x:Key="Str.Err.PathNotAllowed">Ścieżka {0} wychodziłaby poza folder docelowy i została odrzucona.</sys:String>
     <sys:String x:Key="Str.Err.DamagedEntriesPresent">Przed zapisaniem archiwum należy usunąć uszkodzone pliki.</sys:String>
 
@@ -367,6 +369,8 @@
     <sys:String x:Key="Str.TableVariable">Zmienna</sys:String>
     <sys:String x:Key="Str.TableValue">Wartość początkowa</sys:String>
     <sys:String x:Key="Str.TableComment">Komentarz</sys:String>
+    <sys:String x:Key="Str.TableShowLineComments">Komentarze w wierszach</sys:String>
+    <sys:String x:Key="Str.TableShowBlockComments">Komentarze między wierszami</sys:String>
     <sys:String x:Key="Str.TableFrame">Klatka</sys:String>
     <sys:String x:Key="Str.LipSectionFile">Synchronizacja ruchu warg</sys:String>
     <sys:String x:Key="Str.LipVersion">Wersja</sys:String>
@@ -394,6 +398,7 @@
     <sys:String x:Key="Str.LowercaseNothing">Wszystkie nazwy są już zapisane małymi literami.</sys:String>
     <sys:String x:Key="Str.LowercaseDone">Nazwy zamienione na małe litery: {0}.</sys:String>
     <sys:String x:Key="Str.ViewerDecompiled">Zdekompilowano z .int</sys:String>
+    <sys:String x:Key="Str.ViewerScr">Skrypt Arcanum (.scr) pokazany jako tekst: warunek i akcje każdego wiersza.</sys:String>
     <sys:String x:Key="Str.ViewerDecompiledWarnings" xml:space="preserve"> · ostrzeżeń: {0}</sys:String>
     <sys:String x:Key="Str.ViewerScriptError">Nie można zdekompilować tego skryptu: {0}</sys:String>
     <sys:String x:Key="Str.ViewerNotColored">Za długi do kolorowania</sys:String>

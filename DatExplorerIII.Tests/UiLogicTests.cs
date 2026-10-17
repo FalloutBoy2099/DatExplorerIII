@@ -411,7 +411,7 @@ namespace DatExplorerIII.Tests
 				.Descendants().First(element => element.Attribute(XamlNamespace + "Key")?.Value == "Str.DatFilter").Value;
 
 			Assert.Contains("*.dat;*.patch0;", filter);
-			Assert.Contains("*.patch9|", filter);
+			Assert.Contains("*.patch9;*.zip|", filter);
 		}
 
 		[Fact]

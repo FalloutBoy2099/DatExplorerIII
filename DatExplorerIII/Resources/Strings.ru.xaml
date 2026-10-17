@@ -17,6 +17,8 @@
     <sys:String x:Key="Str.QuickSave">Быстрое сохранение</sys:String>
     <sys:String x:Key="Str.CloseDat">Закрыть DAT</sys:String>
     <sys:String x:Key="Str.CloseAllDats">Закрыть все DAT</sys:String>
+    <sys:String x:Key="Str.MoveDatUp">Переместить DAT вверх</sys:String>
+    <sys:String x:Key="Str.MoveDatDown">Переместить DAT вниз</sys:String>
     <sys:String x:Key="Str.Exit">Выход</sys:String>
     <sys:String x:Key="Str.OpenItem">Открыть</sys:String>
     <sys:String x:Key="Str.ExtractFile">Извлечь файл в ...</sys:String>
@@ -104,7 +106,7 @@
     <sys:String x:Key="Str.Cancel">Отмена</sys:String>
     <sys:String x:Key="Str.Close">Закрыть</sys:String>
     <sys:String x:Key="Str.ErrorTitle">Ошибка</sys:String>
-    <sys:String x:Key="Str.DatFilter">DAT файлы (*.dat, *.patch0-9)|*.dat;*.patch0;*.patch1;*.patch2;*.patch3;*.patch4;*.patch5;*.patch6;*.patch7;*.patch8;*.patch9|Все файлы (*.*)|*.*</sys:String>
+    <sys:String x:Key="Str.DatFilter">DAT файлы (*.dat, *.patch0-9, *.zip)|*.dat;*.patch0;*.patch1;*.patch2;*.patch3;*.patch4;*.patch5;*.patch6;*.patch7;*.patch8;*.patch9;*.zip|Все файлы (*.*)|*.*</sys:String>
     <sys:String x:Key="Str.SelectDestination">Выберите папку назначения</sys:String>
     <sys:String x:Key="Str.AlreadyOpen">Этот DAT файл уже открыт!</sys:String>
     <sys:String x:Key="Str.RecentMissing">Файл {0} больше не существует. Он удалён из списка недавних файлов.</sys:String>
@@ -204,7 +206,7 @@
     <sys:String x:Key="Str.Err.FolderAlreadyExists">Папка {0} уже существует.</sys:String>
     <sys:String x:Key="Str.Err.RootFolderRename">Корневую папку нельзя переименовать.</sys:String>
     <sys:String x:Key="Str.Err.ArchiveTooLarge">Размер архива превысил бы 4 ГБ, предел формата DAT.</sys:String>
-    <sys:String x:Key="Str.Err.ReadOnlyFormat">Архивы Temple of Elemental Evil можно открывать и извлекать, но пока нельзя сохранять.</sys:String>
+    <sys:String x:Key="Str.Err.ReadOnlyFormat">Архивы Temple of Elemental Evil и файлы ZIP можно открывать и извлекать, но пока нельзя сохранять.</sys:String>
     <sys:String x:Key="Str.Err.PathNotAllowed">Путь {0} вышел бы за пределы папки назначения и был отклонен.</sys:String>
     <sys:String x:Key="Str.Err.DamagedEntriesPresent">Перед сохранением архива необходимо удалить поврежденные файлы.</sys:String>
 
@@ -367,6 +369,8 @@
     <sys:String x:Key="Str.TableVariable">Переменная</sys:String>
     <sys:String x:Key="Str.TableValue">Начальное значение</sys:String>
     <sys:String x:Key="Str.TableComment">Комментарий</sys:String>
+    <sys:String x:Key="Str.TableShowLineComments">Комментарии в строках</sys:String>
+    <sys:String x:Key="Str.TableShowBlockComments">Комментарии между строками</sys:String>
     <sys:String x:Key="Str.TableFrame">Кадр</sys:String>
     <sys:String x:Key="Str.LipSectionFile">Синхронизация движения губ</sys:String>
     <sys:String x:Key="Str.LipVersion">Версия</sys:String>
@@ -394,6 +398,7 @@
     <sys:String x:Key="Str.LowercaseNothing">Все имена уже написаны строчными буквами.</sys:String>
     <sys:String x:Key="Str.LowercaseDone">Имён преобразовано в строчные буквы: {0}.</sys:String>
     <sys:String x:Key="Str.ViewerDecompiled">Декомпилировано из .int</sys:String>
+    <sys:String x:Key="Str.ViewerScr">Скрипт Arcanum (.scr) в виде текста: условие и действия каждой строки.</sys:String>
     <sys:String x:Key="Str.ViewerDecompiledWarnings" xml:space="preserve"> · предупреждений: {0}</sys:String>
     <sys:String x:Key="Str.ViewerScriptError">Не удалось декомпилировать этот скрипт: {0}</sys:String>
     <sys:String x:Key="Str.ViewerNotColored">Слишком длинный для подсветки</sys:String>

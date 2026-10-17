@@ -89,6 +89,7 @@ namespace DatExplorerIII.ViewModels
 					DatFormat.Fallout2 => "F2",
 					DatFormat.Arcanum => "AR",
 					DatFormat.Toee => "TE",
+					DatFormat.Zip => "ZIP",
 					_ => "F1",
 				};
 				return $"[{version}] {System.IO.Path.GetFileName(Document.FilePath)}";
