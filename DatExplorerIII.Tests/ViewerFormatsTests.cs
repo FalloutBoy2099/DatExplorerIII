@@ -315,7 +315,7 @@ namespace DatExplorerIII.Tests
 		[Fact]
 		public void Image_TheWheel_StepsTheMagnificationFrom1To16_WithoutFit()
 		{
-			ImageViewerViewModel viewer = new(new ManualUiThread()) { WheelNotchesOverride = 1 };
+			ImageViewerViewModel viewer = new(new ManualUiThread()) { WheelNotchesSource = () => 1 };
 			Assert.Equal(1, viewer.SelectedZoom.Factor);
 
 			// Fit is not a step: the wheel stays at 1x going down.

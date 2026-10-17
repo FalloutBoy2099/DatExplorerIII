@@ -90,9 +90,16 @@ namespace DatExplorerIII.Core
 
 			try
 			{
+				// A file that starts like a ZIP is a ZIP only if it reads as one: the first bytes of a DAT can be those of a ZIP it stores.
 				if (IsZipFile(stream, length))
 				{
-					return ReadZipArchive(filePath, stream, length);
+					try
+					{
+						return ReadZipArchive(filePath, stream, length);
+					}
+					catch (DatException exception) when (exception.Kind == DatErrorKind.NotADat)
+					{
+					}
 				}
 
 				if (TryReadArcanumFooter(stream, length, out ArcanumFooter arcanumFooter))
@@ -553,18 +560,17 @@ namespace DatExplorerIII.Core
 		/// <param name="entries">Files to extract.</param>
 		/// <param name="destination">Destination folder.</param>
 		/// <param name="stripPrefix">Leading part of the archive folder that is not recreated on disk (empty to keep everything).</param>
-		/// <param name="flat">True to put every file straight in the destination, with no folders (a name already taken gets a number).</param>
+		/// <param name="flatNames">Null to keep the folders; else the name of each file (see <see cref="GetFlatNames"/>): every file goes straight in the destination.</param>
 		public DatExtractResult Extract(
 			IReadOnlyList<DatEntry> entries,
 			String destination,
 			String stripPrefix,
 			IProgress<DatProgress>? progress = null,
 			CancellationToken cancellationToken = default,
-			Boolean flat = false)
+			IReadOnlyDictionary<DatEntry, String>? flatNames = null)
 		{
 			String root = Path.GetFullPath(destination);
 			String rootWithSeparator = Path.EndsInDirectorySeparator(root) ? root : root + Path.DirectorySeparatorChar;
-			HashSet<String> taken = new(StringComparer.OrdinalIgnoreCase);
 			List<String> failures = new();
 			Int32 succeeded = 0;
 			DatProgressThrottle throttle = new(progress, entries.Count);
@@ -583,13 +589,7 @@ namespace DatExplorerIII.Core
 
 				try
 				{
-					String target = ResolveTarget(rootWithSeparator, entry, stripPrefix, flat);
-					if (flat)
-					{
-						// Two files of different folders can have the same name: the second one is numbered, it does not replace the first.
-						target = NumberIfTaken(target, taken);
-					}
-
+					String target = ResolveTarget(rootWithSeparator, entry, stripPrefix, flatNames?[entry]);
 					Byte[] data = ReadData(entry);
 					Directory.CreateDirectory(Path.GetDirectoryName(target)!);
 					File.WriteAllBytes(target, data);
@@ -608,30 +608,43 @@ namespace DatExplorerIII.Core
 		/// Returns where a file is extracted, refusing paths that would leave the destination folder.
 		/// </summary>
 		/// <exception cref="DatException">The path of the file is not allowed.</exception>
-		public static String GetExtractionPath(String destination, DatEntry entry, String stripPrefix, Boolean flat = false)
+		public static String GetExtractionPath(String destination, DatEntry entry, String stripPrefix, String? flatName = null)
 		{
 			String root = Path.GetFullPath(destination);
-			return ResolveTarget(Path.EndsInDirectorySeparator(root) ? root : root + Path.DirectorySeparatorChar, entry, stripPrefix, flat);
+			return ResolveTarget(Path.EndsInDirectorySeparator(root) ? root : root + Path.DirectorySeparatorChar, entry, stripPrefix, flatName);
 		}
 
-		/// <summary>The path with a number before its extension when it is already in <paramref name="taken"/>; the path it returns is added to the set.</summary>
-		private static String NumberIfTaken(String path, HashSet<String> taken)
+		/// <summary>
+		/// The names the files have when they are extracted with no folders. Files of different folders can have the same name: the
+		/// first one keeps it, the next ones get a suffix before the extension, <c>_1</c>, then <c>_2</c>... (a.txt, a_1.txt, a_2.txt).
+		/// The names depend on all the files given, so that a file that is not extracted does not change the name of the others.
+		/// </summary>
+		public static Dictionary<DatEntry, String> GetFlatNames(IEnumerable<DatEntry> entries)
 		{
-			String result = path;
-			for (Int32 number = 2; !taken.Add(result); number++)
+			Dictionary<DatEntry, String> names = new();
+			HashSet<String> taken = new(StringComparer.OrdinalIgnoreCase);
+			foreach (DatEntry entry in entries)
 			{
-				result = Path.Combine(Path.GetDirectoryName(path)!, Path.GetFileNameWithoutExtension(path) + " (" + number + ")" + Path.GetExtension(path));
+				String name = entry.Name;
+				String stem = Path.GetFileNameWithoutExtension(name);
+				String extension = Path.GetExtension(name);
+				for (Int32 number = 1; !taken.Add(name); number++)
+				{
+					name = stem + "_" + number.ToString(System.Globalization.CultureInfo.InvariantCulture) + extension;
+				}
+
+				names[entry] = name;
 			}
 
-			return result;
+			return names;
 		}
 
-		internal static String ResolveTarget(String rootWithSeparator, DatEntry entry, String stripPrefix, Boolean flat = false)
+		internal static String ResolveTarget(String rootWithSeparator, DatEntry entry, String stripPrefix, String? flatName = null)
 		{
 			String relative = entry.FullPath;
-			if (flat)
+			if (flatName != null)
 			{
-				relative = relative.Substring(relative.LastIndexOfAny(['\\', '/']) + 1);
+				relative = flatName;
 			}
 			else if (stripPrefix.Length > 0 && relative.StartsWith(stripPrefix, StringComparison.OrdinalIgnoreCase))
 			{

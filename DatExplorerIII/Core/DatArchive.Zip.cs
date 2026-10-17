@@ -40,6 +40,7 @@ namespace DatExplorerIII.Core
 			}
 			catch (InvalidDataException exception)
 			{
+				archive.Dispose();
 				throw new DatException(DatErrorKind.NotADat, "The file is not a valid ZIP archive.", exception);
 			}
 
@@ -88,6 +89,12 @@ namespace DatExplorerIII.Core
 				if (_zipEntries == null || !_zipEntries.TryGetValue(entry, out ZipArchiveEntry? zipEntry))
 				{
 					throw new DatException(DatErrorKind.NotOnDisk, "The archive is not stored on disk.");
+				}
+
+				// A deflate stream cannot shrink more than about 1032 to 1: a larger announced size is a lie (and would fill the memory).
+				if (entry.IsCompressed && entry.UnpackedSize > ((Int64)entry.PackedSize * MaxZlibRatio) + 1024)
+				{
+					throw new DatException(DatErrorKind.CorruptData, $"The announced size of '{entry.FullPath}' is impossible.", entry.FullPath);
 				}
 
 				try

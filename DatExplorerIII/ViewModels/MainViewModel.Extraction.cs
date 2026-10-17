@@ -98,7 +98,9 @@ namespace DatExplorerIII.ViewModels
 
 			_settings.Data.LastExtractFolder = destination;
 
-			List<DatEntry>? selected = ResolveOverwrites(entries, destination, stripPrefix, flat);
+			// Without folders, the files that share a name get a suffix (a_1.txt): the names are decided for all the files, before the questions.
+			Dictionary<DatEntry, String>? flatNames = flat ? DatArchive.GetFlatNames(entries) : null;
+			List<DatEntry>? selected = ResolveOverwrites(entries, destination, stripPrefix, flatNames);
 			if (selected == null)
 			{
 				return;
@@ -108,7 +110,7 @@ namespace DatExplorerIII.ViewModels
 			Boolean completed = await RunBusyAsync(
 				Loc.Get("Str.Extracting"),
 				true,
-				(progress, token) => Task.Run(() => result = document.Archive.Extract(selected, destination, stripPrefix, progress, token, flat), token));
+				(progress, token) => Task.Run(() => result = document.Archive.Extract(selected, destination, stripPrefix, progress, token, flatNames), token));
 
 			if (completed && result != null)
 			{
@@ -120,18 +122,17 @@ namespace DatExplorerIII.ViewModels
 		/// <summary>
 		/// Asks what to do with the files that already exist. Returns the files to extract, or null when cancelled.
 		/// </summary>
-		private List<DatEntry>? ResolveOverwrites(IReadOnlyList<DatEntry> entries, String destination, String stripPrefix, Boolean flat)
+		private List<DatEntry>? ResolveOverwrites(IReadOnlyList<DatEntry> entries, String destination, String stripPrefix, IReadOnlyDictionary<DatEntry, String>? flatNames)
 		{
 			List<DatEntry> selected = new(entries.Count);
 			ConflictResolver resolver = new(_dialogs, Title);
-			HashSet<String> seen = new(StringComparer.OrdinalIgnoreCase);
 
 			foreach (DatEntry entry in entries)
 			{
 				String target;
 				try
 				{
-					target = DatArchive.GetExtractionPath(destination, entry, stripPrefix, flat);
+					target = DatArchive.GetExtractionPath(destination, entry, stripPrefix, flatNames?[entry]);
 				}
 				catch (DatException)
 				{
@@ -140,8 +141,7 @@ namespace DatExplorerIII.ViewModels
 					continue;
 				}
 
-				// Without folders, a name that comes twice is numbered by the extraction: only the first one can replace a file.
-				if (!seen.Add(target) || !File.Exists(target))
+				if (!File.Exists(target))
 				{
 					selected.Add(entry);
 					continue;

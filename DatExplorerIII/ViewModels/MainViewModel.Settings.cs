@@ -60,6 +60,9 @@ namespace DatExplorerIII.ViewModels
 			viewer.Text.Ask = (title, label, initial, validate) => _dialogs.Prompt(title, label, initial, validate);
 			viewer.Text.Inform = message => _dialogs.ShowMessage(Title, message, DialogIcon.Information);
 
+			// The wheel of the mouse magnifies a picture by the notches the user chose (read at each turn: a change applies at once).
+			viewer.Image.WheelNotchesSource = () => WheelNotches;
+
 			// The comments of the message files and of the dialogs that are shown are kept for the next file, and for the next run.
 			viewer.Table.ShowLineComments = _settings.Data.ShowLineComments;
 			viewer.Table.ShowBlockComments = _settings.Data.ShowBlockComments;

@@ -200,7 +200,11 @@
         </Grid>
     </ControlTemplate>
 
-    <!--  A scroll viewer with the two bars: the square where they meet has the color of the background, not the white of the system.  -->
+    <!--
+        A scroll viewer with the two bars: the square where they meet has the color of the background, not the white of the system.
+        It is for the scroll viewers that show both bars over the background of the window (set with Style="{StaticResource CornerScrollViewer}"):
+        the others keep the one of the theme.
+    -->
     <ControlTemplate x:Key="ScrollViewerTemplate" TargetType="ScrollViewer">
         <Grid Background="{TemplateBinding Background}">
             <Grid.ColumnDefinitions>
@@ -241,7 +245,7 @@
         </Grid>
     </ControlTemplate>
 
-    <Style TargetType="ScrollViewer">
+    <Style x:Key="CornerScrollViewer" TargetType="ScrollViewer">
         <Setter Property="Template" Value="{StaticResource ScrollViewerTemplate}" />
     </Style>
 

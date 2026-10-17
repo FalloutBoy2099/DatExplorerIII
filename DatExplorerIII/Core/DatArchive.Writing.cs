@@ -126,7 +126,7 @@ namespace DatExplorerIII.Core
 				throw new DatException(DatErrorKind.DamagedEntriesPresent, "The damaged files must be removed before the archive is saved.");
 			}
 
-			if (Format is DatFormat.Toee or DatFormat.Zip)
+			if (IsReadOnly)
 			{
 				throw new DatException(DatErrorKind.ReadOnlyFormat, "This kind of archive cannot be saved yet.");
 			}

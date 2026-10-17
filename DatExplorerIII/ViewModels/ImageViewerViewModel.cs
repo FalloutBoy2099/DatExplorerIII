@@ -89,11 +89,8 @@ namespace DatExplorerIII.ViewModels
 			}
 		}
 
-		/// <summary>How many notches of the wheel make one step of magnification (a setting of the program: 1 to 3).</summary>
-		public static Int32 WheelNotchesPerZoom { get; set; } = 3;
-
-		/// <summary>The notches for this viewer alone (the tests, which run side by side, must not share the setting of the program).</summary>
-		internal Int32? WheelNotchesOverride { get; set; }
+		/// <summary>How many notches of the wheel make one step of magnification (1 to 3): the program gives the choice of the user (3 when it gives none).</summary>
+		public Func<Int32>? WheelNotchesSource { get; set; }
 
 		/// <summary>A notch of a wheel, in the units of the mouse messages.</summary>
 		private const Int32 WheelNotch = 120;
@@ -111,7 +108,7 @@ namespace DatExplorerIII.ViewModels
 			}
 
 			_wheelRemainder += delta;
-			Int32 needed = Math.Clamp(WheelNotchesOverride ?? WheelNotchesPerZoom, 1, 3) * WheelNotch;
+			Int32 needed = Math.Clamp(WheelNotchesSource?.Invoke() ?? 3, 1, 3) * WheelNotch;
 			while (Math.Abs(_wheelRemainder) >= needed)
 			{
 				Int32 step = Math.Sign(_wheelRemainder);

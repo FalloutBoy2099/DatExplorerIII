@@ -114,7 +114,6 @@ namespace DatExplorerIII.ViewModels
 		private void SetWheelNotches(Int32 notches)
 		{
 			_settings.Data.WheelNotchesPerZoom = Math.Clamp(notches, 1, 3);
-			ImageViewerViewModel.WheelNotchesPerZoom = WheelNotches;
 			OnPropertyChanged(nameof(WheelNotches));
 			OnPropertyChanged(nameof(IsWheelNotches1));
 			OnPropertyChanged(nameof(IsWheelNotches2));

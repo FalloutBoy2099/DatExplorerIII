@@ -570,6 +570,50 @@ namespace DatExplorerIII.Tests
 			Assert.Empty(new SettingsService(Path.Combine(_root, "settings"), null).Data.RecentFiles);
 		}
 
+		[Fact]
+		public async Task ViewModel_AZip_CannotBeChanged_ButCanBeExtracted()
+		{
+			String zipPath = Path.Combine(_root, "test.zip");
+			using (System.IO.Compression.ZipArchive zip = System.IO.Compression.ZipFile.Open(zipPath, System.IO.Compression.ZipArchiveMode.Create))
+			{
+				using StreamWriter writer = new(zip.CreateEntry("a.txt").Open());
+				writer.Write("hello");
+			}
+
+			MainViewModel viewModel = CreateViewModel(new FakeDialogs());
+			await viewModel.OpenFilesAsync([zipPath]);
+
+			Assert.True(viewModel.CurrentDocument!.Archive.IsReadOnly);
+			Assert.False(viewModel.ImportFilesCommand.CanExecute(null));
+			Assert.False(viewModel.ImportFolderCommand.CanExecute(null));
+			Assert.False(viewModel.NewFolderCommand.CanExecute(null));
+			Assert.False(viewModel.SaveAsCommand.CanExecute(null));
+			Assert.False(viewModel.ImportDroppedCommand.CanExecute(new[] { zipPath }));
+			Assert.True(viewModel.ExtractAllCommand.CanExecute(null));
+		}
+
+		[Fact]
+		public async Task ViewModel_MovesTheSelectedDat_UpAndDown_WithinTheList()
+		{
+			MainViewModel viewModel = CreateViewModel(new FakeDialogs());
+			await viewModel.OpenFilesAsync([MakeFolder("first")]);
+			await viewModel.OpenFilesAsync([MakeFolder("second")]);
+			Assert.Equal(2, viewModel.Roots.Count);
+			DatDocument second = viewModel.CurrentDocument!;
+			Assert.Same(second.Root, viewModel.Roots[1]);
+
+			// The last of the list cannot go down; it can go up.
+			Assert.False(viewModel.MoveDatDownCommand.CanExecute(null));
+			Assert.True(viewModel.MoveDatUpCommand.CanExecute(null));
+
+			viewModel.MoveDatUpCommand.Execute(null);
+
+			Assert.Same(second.Root, viewModel.Roots[0]);
+			Assert.Same(second, viewModel.CurrentDocument);
+			Assert.False(viewModel.MoveDatUpCommand.CanExecute(null));
+			Assert.True(viewModel.MoveDatDownCommand.CanExecute(null));
+		}
+
 		#endregion
 
 		#region Shortcuts and drag and drop

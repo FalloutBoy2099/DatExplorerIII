@@ -57,7 +57,7 @@ namespace DatExplorerIII.ViewModels
 			OpenRecentCommand = new AsyncRelayCommand(OpenRecentAsync, _ => CanBrowse());
 			ClearRecentCommand = new RelayCommand(ClearRecent);
 			OpenFolderCommand = new AsyncRelayCommand(PickAndOpenFolderAsync, CanBrowse);
-			SaveAsCommand = new AsyncRelayCommand(SaveAsAsync, () => CanBrowse() && CurrentDocument != null);
+			SaveAsCommand = new AsyncRelayCommand(SaveAsAsync, () => CanEdit());
 			NewFallout1Command = new RelayCommand(() => CreateArchive(DatFormat.Fallout1), CanBrowse);
 			NewFallout2Command = new RelayCommand(() => CreateArchive(DatFormat.Fallout2), CanBrowse);
 			NewArcanumCommand = new RelayCommand(() => CreateArchive(DatFormat.Arcanum), CanBrowse);
@@ -74,14 +74,14 @@ namespace DatExplorerIII.ViewModels
 			ExtractItemsCommand = new AsyncRelayCommand(ExtractSelectedItemsAsync, _ => CanBrowse() && SelectedItems.Count > 0);
 			ExtractFolderCommand = new AsyncRelayCommand(ExtractSelectedFolderAsync, _ => CanBrowse() && SelectedFolder is { IsRoot: false });
 			ExtractAllCommand = new AsyncRelayCommand(ExtractAllAsync, _ => HasDocument());
-			ImportFilesCommand = new AsyncRelayCommand(ImportFilesAsync, _ => HasDocument());
-			ImportFolderCommand = new AsyncRelayCommand(ImportFolderAsync, _ => HasDocument());
-			NewFolderCommand = new RelayCommand(CreateFolder, HasDocument);
-			RenameItemCommand = new RelayCommand(RenameSelectedItem, () => CanBrowse() && SelectedItems.Count == 1);
-			DeleteItemsCommand = new RelayCommand(DeleteSelectedItems, () => CanBrowse() && SelectedItems.Count > 0);
-			LowercaseCommand = new RelayCommand(LowercaseSelectedFolder, () => CanBrowse() && SelectedFolder != null);
-			RenameFolderCommand = new RelayCommand(RenameSelectedFolder, () => CanBrowse() && SelectedFolder is { IsRoot: false });
-			DeleteFolderCommand = new RelayCommand(DeleteSelectedFolder, () => CanBrowse() && SelectedFolder is { IsRoot: false });
+			ImportFilesCommand = new AsyncRelayCommand(ImportFilesAsync, _ => CanEdit());
+			ImportFolderCommand = new AsyncRelayCommand(ImportFolderAsync, _ => CanEdit());
+			NewFolderCommand = new RelayCommand(CreateFolder, CanEdit);
+			RenameItemCommand = new RelayCommand(RenameSelectedItem, () => CanEdit() && SelectedItems.Count == 1);
+			DeleteItemsCommand = new RelayCommand(DeleteSelectedItems, () => CanEdit() && SelectedItems.Count > 0);
+			LowercaseCommand = new RelayCommand(LowercaseSelectedFolder, () => CanEdit() && SelectedFolder != null);
+			RenameFolderCommand = new RelayCommand(RenameSelectedFolder, () => CanEdit() && SelectedFolder is { IsRoot: false });
+			DeleteFolderCommand = new RelayCommand(DeleteSelectedFolder, () => CanEdit() && SelectedFolder is { IsRoot: false });
 
 			GlobalSearchCommand = new RelayCommand(SearchEverywhere, HasDocument);
 			VerifyCommand = new AsyncRelayCommand(VerifyAsync, _ => HasDocument());
@@ -96,7 +96,6 @@ namespace DatExplorerIII.ViewModels
 			OpenExternalCommand = new AsyncRelayCommand(_ => OpenExternalAsync(SelectedItems.FirstOrDefault()), _ => CanBrowse() && SelectedItems.Count > 0);
 			SetDoubleClickCommand = new RelayCommand(parameter => SetDoubleClick((String)parameter!));
 			SetWheelNotchesCommand = new RelayCommand(parameter => SetWheelNotches(Int32.Parse((String)parameter!, System.Globalization.CultureInfo.InvariantCulture)));
-			ImageViewerViewModel.WheelNotchesPerZoom = WheelNotches;
 			AboutCommand = new RelayCommand(_dialogs.ShowAbout);
 			SettingsCommand = new AsyncRelayCommand(OpenSettingsAsync, () => !Busy.IsBusy);
 			Comparison = new ComparisonController(this, dialogs, settings, temp, uiThread);
@@ -309,6 +308,12 @@ namespace DatExplorerIII.ViewModels
 		private Boolean CanBrowse()
 		{
 			return !Busy.IsBusy && !Comparison.IsComparing;
+		}
+
+		/// <summary>A DAT is selected and it can be changed (an archive of a format that is only read cannot).</summary>
+		private Boolean CanEdit()
+		{
+			return HasDocument() && !CurrentDocument!.Archive.IsReadOnly;
 		}
 
 		private Boolean HasDocument()

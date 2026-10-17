@@ -44,6 +44,9 @@ namespace DatExplorerIII.Core
 		/// <summary>Where the data of the files must end: the start of the directory tree.</summary>
 		private Int64 _dataLimit;
 
+		/// <summary>True for the formats that are read and not written (Temple of Elemental Evil, ZIP): nothing in them can be changed.</summary>
+		public Boolean IsReadOnly => Format is DatFormat.Toee or DatFormat.Zip;
+
 		private DatArchive(String filePath, DatFormat format)
 		{
 			FilePath = filePath;

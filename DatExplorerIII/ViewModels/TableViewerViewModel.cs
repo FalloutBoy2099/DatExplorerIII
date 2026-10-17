@@ -77,6 +77,7 @@ namespace DatExplorerIII.ViewModels
 			{
 				if (SetProperty(ref _showBlockComments, value))
 				{
+					OnPropertyChanged(nameof(HasCommentRows));
 					RefreshComments();
 				}
 			}
@@ -84,6 +85,9 @@ namespace DatExplorerIII.ViewModels
 
 		/// <summary>The kinds of file that can have comments (message files and dialogs) offer the choice to show them.</summary>
 		public Boolean HasComments => _messages != null || _dialog != null;
+
+		/// <summary>True when the table has lines that are comments, so that a column marks them (the view colors them by it).</summary>
+		public Boolean HasCommentRows => _showBlockComments && HasComments;
 
 		private void RefreshComments()
 		{
@@ -130,6 +134,7 @@ namespace DatExplorerIII.ViewModels
 			Clear();
 			_messages = messages;
 			OnPropertyChanged(nameof(HasComments));
+			OnPropertyChanged(nameof(HasCommentRows));
 			Build();
 		}
 
@@ -138,6 +143,7 @@ namespace DatExplorerIII.ViewModels
 			Clear();
 			_dialog = dialog;
 			OnPropertyChanged(nameof(HasComments));
+			OnPropertyChanged(nameof(HasCommentRows));
 			Build();
 		}
 
@@ -162,6 +168,7 @@ namespace DatExplorerIII.ViewModels
 			_variables = null;
 			_subtitles = null;
 			OnPropertyChanged(nameof(HasComments));
+			OnPropertyChanged(nameof(HasCommentRows));
 			Rows = null;
 			Status = String.Empty;
 			Notice = String.Empty;
@@ -227,6 +234,8 @@ namespace DatExplorerIII.ViewModels
 
 		private void Build()
 		{
+			// The order the user chose (a column header) is kept when the table is written again; a column that is gone is not sorted by.
+			String sort = Rows?.Sort ?? String.Empty;
 			DataTable table = new();
 			table.Columns.Add(NumberColumn, typeof(Int32));
 			Int32 count;
@@ -311,7 +320,20 @@ namespace DatExplorerIII.ViewModels
 				encoding = dialog.EncodingName;
 			}
 
-			Rows = table.DefaultView;
+			DataView view = table.DefaultView;
+			if (sort.Length > 0)
+			{
+				try
+				{
+					view.Sort = sort;
+				}
+				catch (IndexOutOfRangeException)
+				{
+					// The column it was sorted by is not in the table any more.
+				}
+			}
+
+			Rows = view;
 			Status = Loc.Format("Str.TableStatus", count.ToString("N0", CultureInfo.CurrentCulture), encoding);
 			Notice = skipped > 0 ? Loc.Format("Str.TableSkipped", skipped.ToString("N0", CultureInfo.CurrentCulture)) : String.Empty;
 		}

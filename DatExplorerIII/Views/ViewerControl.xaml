@@ -87,10 +87,31 @@
                 <Trigger Property="ItemsControl.AlternationIndex" Value="1">
                     <Setter Property="Background" Value="{StaticResource StripeBrush}" />
                 </Trigger>
-                <!--  A comment between the lines of the file (a message file, a dialog): in the color of the comments, in italics.  -->
+            </Style.Triggers>
+        </Style>
+
+        <!--  The same for a table that has comments between its lines (a message file, a dialog): they are in the color of the comments, in italics.  -->
+        <Style
+            x:Key="StripedCommentRow"
+            BasedOn="{StaticResource StripedRow}"
+            TargetType="DataGridRow">
+            <Style.Triggers>
                 <DataTrigger Binding="{Binding IsComment}" Value="True">
                     <Setter Property="Foreground" Value="{DynamicResource SystemFillColorSuccessBrush}" />
                     <Setter Property="FontStyle" Value="Italic" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!--  The table of a message file, a dialog or the variables: the lines have the other style only when a column marks the comments.  -->
+        <Style
+            x:Key="TableGrid"
+            BasedOn="{StaticResource {x:Type DataGrid}}"
+            TargetType="DataGrid">
+            <Setter Property="RowStyle" Value="{StaticResource StripedRow}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding HasCommentRows}" Value="True">
+                    <Setter Property="RowStyle" Value="{StaticResource StripedCommentRow}" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -470,6 +491,7 @@
                     <ScrollViewer
                         behaviors:RightDragScroll.IsEnabled="True"
                         HorizontalScrollBarVisibility="Auto"
+                        Style="{StaticResource CornerScrollViewer}"
                         VerticalScrollBarVisibility="Auto"
                         Visibility="{Binding IsFit, Converter={StaticResource InverseBoolToVisibility}}">
                         <Viewbox
@@ -907,8 +929,8 @@
                 HeadersVisibility="Column"
                 IsReadOnly="True"
                 ItemsSource="{Binding Rows}"
-                RowStyle="{StaticResource StripedRow}"
-                SelectionUnit="FullRow" />
+                SelectionUnit="FullRow"
+                Style="{StaticResource TableGrid}" />
 
             <Grid Grid.Row="2" Margin="0,6,0,0">
                 <Grid.ColumnDefinitions>

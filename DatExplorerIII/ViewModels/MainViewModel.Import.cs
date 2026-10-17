@@ -45,7 +45,11 @@ namespace DatExplorerIII.ViewModels
 				return;
 			}
 
-			await ImportAsync(paths, false);
+			// A DAT that cannot be changed takes nothing: the files are not imported.
+			if (!CurrentDocument.Archive.IsReadOnly)
+			{
+				await ImportAsync(paths, false);
+			}
 		}
 
 		/// <summary>Opens the DAT archives (.dat, .patch0 to .patch9) dropped on the tree.</summary>

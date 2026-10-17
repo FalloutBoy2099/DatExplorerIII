@@ -72,7 +72,7 @@ namespace DatExplorerIII.ViewModels
 				parameter => PathsOf(parameter).Any(DatFiles.IsArchiveFile));
 			ImportDroppedCommand = new AsyncRelayCommand(
 				parameter => ImportDroppedAsync(PathsOf(parameter)),
-				parameter => PathsOf(parameter).Count > 0);
+				parameter => PathsOf(parameter).Count > 0 && CurrentDocument?.Archive.IsReadOnly != true);
 			FolderDragSource = new DelegateDragOutSource(item => item is FolderNode node ? PrepareDragOut(node) : null);
 			ListDragSource = new DelegateDragOutSource(_ => SelectedItems.Count > 0 ? PrepareDragOut(SelectedItems.ToList()) : null);
 
