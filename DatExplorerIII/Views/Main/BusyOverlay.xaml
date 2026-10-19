@@ -1,0 +1,53 @@
+﻿<UserControl
+    x:Class="DatExplorerIII.Views.Main.BusyOverlay"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:behaviors="clr-namespace:DatExplorerIII.Views.Behaviors"
+    xmlns:infrastructure="clr-namespace:DatExplorerIII.Infrastructure"
+    xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
+    xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+    xmlns:views="clr-namespace:DatExplorerIII.Views">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="MainResources.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid Background="#99000000" Visibility="{Binding Busy.IsBusy, Converter={StaticResource BoolToVisibility}}">
+        <Border
+            Width="460"
+            Padding="24"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Background="{DynamicResource SolidBackgroundFillColorBaseBrush}"
+            BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+            BorderThickness="1"
+            CornerRadius="8">
+            <StackPanel>
+                <TextBlock
+                    FontSize="16"
+                    FontWeight="SemiBold"
+                    Text="{Binding Busy.Title}" />
+                <ProgressBar
+                    Height="6"
+                    Margin="0,16,0,8"
+                    IsIndeterminate="{Binding Busy.IsIndeterminate, Mode=OneWay}"
+                    Maximum="{Binding Busy.ProgressMaximum, Mode=OneWay}"
+                    Value="{Binding Busy.ProgressValue, Mode=OneWay}" />
+                <TextBlock
+                    Height="18"
+                    Text="{Binding Busy.Detail}"
+                    TextTrimming="CharacterEllipsis" />
+                <Button
+                    MinWidth="88"
+                    Margin="0,16,0,0"
+                    HorizontalAlignment="Right"
+                    Command="{Binding Busy.CancelCommand, Mode=OneTime}"
+                    Content="{DynamicResource Str.Cancel}"
+                    Visibility="{Binding Busy.CanCancel, Converter={StaticResource BoolToVisibility}}" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

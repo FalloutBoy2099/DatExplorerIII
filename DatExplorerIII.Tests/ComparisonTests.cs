@@ -11,6 +11,7 @@ namespace DatExplorerIII.Tests
 	using DatExplorerIII.Models;
 	using DatExplorerIII.Services;
 	using DatExplorerIII.ViewModels;
+	using DatExplorerIII.ViewModels.Main;
 
 	/// <summary>The comparison of two archives (DAT files or folders) and the copy or move of files between them.</summary>
 	public sealed class ComparisonTests : IDisposable

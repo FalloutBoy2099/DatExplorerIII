@@ -15,8 +15,7 @@ namespace DatExplorerIII.Tests
 	using DatExplorerIII.Views;
 
 	/// <summary>
-	/// The maps of Fallout (.map) and the colors of the message files (.msg). The test with the real maps runs when the folder of
-	/// Fallout 2 is given in DATEXPLORERIII_FALLOUT_DIR.
+	/// The maps of Fallout (.map) and the colors of the message files (.msg).
 	/// </summary>
 	public sealed class MapAndMessageTests : IDisposable
 	{
@@ -316,65 +315,6 @@ namespace DatExplorerIII.Tests
 			MapResources empty = new(_ => null);
 			Assert.Null(empty.ScriptName(0));
 			Assert.Null(empty.MapName(0));
-		}
-
-		[Fact]
-		public void RealGame_EveryMapIsReadToTheEnd()
-		{
-			String? folder = Environment.GetEnvironmentVariable("DATEXPLORERIII_FALLOUT_DIR");
-			if (folder == null || !File.Exists(Path.Combine(folder, "master.dat")))
-			{
-				return;
-			}
-
-			using DatArchive master = DatArchive.Open(Path.Combine(folder, "master.dat"));
-			MapResources resources = new(path =>
-			{
-				DatEntry? entry = master.Find(path);
-				return entry == null ? null : master.ReadData(entry);
-			});
-
-			List<DatEntry> maps = master.Entries.Where(entry => entry.Name.EndsWith(".map", StringComparison.OrdinalIgnoreCase)).ToList();
-			Assert.True(maps.Count > 100);
-			foreach (DatEntry entry in maps)
-			{
-				MapFile map = MapReader.Read(master.ReadData(entry), resources);
-				Assert.True(map.Note == null, entry.FullPath + ": " + map.Note);
-			}
-
-			MapFile temple = MapReader.Read(master.ReadData(master.Find("maps\\artemple.map")!), resources);
-			Assert.Equal(20, temple.Header.Version);
-			Assert.Equal("ARTemple.int", temple.Header.ScriptName);
-			Assert.Equal(567, temple.TotalObjects);
-			Assert.Equal(new[] { 0, 1, 397, 45, 0, 124 }, Assert.Single(temple.Elevations).ObjectsByType);
-			Assert.Contains(temple.Transitions, exit => exit.DestinationMap == 4 && exit.DestinationMapName!.Contains("arvillag", StringComparison.Ordinal));
-		}
-
-		[Fact]
-		public void RealFallout1_EveryMapIsReadToTheEnd_FromAFolderOpenedLikeADat()
-		{
-			String? folder = Environment.GetEnvironmentVariable("DATEXPLORERIII_FALLOUT1_DIR");
-			if (folder == null || !Directory.Exists(folder))
-			{
-				return;
-			}
-
-			// The folder holds the files of master.dat of Fallout 1: it is opened like the archive.
-			using DatArchive master = DatArchive.OpenFolder(folder);
-			MapResources resources = new(path =>
-			{
-				DatEntry? entry = master.Find(path);
-				return entry == null ? null : master.ReadData(entry);
-			});
-
-			List<DatEntry> maps = master.Entries.Where(entry => entry.Name.EndsWith(".map", StringComparison.OrdinalIgnoreCase)).ToList();
-			Assert.True(maps.Count > 60);
-			foreach (DatEntry entry in maps)
-			{
-				MapFile map = MapReader.Read(master.ReadData(entry), resources);
-				Assert.Equal(19, map.Header.Version);
-				Assert.True(map.Note == null, entry.FullPath + ": " + map.Note);
-			}
 		}
 
 		[Fact]

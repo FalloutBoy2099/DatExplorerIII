@@ -1,0 +1,149 @@
+﻿<UserControl
+    x:Class="DatExplorerIII.Views.Main.ExplorerView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:behaviors="clr-namespace:DatExplorerIII.Views.Behaviors"
+    xmlns:infrastructure="clr-namespace:DatExplorerIII.Infrastructure"
+    xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
+    xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+    xmlns:views="clr-namespace:DatExplorerIII.Views">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="ExplorerResources.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid
+        Margin="6,6,6,6"
+        IsEnabled="{Binding Busy.IsBusy, Converter={StaticResource InverseBool}}"
+        Visibility="{Binding Comparison.IsComparing, Converter={StaticResource InverseBoolToVisibility}}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition
+                x:Name="TreeColumn"
+                Width="280"
+                MinWidth="160" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition
+                x:Name="ListColumn"
+                Width="*"
+                MinWidth="240" />
+            <ColumnDefinition x:Name="PreviewSplitterColumn" Width="0" />
+            <ColumnDefinition x:Name="PreviewColumn" Width="0" />
+        </Grid.ColumnDefinitions>
+
+        <TreeView
+            x:Name="FolderTree"
+            Grid.Column="0"
+            behaviors:FileDrag.Source="{Binding FolderDragSource, Mode=OneTime}"
+            behaviors:FileDrop.Command="{Binding OpenDroppedCommand, Mode=OneTime}"
+            behaviors:TreeViewBehavior.SelectOnRightClick="True"
+            behaviors:TreeViewBehavior.SelectedItemCommand="{Binding TreeSelectionChangedCommand, Mode=OneTime}"
+            ItemContainerStyle="{StaticResource FolderItemStyle}"
+            ItemTemplate="{StaticResource FolderTemplate}"
+            ItemsSource="{Binding Roots}">
+            <TreeView.InputBindings>
+                <KeyBinding Key="Delete" Command="{Binding DeleteFolderCommand}" />
+                <KeyBinding Key="F2" Command="{Binding RenameFolderCommand}" />
+            </TreeView.InputBindings>
+            <TreeView.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Command="{Binding ExtractFolderCommand}" Header="{DynamicResource Str.ExtractFolder}" />
+                    <MenuItem Command="{Binding ExtractAllCommand}" Header="{DynamicResource Str.ExtractAll}" />
+                    <Separator />
+                    <MenuItem Command="{Binding ImportFolderCommand}" Header="{DynamicResource Str.ImportFolder}" />
+                    <MenuItem Command="{Binding NewFolderCommand}" Header="{DynamicResource Str.NewFolder}" />
+                    <MenuItem Command="{Binding RenameFolderCommand}" Header="{DynamicResource Str.Rename}" />
+                    <MenuItem Command="{Binding DeleteFolderCommand}" Header="{DynamicResource Str.Delete}" />
+                    <MenuItem
+                        Command="{Binding LowercaseCommand}"
+                        Header="{DynamicResource Str.Lowercase}"
+                        ToolTip="{DynamicResource Str.LowercaseTip}" />
+                    <Separator />
+                    <MenuItem Command="{Binding MoveDatUpCommand}" Header="{DynamicResource Str.MoveDatUp}" />
+                    <MenuItem Command="{Binding MoveDatDownCommand}" Header="{DynamicResource Str.MoveDatDown}" />
+                    <Separator />
+                    <MenuItem Command="{Binding CloseDatCommand}" Header="{DynamicResource Str.CloseDat}" />
+                </ContextMenu>
+            </TreeView.ContextMenu>
+        </TreeView>
+
+        <GridSplitter Grid.Column="1" Style="{StaticResource BlockSplitterStyle}" />
+
+        <ListView
+            x:Name="FilesList"
+            Grid.Column="2"
+            behaviors:FileDrag.Source="{Binding ListDragSource, Mode=OneTime}"
+            behaviors:FileDrop.Command="{Binding ImportDroppedCommand, Mode=OneTime}"
+            behaviors:GridViewColumnWidths.Widths="{Binding ColumnWidths, Mode=TwoWay}"
+            behaviors:ItemActivation.Command="{Binding OpenItemCommand, Mode=OneTime}"
+            behaviors:SelectionBehavior.Command="{Binding ListSelectionChangedCommand, Mode=OneTime}"
+            behaviors:SortColumn.Command="{Binding SortCommand, Mode=OneTime}"
+            ItemsSource="{Binding Items}"
+            SelectionMode="Extended"
+            Style="{StaticResource FileListStyle}">
+            <ListView.InputBindings>
+                <KeyBinding Key="Return" Command="{Binding OpenItemCommand}" />
+                <KeyBinding Key="Delete" Command="{Binding DeleteItemsCommand}" />
+                <KeyBinding Key="F2" Command="{Binding RenameItemCommand}" />
+                <KeyBinding Key="Back" Command="{Binding UpCommand}" />
+            </ListView.InputBindings>
+            <ListView.ContextMenu>
+                <ContextMenu>
+                    <!--  With several files selected, the menu only offers what makes sense for all of them.  -->
+                    <MenuItem
+                        Command="{Binding OpenItemCommand}"
+                        Header="{DynamicResource Str.OpenItem}"
+                        Visibility="{Binding IsMultiSelection, Converter={StaticResource InverseBoolToVisibility}}" />
+                    <MenuItem
+                        Command="{Binding ViewItemCommand}"
+                        Header="{DynamicResource Str.ViewFile}"
+                        ToolTip="{DynamicResource Str.ViewFileTip}"
+                        Visibility="{Binding IsMultiSelection, Converter={StaticResource InverseBoolToVisibility}}" />
+                    <MenuItem
+                        Command="{Binding OpenExternalCommand}"
+                        Header="{DynamicResource Str.OpenExternal}"
+                        Visibility="{Binding IsMultiSelection, Converter={StaticResource InverseBoolToVisibility}}" />
+                    <MenuItem
+                        Command="{Binding ShowMessageProblemsCommand}"
+                        Header="{DynamicResource Str.MsgProblemsCommand}"
+                        Visibility="{Binding IsMultiSelection, Converter={StaticResource InverseBoolToVisibility}}" />
+                    <MenuItem
+                        Command="{Binding ExtractItemsCommand}"
+                        Header="{Binding ExtractItemsText}"
+                        ToolTip="{DynamicResource Str.ExtractFilesTip}" />
+                    <Separator />
+                    <MenuItem
+                        Command="{Binding ImportFilesCommand}"
+                        Header="{DynamicResource Str.ImportFiles}"
+                        ToolTip="{DynamicResource Str.ImportFilesTip}" />
+                    <MenuItem
+                        Command="{Binding ImportFolderCommand}"
+                        Header="{DynamicResource Str.ImportFolder}"
+                        ToolTip="{DynamicResource Str.ImportFolderTip}" />
+                    <MenuItem Command="{Binding NewFolderCommand}" Header="{DynamicResource Str.NewFolder}" />
+                    <Separator Visibility="{Binding IsMultiSelection, Converter={StaticResource InverseBoolToVisibility}}" />
+                    <MenuItem
+                        Command="{Binding RenameItemCommand}"
+                        Header="{DynamicResource Str.Rename}"
+                        Visibility="{Binding IsMultiSelection, Converter={StaticResource InverseBoolToVisibility}}" />
+                    <MenuItem
+                        Command="{Binding DeleteItemsCommand}"
+                        Header="{DynamicResource Str.Delete}"
+                        ToolTip="{DynamicResource Str.DeleteTip}"
+                        Visibility="{Binding IsMultiSelection, Converter={StaticResource InverseBoolToVisibility}}" />
+                </ContextMenu>
+            </ListView.ContextMenu>
+        </ListView>
+
+        <GridSplitter Grid.Column="3" Style="{StaticResource BlockSplitterStyle}" />
+
+        <Border
+            Grid.Column="4"
+            Padding="8,0,0,0"
+            DataContext="{Binding Preview}">
+            <views:ViewerControl />
+        </Border>
+    </Grid>
+</UserControl>

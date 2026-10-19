@@ -8,6 +8,7 @@ namespace DatExplorerIII.Tests
 	using System.Windows.Input;
 	using DatExplorerIII.Models;
 	using DatExplorerIII.ViewModels;
+	using DatExplorerIII.ViewModels.Main;
 
 	/// <summary>
 	/// The shortcuts and the drag and drop are written in the XAML, where nothing checks them until a key is pressed: these tests
@@ -15,7 +16,12 @@ namespace DatExplorerIII.Tests
 	/// </summary>
 	public sealed class InputBindingsTests
 	{
-		private static String ReadMainWindowXaml() => SourceFiles.Read("Views", "MainWindow.xaml");
+		/// <summary>The XAML of the main window: the window and its parts (title bar, menu, tool bar, explorer, comparison...), in one text.</summary>
+		private static String ReadMainWindowXaml()
+		{
+			String folder = System.IO.Path.Combine(SourceFiles.ProjectFolder, "Views", "Main");
+			return String.Concat(System.IO.Directory.GetFiles(folder, "*.xaml").OrderBy(path => path, StringComparer.Ordinal).Select(System.IO.File.ReadAllText));
+		}
 
 		[Fact]
 		public void EveryKeyBinding_NamesACommandOfTheViewModel()

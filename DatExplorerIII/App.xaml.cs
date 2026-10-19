@@ -7,6 +7,7 @@ namespace DatExplorerIII
 	using System.Windows.Threading;
 	using Services;
 	using ViewModels;
+	using ViewModels.Main;
 	using Views;
 
 	/// <summary>
@@ -42,7 +43,7 @@ namespace DatExplorerIII
 
 			MainViewModel viewModel = new(new DialogService(), settings, new TempFolder(), new DispatcherUiThread(), scrollBars);
 			_mainViewModel = viewModel;
-			Views.MainWindow window = new(viewModel);
+			Views.Main.MainWindow window = new(viewModel);
 			MainWindow = window;
 
 			_singleInstance = new SingleInstance(SingleInstance.DefaultPipeName, paths => Dispatcher.InvokeAsync(() => OnOtherLaunch(window, viewModel, paths)));
@@ -119,7 +120,7 @@ namespace DatExplorerIII
 		}
 
 		/// <summary>Another launch handed its files over: the window comes to the front and opens them.</summary>
-		private static async void OnOtherLaunch(Views.MainWindow window, MainViewModel viewModel, IReadOnlyList<String> paths)
+		private static async void OnOtherLaunch(Views.Main.MainWindow window, MainViewModel viewModel, IReadOnlyList<String> paths)
 		{
 			if (window.WindowState == WindowState.Minimized)
 			{

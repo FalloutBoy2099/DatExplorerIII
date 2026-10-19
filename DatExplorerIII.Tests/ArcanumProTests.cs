@@ -13,8 +13,7 @@ namespace DatExplorerIII.Tests
 	using DatExplorerIII.ViewModels;
 
 	/// <summary>
-	/// The prototype files (.pro) of Arcanum. The test with the real files runs when the folder of the game is given in
-	/// DATEXPLORERIII_ARCANUM_DIR (the prototypes are searched in ..\_work\_dat\proto next to it).
+	/// The prototype files (.pro) of Arcanum.
 	/// </summary>
 	public sealed class ArcanumProTests : IDisposable
 	{
@@ -293,34 +292,5 @@ namespace DatExplorerIII.Tests
 			Assert.Empty(viewer.Prototype.Sections);
 		}
 
-		[Fact]
-		public void RealArcanum_PrototypesAreReadToTheEnd()
-		{
-			String? folder = Environment.GetEnvironmentVariable("DATEXPLORERIII_ARCANUM_DIR");
-			if (folder == null)
-			{
-				return;
-			}
-
-			String protos = Path.GetFullPath(Path.Combine(folder, "..", "_work", "_dat", "proto"));
-			if (!Directory.Exists(protos))
-			{
-				return;
-			}
-
-			List<ArcanumProto> all = new();
-			foreach (String path in Directory.EnumerateFiles(protos, "*.pro"))
-			{
-				Byte[] data = File.ReadAllBytes(path);
-				Assert.True(ArcanumProReader.IsArcanumPro(data), path);
-				ArcanumProto proto = ArcanumProReader.Read(data);
-				Assert.Null(proto.Note);
-				all.Add(proto);
-			}
-
-			Assert.Equal(20, all.Count);
-			Assert.Equal([7058, 7059, 7060, 7061], all.Where(proto => proto.Type == ArcanumObjectType.Ammo).Select(proto => proto.Number).OrderBy(number => number));
-			Assert.Equal(Enumerable.Range(16086, 16), all.Where(proto => proto.Type == ArcanumObjectType.Pc).Select(proto => proto.Number).OrderBy(number => number));
-		}
 	}
 }

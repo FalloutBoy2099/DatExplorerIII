@@ -27,7 +27,7 @@ namespace DatExplorerIII.Tests
 		/// <summary>The lines of a menu of the main window: the name of the text of each, "-" for a separator.</summary>
 		private static List<String> Lines(String menuTitleKey)
 		{
-			XDocument window = XDocument.Load(Path.Combine(SolutionFolder(), "DatExplorerIII", "Views", "MainWindow.xaml"));
+			XDocument window = XDocument.Load(Path.Combine(SolutionFolder(), "DatExplorerIII", "Views", "Main", "MainMenu.xaml"));
 			XElement menu = window.Descendants(Presentation + "MenuItem").First(item => (String?)item.Attribute("Header") == "{DynamicResource " + menuTitleKey + "}");
 
 			return menu.Elements().Select(element =>

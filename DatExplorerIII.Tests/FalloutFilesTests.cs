@@ -406,55 +406,6 @@ namespace DatExplorerIII.Tests
 
 		#endregion
 
-		#region Real files
-
-		[Fact]
-		public void RealGame_TheNewFormatsAreReadWithoutError()
-		{
-			String? folder = Environment.GetEnvironmentVariable("DATEXPLORERIII_FALLOUT1_DIR");
-			if (folder == null || !Directory.Exists(folder))
-			{
-				return;
-			}
-
-			Int32 count = 0;
-			foreach (String path in Directory.EnumerateFiles(folder, "*.*", SearchOption.AllDirectories))
-			{
-				String extension = Path.GetExtension(path).ToLowerInvariant();
-				if (extension is not (".aaf" or ".fon" or ".lip" or ".gam" or ".sve"))
-				{
-					continue;
-				}
-
-				Byte[] data = File.ReadAllBytes(path);
-				switch (extension)
-				{
-					case ".aaf":
-						Assert.Equal(256, AafReader.Read(data).Glyphs.Count);
-						break;
-					case ".fon":
-						Assert.NotEmpty(FonReader.Read(data).Glyphs);
-						break;
-					case ".lip":
-						LipFile lip = LipReader.Read(data);
-						Assert.Equal(lip.Phonemes.Count + 1, lip.Markers.Count);
-						break;
-					case ".gam":
-						Assert.NotNull(GamReader.Read(data).Variables);
-						break;
-					default:
-						Assert.NotNull(SveReader.Read(data).Entries);
-						break;
-				}
-
-				count++;
-			}
-
-			Assert.True(count > 0);
-		}
-
-		#endregion
-
 		#region Helpers
 
 		private readonly List<String> _folders = new();

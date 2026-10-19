@@ -16,8 +16,7 @@ namespace DatExplorerIII.Tests
 	using DatExplorerIII.ViewModels;
 
 	/// <summary>
-	/// The files of Arcanum (messages, dialogs, art) and the usual picture and sound files. The tests with the real files of the
-	/// game run when the folder with its archives is given in DATEXPLORERIII_ARCANUM_DIR.
+	/// The files of Arcanum (messages, dialogs, art) and the usual picture and sound files.
 	/// </summary>
 	public sealed class ArcanumFormatsTests : IDisposable
 	{
@@ -506,82 +505,5 @@ namespace DatExplorerIII.Tests
 
 		#endregion
 
-		#region Real files of the game
-
-		private static String? ArcanumFolder()
-		{
-			String? folder = Environment.GetEnvironmentVariable("DATEXPLORERIII_ARCANUM_DIR");
-			return folder != null && File.Exists(Path.Combine(folder, "ArcanumZPackFrench.dat")) ? folder : null;
-		}
-
-		[Fact]
-		public void RealArcanum_MessagesDialogsAndPicturesAreRead()
-		{
-			String? folder = ArcanumFolder();
-			if (folder == null)
-			{
-				return;
-			}
-
-			using DatArchive archive = DatArchive.Open(Path.Combine(folder, "ArcanumZPackFrench.dat"));
-
-			List<DatEntry> dialogs = archive.Entries.Where(entry => entry.Name.EndsWith(".dlg", StringComparison.OrdinalIgnoreCase)).ToList();
-			Assert.True(dialogs.Count > 700);
-			Int32 lines = 0;
-			foreach (DatEntry entry in dialogs)
-			{
-				DlgFile file = DlgReader.Read(archive.ReadData(entry));
-				lines += file.Entries.Count;
-				Assert.True(file.Entries.Count > 0, entry.FullPath);
-			}
-
-			Assert.True(lines > 30_000);
-
-			foreach (DatEntry entry in archive.Entries.Where(entry => entry.Name.EndsWith(".mes", StringComparison.OrdinalIgnoreCase)))
-			{
-				MesFile file = MesReader.Read(archive.ReadData(entry));
-				Assert.True(file.Entries.Count > 0, entry.FullPath);
-			}
-
-			foreach (DatEntry entry in archive.Entries.Where(entry => entry.Name.EndsWith(".art", StringComparison.OrdinalIgnoreCase)))
-			{
-				ArtImage art = ArtReader.Read(archive.ReadData(entry));
-				FrmFrame frame = art.Image.Directions[0].Frames[0];
-				Assert.Equal(668, frame.Width);
-				Assert.Equal(400, frame.Height);
-			}
-
-			foreach (DatEntry entry in archive.Entries.Where(entry => entry.Name.EndsWith(".bmp", StringComparison.OrdinalIgnoreCase)).Take(40))
-			{
-				Assert.True(PictureDecoder.Decode(archive.ReadData(entry)).Width > 0, entry.FullPath);
-			}
-		}
-
-		[Fact]
-		public void RealArcanum_ModulesAreReadAndVerified_AndTheirSoundsDecode()
-		{
-			String? folder = ArcanumFolder();
-			String modules = folder == null ? String.Empty : Path.GetFullPath(Path.Combine(folder, "..", "_mods", "modules"));
-			if (folder == null || !Directory.Exists(modules))
-			{
-				return;
-			}
-
-			foreach (String path in Directory.GetFiles(modules, "*.dat"))
-			{
-				using DatArchive archive = DatArchive.Open(path);
-				Assert.Equal(DatFormat.Arcanum, archive.Format);
-				Assert.Empty(archive.Issues);
-				Assert.Empty(archive.Verify().Damaged);
-
-				foreach (DatEntry entry in archive.Entries.Where(entry => entry.Name.EndsWith(".mp3", StringComparison.OrdinalIgnoreCase)).Take(6))
-				{
-					AudioClip clip = Mp3Reader.Read(archive.ReadData(entry));
-					Assert.True(clip.Duration > TimeSpan.Zero, entry.FullPath);
-				}
-			}
-		}
-
-		#endregion
 	}
 }

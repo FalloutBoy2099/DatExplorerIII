@@ -99,6 +99,6 @@ dotnet run --project DatExplorerIII
 | `DatExplorerIII/Core` | Reading (strict or tolerant), verification, repair, editing and writing of the DAT archives. |
 | `DatExplorerIII/ViewModels`, `Views`, `Services`, `Infrastructure` | WPF interface (MVVM without any external library). |
 | `DatExplorerIII/Resources` | Icons and texts (`Strings.<language>.xaml`). |
-| `DatExplorerIII.Tests` | xUnit tests: format readers and text decoding (with the real files of the game if `DATEXPLORERIII_FALLOUT_DIR` names the Fallout 2 folder), core (Fallout 1 and 2 round trip, quick save, LZSS, safety of the paths), damaged archives (recovery, verification, fuzzing), logic of the interface and completeness of the translations. |
+| `DatExplorerIII.Tests` | xUnit tests: format readers and text decoding, core (Fallout 1 and 2 round trip, quick save, LZSS, safety of the paths), damaged archives (recovery, verification, fuzzing), logic of the interface and completeness of the translations. |
 
 The code style follows the `.editorconfig`: block scoped namespaces, `using` inside the namespace, CLR types (`String`, `Int32`, `Boolean`...), names in English.

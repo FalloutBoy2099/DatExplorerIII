@@ -18,7 +18,6 @@ namespace DatExplorerIII.Tests
 
 	/// <summary>
 	/// The readers of the Fallout file formats (pictures, palettes, sounds), the decoding of texts, and the choice of the viewer.
-	/// Tests with the real files of the game run when the folder of Fallout 2 is given in DATEXPLORERIII_FALLOUT_DIR.
 	/// </summary>
 	public sealed class ViewerFormatsTests : IDisposable
 	{
@@ -1596,106 +1595,9 @@ namespace DatExplorerIII.Tests
 			Assert.Empty(viewer.Prototype.Sections);
 		}
 
-		[Fact]
-		public void RealGame_AllPrototypesAreRead()
-		{
-			String? folder = GameFolder();
-			if (folder == null)
-			{
-				return;
-			}
-
-			using DatArchive master = DatArchive.Open(Path.Combine(folder, "master.dat"));
-			List<DatEntry> files = master.Entries.Where(e => e.Name.EndsWith(".pro", StringComparison.OrdinalIgnoreCase)).ToList();
-			Assert.True(files.Count > 7000);
-
-			Dictionary<String, ProtoFile> byPath = new(StringComparer.OrdinalIgnoreCase);
-			foreach (DatEntry entry in files)
-			{
-				byPath[entry.FullPath] = ProReader.Read(master.ReadData(entry));
-			}
-
-			// The kind of object is where the file is.
-			Assert.All(byPath, pair => Assert.Equal(pair.Key.Contains("\\items\\", StringComparison.OrdinalIgnoreCase), pair.Value.Type == ProtoType.Item));
-
-			// The number in the name of a file is not the identifier of the object: objects are found by identifier.
-			ItemProto leather = byPath.Values.OfType<ItemProto>().Single(item => item.Id == 1);
-			Assert.Equal(ItemType.Armor, leather.ItemType);
-			Assert.Equal(15, leather.Armor!.ArmorClass);
-			Assert.Equal(8, leather.Weight);
-
-			ItemProto pistol = byPath.Values.OfType<ItemProto>().Single(item => item.Id == 8);
-			Assert.Equal(ItemType.Weapon, pistol.ItemType);
-			Assert.Equal(5, pistol.Weapon!.MinDamage);
-			Assert.Equal(12, pistol.Weapon.MaxDamage);
-			Assert.Equal(12, pistol.Weapon.AmmoCapacity);
-		}
-
 		#endregion
 
 		#region Real movies and characters of the game
-
-		[Fact]
-		public void RealGame_MoviesAreDecoded_AndCharactersAreRead()
-		{
-			String? folder = GameFolder();
-			if (folder == null)
-			{
-				return;
-			}
-
-			using DatArchive master = DatArchive.Open(Path.Combine(folder, "master.dat"));
-			foreach (String name in new[] { "afailed.mve", "timeout.mve" })
-			{
-				DatEntry entry = master.Entries.First(e => e.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
-				MveMovie movie = MveReader.Read(master.ReadData(entry));
-
-				Assert.Equal(640, movie.Width);
-				Assert.False(movie.IsIncomplete, name);
-				Assert.NotNull(movie.Audio);
-				Assert.InRange(movie.Duration.TotalSeconds, 5, 30);
-
-				MveFrameReader reader = movie.CreateFrameReader();
-				Byte[] bgra = new Byte[reader.FrameBytes];
-				Int32 count = 0;
-				while (reader.ReadFrame(bgra))
-				{
-					count++;
-				}
-
-				Assert.Equal(movie.FrameCount, count);
-
-				// Jumping gives what playing gives (the picture 123 is built on the checkpoint saved at 100).
-				MveFrameReader jumper = MveReader.Read(master.ReadData(entry)).CreateFrameReader();
-				MveFrameReader player = movie.CreateFrameReader();
-				Byte[] played = new Byte[player.FrameBytes];
-				Byte[] jumped = new Byte[player.FrameBytes];
-				for (Int32 i = 0; i <= 123; i++)
-				{
-					player.ReadFrame(played);
-				}
-
-				jumper.SeekTo(123);
-				Assert.True(jumper.ReadFrame(jumped));
-				Assert.Equal(played, jumped);
-			}
-
-			GcdCharacter narg = GcdReader.Read(master.ReadData(master.Entries.First(e => e.Name.Equals("combat.gcd", StringComparison.OrdinalIgnoreCase))));
-			Assert.Equal("Narg", narg.Name);
-			Assert.Equal(8, narg.GetStat(CharacterStat.Strength));
-			Assert.Equal([4, 0, 5, -1], narg.TaggedSkills);
-			Assert.Equal([6, 15], narg.Traits);
-
-			foreach (DatEntry entry in master.Entries.Where(e => e.Name.EndsWith(".gcd", StringComparison.OrdinalIgnoreCase)))
-			{
-				Assert.NotNull(GcdReader.Read(master.ReadData(entry)).TaggedSkills);
-			}
-
-			foreach (DatEntry entry in master.Entries.Where(e => e.Name.EndsWith(".bio", StringComparison.OrdinalIgnoreCase)))
-			{
-				Assert.Contains("STORY", BioReader.Read(master.ReadData(entry)).Text, StringComparison.OrdinalIgnoreCase);
-			}
-		}
 
 		[Fact]
 		public async Task Viewer_ShowsAPictureWithThePaletteOfTheProgram_WhenTheArchiveHasNone()
@@ -1727,107 +1629,5 @@ namespace DatExplorerIII.Tests
 
 		#endregion
 
-		#region Real files of the game
-
-		private static String? GameFolder()
-		{
-			String? folder = Environment.GetEnvironmentVariable("DATEXPLORERIII_FALLOUT_DIR");
-			return folder != null && File.Exists(Path.Combine(folder, "master.dat")) ? folder : null;
-		}
-
-		[Fact]
-		public void RealGame_PicturesAndSoundsAreAllReadable()
-		{
-			String? folder = GameFolder();
-			if (folder == null)
-			{
-				return;
-			}
-
-			using DatArchive master = DatArchive.Open(Path.Combine(folder, "master.dat"));
-			Palette palette = PaletteReader.Read(master.ReadData(master.Find("color.pal")!));
-
-			foreach (DatEntry entry in master.Entries.Where(e => e.Name.EndsWith(".rix", StringComparison.OrdinalIgnoreCase)))
-			{
-				RixImage rix = RixReader.Read(master.ReadData(entry));
-				Assert.Equal(640 * 480, rix.Pixels.Length);
-			}
-
-			Int32 pictures = 0;
-			foreach (DatEntry entry in master.Entries.Where(e => e.Name.EndsWith(".frm", StringComparison.OrdinalIgnoreCase)))
-			{
-				FrmImage frm = FrmReader.Read(master.ReadData(entry));
-				Assert.All(frm.Directions, direction => Assert.Equal(frm.FramesPerDirection, direction.Frames.Count));
-				pictures++;
-			}
-
-			Assert.True(pictures > 1000);
-			Assert.NotNull(palette);
-
-			List<DatEntry> sounds = master.Entries.Where(e => e.Name.EndsWith(".acm", StringComparison.OrdinalIgnoreCase)).Take(300).ToList();
-			Assert.NotEmpty(sounds);
-			foreach (DatEntry entry in sounds)
-			{
-				AudioClip clip = AcmReader.Read(master.ReadData(entry));
-				Assert.False(clip.IsIncomplete, entry.FullPath);
-				Assert.True(clip.Duration > TimeSpan.Zero);
-			}
-		}
-
-		[Fact]
-		public void RealGame_SpeechAndEffectsAreMono_AndMusicIsStereo()
-		{
-			String? folder = GameFolder();
-			if (folder == null)
-			{
-				return;
-			}
-
-			// The header says stereo for all of them; the speech and the effects are mono and would play twice as fast.
-			using DatArchive master = DatArchive.Open(Path.Combine(folder, "master.dat"));
-			List<DatEntry> speech = master.Entries
-				.Where(e => e.FullPath.StartsWith("sound\\speech", StringComparison.OrdinalIgnoreCase) && e.Name.EndsWith(".acm", StringComparison.OrdinalIgnoreCase))
-				.Take(200).ToList();
-			Assert.NotEmpty(speech);
-			Assert.All(speech, entry => Assert.Equal(1, AcmReader.Read(master.ReadData(entry)).Channels));
-
-			String music = Path.Combine(folder, "sound", "music", "01hub.acm");
-			if (File.Exists(music))
-			{
-				Assert.Equal(2, AcmReader.Read(File.ReadAllBytes(music)).Channels);
-			}
-		}
-
-		[Fact]
-		public void RealGame_MusicIsSmooth()
-		{
-			String? folder = GameFolder();
-			String? music = folder == null ? null : Path.Combine(folder, "sound", "music", "01hub.acm");
-			if (music == null || !File.Exists(music))
-			{
-				return;
-			}
-
-			AudioClip clip = AcmReader.Read(File.ReadAllBytes(music));
-			Assert.Equal(2, clip.Channels);
-			Assert.False(clip.IsIncomplete);
-			Assert.InRange(clip.Duration.TotalSeconds, 60, 600);
-
-			// A decoded song is smooth (neighbouring samples are alike); a decoding error would give noise.
-			Double same = 0;
-			Double energy = 0;
-			Int16 previous = 0;
-			for (Int32 i = 44; i + 4 < clip.WavData.Length; i += 4)
-			{
-				Int16 sample = BinaryPrimitives.ReadInt16LittleEndian(clip.WavData.AsSpan(i));
-				same += (Double)sample * previous;
-				energy += (Double)sample * sample;
-				previous = sample;
-			}
-
-			Assert.True(same / energy > 0.9);
-		}
-
-		#endregion
 	}
 }

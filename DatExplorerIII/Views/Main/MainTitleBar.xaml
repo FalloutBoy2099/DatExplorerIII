@@ -1,0 +1,118 @@
+﻿<UserControl
+    x:Class="DatExplorerIII.Views.Main.MainTitleBar"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:behaviors="clr-namespace:DatExplorerIII.Views.Behaviors"
+    xmlns:infrastructure="clr-namespace:DatExplorerIII.Infrastructure"
+    xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
+    xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+    xmlns:views="clr-namespace:DatExplorerIII.Views">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <!--  Buttons of the title bar  -->
+            <Style x:Key="CaptionButtonStyle" TargetType="Button">
+                <Setter Property="Width" Value="46" />
+                <Setter Property="Focusable" Value="False" />
+                <Setter Property="FontFamily" Value="{StaticResource IconFont}" />
+                <Setter Property="FontSize" Value="10" />
+                <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
+                <Setter Property="shell:WindowChrome.IsHitTestVisibleInChrome" Value="True" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="Chrome" Background="Transparent">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource SubtleFillColorSecondaryBrush}" />
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource SubtleFillColorTertiaryBrush}" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <Style
+                x:Key="CloseButtonStyle"
+                BasedOn="{StaticResource CaptionButtonStyle}"
+                TargetType="Button">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="Chrome" Background="Transparent">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Chrome" Property="Background" Value="#C42B1C" />
+                                    <Setter Property="Foreground" Value="White" />
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="Chrome" Property="Background" Value="#B22A1B" />
+                                    <Setter Property="Foreground" Value="White" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid Background="{DynamicResource LayerFillColorDefaultBrush}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <Image
+            Width="16"
+            Height="16"
+            Margin="10,0,8,0"
+            Source="pack://application:,,,/Resources/app.ico" />
+        <TextBlock
+            Grid.Column="1"
+            VerticalAlignment="Center"
+            Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+            Text="{Binding Title}"
+            TextTrimming="CharacterEllipsis" />
+        <StackPanel Grid.Column="2" Orientation="Horizontal">
+            <Button
+                x:Name="ThemeButton"
+                Click="OnThemeButtonClick"
+                Content="&#xE793;"
+                FontSize="14"
+                Style="{StaticResource CaptionButtonStyle}"
+                ToolTip="{DynamicResource Str.Theme}" />
+            <Button
+                x:Name="LanguageButton"
+                Click="OnLanguageButtonClick"
+                Content="&#xE774;"
+                FontSize="14"
+                Style="{StaticResource CaptionButtonStyle}"
+                ToolTip="{DynamicResource Str.LanguageTip}" />
+            <Button
+                AutomationProperties.Name="{DynamicResource Str.Minimize}"
+                Click="OnMinimizeClick"
+                Content="&#xE921;"
+                Style="{StaticResource CaptionButtonStyle}"
+                ToolTip="{DynamicResource Str.Minimize}" />
+            <Button
+                x:Name="MaximizeButton"
+                AutomationProperties.Name="{DynamicResource Str.Maximize}"
+                Click="OnMaximizeClick"
+                Content="&#xE922;"
+                Style="{StaticResource CaptionButtonStyle}"
+                ToolTip="{DynamicResource Str.Maximize}" />
+            <Button
+                AutomationProperties.Name="{DynamicResource Str.CloseWindow}"
+                Click="OnCloseClick"
+                Content="&#xE8BB;"
+                Style="{StaticResource CloseButtonStyle}"
+                ToolTip="{DynamicResource Str.CloseWindow}" />
+        </StackPanel>
+    </Grid>
+</UserControl>

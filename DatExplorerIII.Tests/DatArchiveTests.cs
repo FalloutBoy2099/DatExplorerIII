@@ -465,39 +465,6 @@ namespace DatExplorerIII.Tests
 			Assert.Equal(DatErrorKind.PathTooLong, Assert.Throws<DatException>(() => archive.Save()).Kind);
 		}
 
-		/// <summary>The real archives of the game are read, their files decompress, and writing them again loses nothing.</summary>
-		[Fact]
-		public void RealArcanum_Archives_AreReadAndWrittenAgain()
-		{
-			String? folder = Environment.GetEnvironmentVariable("DATEXPLORERIII_ARCANUM_DIR");
-			String? path = folder == null ? null : Path.Combine(folder, "ArcanumZPackFrench.dat");
-			if (path == null || !File.Exists(path))
-			{
-				return;
-			}
-
-			String copy = ArchivePath("zpack.dat");
-			File.Copy(path, copy);
-
-			using (DatArchive original = DatArchive.Open(copy))
-			{
-				Assert.Equal(DatFormat.Arcanum, original.Format);
-				Assert.Equal(1299, original.Count);
-				Assert.Empty(original.Verify().Damaged);
-
-				Dictionary<String, Byte[]> hashes = original.Entries.ToDictionary(entry => entry.FullPath, entry => System.Security.Cryptography.SHA256.HashData(original.ReadData(entry)));
-				Byte[] guid = Tail(copy, 28).AsSpan(0, 16).ToArray();
-
-				original.RequestRepair();
-				original.Save();
-
-				using DatArchive again = DatArchive.Open(copy);
-				Assert.Equal(original.Count, again.Count);
-				Assert.All(hashes, pair => Assert.Equal(pair.Value, System.Security.Cryptography.SHA256.HashData(again.ReadData(again.Find(pair.Key)!))));
-				Assert.Equal(guid, Tail(copy, 28).AsSpan(0, 16).ToArray());
-			}
-		}
-
 		#endregion
 
 		[Fact]

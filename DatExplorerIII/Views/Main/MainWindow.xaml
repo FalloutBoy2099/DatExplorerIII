@@ -1,0 +1,103 @@
+﻿<Window
+    x:Class="DatExplorerIII.Views.Main.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:behaviors="clr-namespace:DatExplorerIII.Views.Behaviors"
+    xmlns:infrastructure="clr-namespace:DatExplorerIII.Infrastructure"
+    xmlns:main="clr-namespace:DatExplorerIII.Views.Main"
+    xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
+    xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+    Title="{Binding Title}"
+    Width="1020"
+    Height="690"
+    MinWidth="900"
+    MinHeight="420"
+    behaviors:WindowPlacementBehavior.Store="{Binding}"
+    Closed="OnClosed"
+    Closing="OnClosing"
+    FontSize="12"
+    Icon="pack://application:,,,/Resources/app.ico"
+    StateChanged="OnStateChanged">
+
+    <Window.InputBindings>
+        <KeyBinding
+            Key="O"
+            Command="{Binding OpenCommand}"
+            Modifiers="Ctrl" />
+        <KeyBinding
+            Key="S"
+            Command="{Binding SaveCommand}"
+            Modifiers="Ctrl" />
+        <KeyBinding
+            Key="S"
+            Command="{Binding QuickSaveCommand}"
+            Modifiers="Ctrl+Shift" />
+        <KeyBinding
+            Key="W"
+            Command="{Binding CloseDatCommand}"
+            Modifiers="Ctrl" />
+        <KeyBinding
+            Key="F"
+            Command="{Binding FocusSearchCommand}"
+            Modifiers="Ctrl" />
+        <KeyBinding
+            Key="P"
+            Command="{Binding TogglePreviewCommand}"
+            Modifiers="Ctrl" />
+        <KeyBinding Key="F3" Command="{Binding ViewItemCommand}" />
+        <KeyBinding Key="F5" Command="{Binding RefreshCommand}" />
+    </Window.InputBindings>
+
+    <Window.Resources>
+        <!--  Dense layout, like the original application.  -->
+        <!--  Dense layout, like the original application.  -->
+        <sys:Double x:Key="ControlContentThemeFontSize">12</sys:Double>
+    </Window.Resources>
+
+    <shell:WindowChrome.WindowChrome>
+        <shell:WindowChrome
+            CaptionHeight="32"
+            CornerRadius="0"
+            GlassFrameThickness="0"
+            ResizeBorderThickness="6"
+            UseAeroCaptionButtons="False" />
+    </shell:WindowChrome.WindowChrome>
+
+    <!--  The optional frame of the window: a line of the accent color around everything (not when maximized)  -->
+    <Border
+        x:Name="WindowBorder"
+        BorderBrush="{DynamicResource AccentFillColorDefaultBrush}"
+        BorderThickness="0">
+        <Grid x:Name="Frame">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="32" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!--  Title bar in the theme of the application  -->
+            <main:MainTitleBar />
+
+            <Grid Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <main:MainMenu Grid.Row="0" />
+                <main:MainToolBar Grid.Row="1" />
+
+                <!--  The folders, the files and the preview; the comparison of two archives takes their place (the same window in another mode).  -->
+                <main:ExplorerView x:Name="Explorer" Grid.Row="2" />
+                <main:ComparisonView Grid.Row="2" />
+
+                <main:MainStatusBar Grid.Row="3" />
+
+                <!--  Shown while a long operation runs: blocks the window and reports the progress.  -->
+                <main:BusyOverlay Grid.Row="0" Grid.RowSpan="4" />
+            </Grid>
+        </Grid>
+    </Border>
+
+</Window>

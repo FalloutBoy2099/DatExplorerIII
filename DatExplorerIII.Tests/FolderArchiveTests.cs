@@ -10,6 +10,7 @@ namespace DatExplorerIII.Tests
 	using DatExplorerIII.Models;
 	using DatExplorerIII.Services;
 	using DatExplorerIII.ViewModels;
+	using DatExplorerIII.ViewModels.Main;
 
 	/// <summary>
 	/// A folder opened like a DAT archive (a folder named master.dat that holds the files of a DAT), and archives saved under

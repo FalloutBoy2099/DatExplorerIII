@@ -343,7 +343,7 @@ namespace DatExplorerIII.ViewModels
 
 					if (Path.GetExtension(entry.Name).Equals(".scr", StringComparison.OrdinalIgnoreCase))
 					{
-						ShowScr(data);
+						ShowScr(archive, data);
 						break;
 					}
 
@@ -471,11 +471,13 @@ namespace DatExplorerIII.ViewModels
 		}
 
 		/// <summary>Shows a script of Arcanum (.scr) as text, with the colors of a source, like a decompiled script.</summary>
-		private void ShowScr(Byte[] data)
+		private void ShowScr(DatArchive archive, Byte[] data)
 		{
 			try
 			{
-				Byte[] text = System.Text.Encoding.UTF8.GetBytes(ScrText.Render(data));
+				// The scripts that a script calls are named after the files of the open archives (this one first).
+				IEnumerable<DatArchive> archives = new[] { archive }.Concat(OtherArchives?.Invoke() ?? Array.Empty<DatArchive>()).Distinct().ToList();
+				Byte[] text = System.Text.Encoding.UTF8.GetBytes(ScrText.Render(data, ScrScriptNames.For(archives)));
 				Text.Show(text, text.Length, ".ssl", Loc.Get("Str.ViewerScr"));
 				Show(FileViewerKind.Text, String.Empty);
 			}

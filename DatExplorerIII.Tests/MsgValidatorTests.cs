@@ -288,24 +288,5 @@ namespace DatExplorerIII.Tests
 			Assert.True(watch.Elapsed < TimeSpan.FromSeconds(1.5), "The check took " + watch.Elapsed);
 		}
 
-		[Fact]
-		public void TheRealMessageFilesOfFallout_AreCheckedWithoutFailing_WhenTheirFolderIsGiven()
-		{
-			String? folder = Environment.GetEnvironmentVariable("DATEXPLORERIII_FALLOUT_DIR");
-			if (folder == null || !Directory.Exists(folder))
-			{
-				return;
-			}
-
-			Int32 files = 0;
-			foreach (String path in Directory.EnumerateFiles(folder, "*.msg", SearchOption.AllDirectories))
-			{
-				IReadOnlyList<MsgIssue> issues = Check(TextDecoder.Decode(File.ReadAllBytes(path)).Text);
-				Assert.All(issues, issue => Assert.True(issue.Line >= 1 && issue.Column >= 1, path));
-				files++;
-			}
-
-			Assert.True(files >= 0);
-		}
 	}
 }

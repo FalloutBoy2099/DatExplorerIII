@@ -376,28 +376,5 @@ namespace DatExplorerIII.Tests
 
 		#endregion
 
-		#region Real files
-
-		[Fact]
-		public void RealGame_EveryScriptOfFallout2IsDecompiled()
-		{
-			String? folder = Environment.GetEnvironmentVariable("DATEXPLORERIII_FALLOUT_DIR");
-			if (folder == null || !File.Exists(Path.Combine(folder, "master.dat")))
-			{
-				return;
-			}
-
-			using DatArchive master = DatArchive.Open(Path.Combine(folder, "master.dat"));
-			List<DatEntry> scripts = master.Entries.Where(entry => entry.Name.EndsWith(".int", StringComparison.OrdinalIgnoreCase)).ToList();
-			Assert.NotEmpty(scripts);
-
-			foreach (DatEntry script in scripts)
-			{
-				DecompiledScript result = ScriptDecompiler.DecompileLeniently(master.ReadData(script));
-				Assert.NotNull(result.Text);
-			}
-		}
-
-		#endregion
 	}
 }

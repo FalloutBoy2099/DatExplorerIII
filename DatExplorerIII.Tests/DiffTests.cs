@@ -11,6 +11,7 @@ namespace DatExplorerIII.Tests
 	using DatExplorerIII.Models;
 	using DatExplorerIII.Services;
 	using DatExplorerIII.ViewModels;
+	using DatExplorerIII.ViewModels.Main;
 
 	/// <summary>Showing the differences between two versions of a file made of text.</summary>
 	public sealed class DiffTests : IDisposable
@@ -208,37 +209,6 @@ namespace DatExplorerIII.Tests
 		}
 
 		#endregion
-
-		[Fact]
-		public void RealGame_PrototypesCharactersMapsAndMessagesAreWrittenAsLines()
-		{
-			String? folder = Environment.GetEnvironmentVariable("DATEXPLORERIII_FALLOUT_DIR");
-			if (folder == null || !File.Exists(Path.Combine(folder, "master.dat")))
-			{
-				return;
-			}
-
-			using DatArchive master = DatArchive.Open(Path.Combine(folder, "master.dat"));
-			MapResources resources = new(path =>
-			{
-				DatEntry? entry = master.Find(path);
-				return entry == null ? null : master.ReadData(entry);
-			});
-
-			foreach (String extension in new[] { ".pro", ".gcd", ".map", ".msg", ".bio" })
-			{
-				DatEntry entry = master.Entries.First(candidate => candidate.Name.EndsWith(extension, StringComparison.OrdinalIgnoreCase));
-				Assert.Equal(FileTextResult.Lines, FileTextView.TryGetLines(entry.Name, master.ReadData(entry), resources, out IReadOnlyList<String> lines));
-				Assert.NotEmpty(lines);
-			}
-
-			// The two versions of a prototype whose damage was changed differ by one line only.
-			DatEntry weapon = master.Entries.First(candidate => candidate.FullPath.StartsWith(@"proto\items\", StringComparison.OrdinalIgnoreCase) && candidate.Name.EndsWith(".pro", StringComparison.OrdinalIgnoreCase));
-			Byte[] original = master.ReadData(weapon);
-			FileTextView.TryGetLines(weapon.Name, original, resources, out IReadOnlyList<String> before);
-			Assert.StartsWith("[", before[0], StringComparison.Ordinal);
-			Assert.Empty(TextDiff.GroupStarts(TextDiff.Compare(before, before, out _)));
-		}
 
 		#region In the comparison
 

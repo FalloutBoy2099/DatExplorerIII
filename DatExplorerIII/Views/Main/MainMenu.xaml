@@ -1,0 +1,239 @@
+﻿<UserControl
+    x:Class="DatExplorerIII.Views.Main.MainMenu"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:behaviors="clr-namespace:DatExplorerIII.Views.Behaviors"
+    xmlns:infrastructure="clr-namespace:DatExplorerIII.Infrastructure"
+    xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
+    xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+    xmlns:views="clr-namespace:DatExplorerIII.Views">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="MainResources.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Menu IsEnabled="{Binding Busy.IsBusy, Converter={StaticResource InverseBool}}">
+        <MenuItem
+            x:Name="FileMenu"
+            Header="{DynamicResource Str.File}"
+            SubmenuOpened="OnFileMenuOpened">
+            <MenuItem
+                Command="{Binding OpenCommand}"
+                Header="{DynamicResource Str.Open}"
+                InputGestureText="{DynamicResource Str.GestureOpen}" />
+            <MenuItem Command="{Binding OpenFolderCommand}" Header="{DynamicResource Str.OpenFolder}" />
+            <MenuItem Header="{DynamicResource Str.New}">
+                <MenuItem Command="{Binding NewFallout1Command}" Header="{DynamicResource Str.NewFallout1}" />
+                <MenuItem Command="{Binding NewFallout2Command}" Header="{DynamicResource Str.NewFallout2}" />
+                <MenuItem Command="{Binding NewArcanumCommand}" Header="{DynamicResource Str.NewArcanum}" />
+            </MenuItem>
+            <Separator />
+            <MenuItem
+                Command="{Binding SaveCommand}"
+                Header="{DynamicResource Str.Save}"
+                InputGestureText="{DynamicResource Str.GestureSave}" />
+            <MenuItem Command="{Binding SaveAsCommand}" Header="{DynamicResource Str.SaveAs}" />
+            <MenuItem
+                Command="{Binding QuickSaveCommand}"
+                Header="{DynamicResource Str.QuickSave}"
+                InputGestureText="{DynamicResource Str.GestureQuickSave}" />
+            <Separator x:Name="CloseSeparator" />
+            <MenuItem
+                Command="{Binding CloseDatCommand}"
+                Header="{DynamicResource Str.CloseDat}"
+                InputGestureText="{DynamicResource Str.GestureClose}" />
+            <MenuItem Command="{Binding CloseAllDatsCommand}" Header="{DynamicResource Str.CloseAllDats}" />
+            <Separator />
+            <MenuItem
+                x:Name="ExitMenuItem"
+                Click="OnExit"
+                Header="{DynamicResource Str.Exit}"
+                InputGestureText="{DynamicResource Str.GestureExit}" />
+        </MenuItem>
+        <MenuItem Header="{DynamicResource Str.Edit}">
+            <MenuItem
+                Command="{Binding OpenItemCommand}"
+                Header="{DynamicResource Str.OpenItem}"
+                InputGestureText="{DynamicResource Str.GestureOpenItem}" />
+            <MenuItem
+                Command="{Binding ViewItemCommand}"
+                Header="{DynamicResource Str.ViewFile}"
+                InputGestureText="{DynamicResource Str.GestureView}"
+                ToolTip="{DynamicResource Str.ViewFileTip}" />
+            <MenuItem Command="{Binding OpenExternalCommand}" Header="{DynamicResource Str.OpenExternal}" />
+            <Separator />
+            <MenuItem Command="{Binding ExtractItemsCommand}" Header="{Binding ExtractItemsText}" />
+            <MenuItem Command="{Binding ExtractFolderCommand}" Header="{DynamicResource Str.ExtractFolder}" />
+            <MenuItem Command="{Binding ExtractAllCommand}" Header="{DynamicResource Str.ExtractAll}" />
+            <Separator />
+            <MenuItem Command="{Binding ImportFilesCommand}" Header="{DynamicResource Str.ImportFiles}" />
+            <MenuItem Command="{Binding ImportFolderCommand}" Header="{DynamicResource Str.ImportFolder}" />
+            <MenuItem Command="{Binding NewFolderCommand}" Header="{DynamicResource Str.NewFolder}" />
+            <Separator />
+            <MenuItem
+                Command="{Binding RenameItemCommand}"
+                Header="{DynamicResource Str.Rename}"
+                InputGestureText="{DynamicResource Str.GestureRename}" />
+            <MenuItem
+                Command="{Binding DeleteItemsCommand}"
+                Header="{DynamicResource Str.Delete}"
+                InputGestureText="{DynamicResource Str.GestureDelete}" />
+            <MenuItem
+                Command="{Binding LowercaseCommand}"
+                Header="{DynamicResource Str.Lowercase}"
+                ToolTip="{DynamicResource Str.LowercaseTip}" />
+            <Separator />
+            <MenuItem Command="{Binding GlobalSearchCommand}" Header="{DynamicResource Str.SearchAll}" />
+        </MenuItem>
+        <MenuItem Header="{DynamicResource Str.View}">
+            <MenuItem
+                Command="{Binding SetViewModeCommand}"
+                CommandParameter="Details"
+                Header="{DynamicResource Str.ViewDetails}"
+                IsCheckable="True"
+                IsChecked="{Binding IsDetailsView, Mode=OneWay}" />
+            <MenuItem
+                Command="{Binding SetViewModeCommand}"
+                CommandParameter="List"
+                Header="{DynamicResource Str.ViewList}"
+                IsCheckable="True"
+                IsChecked="{Binding IsListView, Mode=OneWay}" />
+            <Separator />
+            <MenuItem
+                Command="{Binding SetViewModeCommand}"
+                CommandParameter="Icons"
+                Header="{DynamicResource Str.ViewIcons}"
+                IsCheckable="True"
+                IsChecked="{Binding IsIconsView, Mode=OneWay}" />
+            <Separator />
+            <MenuItem
+                Header="{DynamicResource Str.PreviewPane}"
+                InputGestureText="{DynamicResource Str.GesturePreview}"
+                IsCheckable="True"
+                IsChecked="{Binding IsPreviewVisible, Mode=TwoWay}" />
+            <Separator />
+            <MenuItem>
+                <!--  The text starts where the text of the lines with a check mark starts (a title that opens a sub menu has no room for one).  -->
+                <MenuItem.Header>
+                    <TextBlock Margin="25.6,0,0,0" Text="{DynamicResource Str.DoubleClickOpens}" />
+                </MenuItem.Header>
+                <MenuItem
+                    Command="{Binding SetDoubleClickCommand}"
+                    CommandParameter="Viewer"
+                    Header="{DynamicResource Str.DoubleClickViewer}"
+                    IsCheckable="True"
+                    IsChecked="{Binding IsDoubleClickViewer, Mode=OneWay}" />
+                <MenuItem
+                    Command="{Binding SetDoubleClickCommand}"
+                    CommandParameter="Program"
+                    Header="{DynamicResource Str.DoubleClickProgram}"
+                    IsCheckable="True"
+                    IsChecked="{Binding IsDoubleClickProgram, Mode=OneWay}" />
+                <MenuItem
+                    Command="{Binding SetDoubleClickCommand}"
+                    CommandParameter="None"
+                    Header="{DynamicResource Str.DoubleClickNothing}"
+                    IsCheckable="True"
+                    IsChecked="{Binding IsDoubleClickNothing, Mode=OneWay}" />
+            </MenuItem>
+            <MenuItem>
+                <MenuItem.Header>
+                    <TextBlock Margin="25.6,0,0,0" Text="{DynamicResource Str.WheelZoom}" />
+                </MenuItem.Header>
+                <MenuItem
+                    Command="{Binding SetWheelNotchesCommand}"
+                    CommandParameter="1"
+                    Header="{DynamicResource Str.WheelNotch1}"
+                    IsCheckable="True"
+                    IsChecked="{Binding IsWheelNotches1, Mode=OneWay}" />
+                <MenuItem
+                    Command="{Binding SetWheelNotchesCommand}"
+                    CommandParameter="2"
+                    Header="{DynamicResource Str.WheelNotch2}"
+                    IsCheckable="True"
+                    IsChecked="{Binding IsWheelNotches2, Mode=OneWay}" />
+                <MenuItem
+                    Command="{Binding SetWheelNotchesCommand}"
+                    CommandParameter="3"
+                    Header="{DynamicResource Str.WheelNotch3}"
+                    IsCheckable="True"
+                    IsChecked="{Binding IsWheelNotches3, Mode=OneWay}" />
+            </MenuItem>
+            <Separator />
+            <MenuItem>
+                <!--  The text starts where the text of the lines with a check mark starts (a title that opens a sub menu has no room for one).  -->
+                <MenuItem.Header>
+                    <TextBlock Margin="25.6,0,0,0" Text="{DynamicResource Str.CompareLayout}" />
+                </MenuItem.Header>
+                <MenuItem
+                    Header="{DynamicResource Str.CompareLayoutListSide}"
+                    IsCheckable="True"
+                    IsChecked="{Binding Comparison.IsCompareListSide}" />
+                <MenuItem
+                    Header="{DynamicResource Str.CompareLayoutListStacked}"
+                    IsCheckable="True"
+                    IsChecked="{Binding Comparison.IsCompareListStacked}" />
+                <Separator />
+                <MenuItem
+                    Header="{DynamicResource Str.CompareLayoutViewersSide}"
+                    IsCheckable="True"
+                    IsChecked="{Binding Comparison.IsCompareViewersSide}" />
+                <MenuItem
+                    Header="{DynamicResource Str.CompareLayoutViewersStacked}"
+                    IsCheckable="True"
+                    IsChecked="{Binding Comparison.IsCompareViewersStacked}" />
+                <Separator />
+                <MenuItem
+                    Header="{DynamicResource Str.CompareLayoutGroupsSide}"
+                    IsCheckable="True"
+                    IsChecked="{Binding Comparison.IsCompareGroupsSide}" />
+                <MenuItem
+                    Header="{DynamicResource Str.CompareLayoutGroupsStacked}"
+                    IsCheckable="True"
+                    IsChecked="{Binding Comparison.IsCompareGroupsStacked}" />
+                <Separator />
+                <MenuItem
+                    Header="{DynamicResource Str.CompareTree}"
+                    IsCheckable="True"
+                    IsChecked="{Binding Comparison.IsCompareTreeVisible}" />
+            </MenuItem>
+            <Separator />
+            <MenuItem
+                Command="{Binding UpCommand}"
+                Header="{DynamicResource Str.Up}"
+                InputGestureText="{DynamicResource Str.GestureUp}" />
+            <MenuItem
+                Command="{Binding RefreshCommand}"
+                Header="{DynamicResource Str.Refresh}"
+                InputGestureText="{DynamicResource Str.GestureRefresh}" />
+        </MenuItem>
+        <MenuItem Header="{DynamicResource Str.Tools}">
+            <MenuItem
+                Command="{Binding VerifyCommand}"
+                Header="{DynamicResource Str.VerifyIntegrity}"
+                ToolTip="{DynamicResource Str.VerifyTip}" />
+            <MenuItem Command="{Binding ShowProblemsCommand}" Header="{DynamicResource Str.ShowProblems}" />
+            <MenuItem
+                Command="{Binding RemoveDamagedCommand}"
+                Header="{DynamicResource Str.RemoveDamaged}"
+                ToolTip="{DynamicResource Str.RemoveDamagedTip}" />
+            <MenuItem
+                Command="{Binding ScanMessagesCommand}"
+                Header="{DynamicResource Str.MsgScanCommand}"
+                ToolTip="{DynamicResource Str.MsgScanTip}" />
+            <Separator />
+            <MenuItem Command="{Binding Comparison.CompareCommand}" Header="{DynamicResource Str.Compare}" />
+            <MenuItem Command="{Binding Comparison.CloseComparisonCommand}" Header="{DynamicResource Str.CompareClose}" />
+            <Separator />
+            <MenuItem Command="{Binding SettingsCommand}" Header="{DynamicResource Str.Settings}" />
+        </MenuItem>
+        <MenuItem Header="{DynamicResource Str.Help}">
+            <MenuItem Command="{Binding AssociateCommand}" Header="{DynamicResource Str.Associate}" />
+            <MenuItem Command="{Binding AssociatePatchesCommand}" Header="{DynamicResource Str.AssociatePatches}" />
+            <MenuItem Command="{Binding AboutCommand}" Header="{DynamicResource Str.About}" />
+        </MenuItem>
+    </Menu>
+</UserControl>
