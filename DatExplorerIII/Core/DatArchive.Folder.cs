@@ -54,12 +54,14 @@ namespace DatExplorerIII.Core
 
 		private void AddFolderContent(String disk, String directory, Boolean showHidden)
 		{
-			IEnumerable<String> files;
-			IEnumerable<String> folders;
+			// The listing gives the size and the attributes of each file and folder: the disk is not asked again for each of them.
+			List<FileInfo> files;
+			List<DirectoryInfo> folders;
 			try
 			{
-				files = Directory.EnumerateFiles(disk).ToList();
-				folders = Directory.EnumerateDirectories(disk).ToList();
+				DirectoryInfo folderInfo = new(disk);
+				files = folderInfo.EnumerateFiles().ToList();
+				folders = folderInfo.EnumerateDirectories().ToList();
 			}
 			catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
 			{
@@ -67,30 +69,31 @@ namespace DatExplorerIII.Core
 				return;
 			}
 
-			foreach (String file in files.OrderBy(path => path, StringComparer.OrdinalIgnoreCase))
+			foreach (FileInfo file in files.OrderBy(file => file.Name, StringComparer.OrdinalIgnoreCase))
 			{
 				try
 				{
-					AddFile(file, directory);
+					AddFile(file, directory, file.Name);
 				}
 				catch (DatException)
 				{
-					_skippedFiles.Add(directory + Path.GetFileName(file));
+					_skippedFiles.Add(directory + file.Name);
 				}
 			}
 
-			foreach (String folder in folders.OrderBy(path => path, StringComparer.OrdinalIgnoreCase))
+			foreach (DirectoryInfo folderInfo in folders.OrderBy(folder => folder.Name, StringComparer.OrdinalIgnoreCase))
 			{
-				String name = Path.GetFileName(folder);
+				String folder = folderInfo.FullName;
+				String name = folderInfo.Name;
 
 				// A hidden folder is left out, not skipped: the user chose not to see it.
-				if (!showHidden && (name.StartsWith('.') || (File.GetAttributes(folder) & FileAttributes.Hidden) != 0))
+				if (!showHidden && (name.StartsWith('.') || (folderInfo.Attributes & FileAttributes.Hidden) != 0))
 				{
 					continue;
 				}
 
 				// A link to a folder could lead back to where it is: it is not followed.
-				if ((File.GetAttributes(folder) & FileAttributes.ReparsePoint) != 0)
+				if ((folderInfo.Attributes & FileAttributes.ReparsePoint) != 0)
 				{
 					_skippedFiles.Add(directory + name + '\\');
 					continue;

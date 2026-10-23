@@ -4,6 +4,7 @@ namespace DatExplorerIII.Tests
 	using System.Collections.Generic;
 	using System.Text;
 	using DatExplorerIII.ViewModels;
+	using DatExplorerIII.ViewModels.Viewer;
 
 	/// <summary>The search of a text in the viewer: find, find next, go to a line, go to a message by its number.</summary>
 	public sealed class TextSearchTests

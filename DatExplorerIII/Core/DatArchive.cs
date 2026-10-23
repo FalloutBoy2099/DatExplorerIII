@@ -188,15 +188,23 @@ namespace DatExplorerIII.Core
 				throw new DatException(DatErrorKind.FileNotFound, $"The file '{sourceFile}' does not exist.", sourceFile);
 			}
 
+			String normalizedDirectory = NormalizeDirectory(directory);
+			ValidateDirectory(normalizedDirectory);
+			return AddFile(info, normalizedDirectory, name ?? info.Name);
+		}
+
+		/// <summary>
+		/// Adds a file of the disk whose size is known (a file found by listing a folder: asking the disk again for each file would
+		/// take long) to a folder that was checked already.
+		/// </summary>
+		private DatEntry AddFile(System.IO.FileInfo info, String normalizedDirectory, String fileName)
+		{
 			if (info.Length > Int32.MaxValue)
 			{
-				throw new DatException(DatErrorKind.FileTooLarge, $"The file '{sourceFile}' is too large for a DAT archive.", sourceFile);
+				throw new DatException(DatErrorKind.FileTooLarge, $"The file '{info.FullName}' is too large for a DAT archive.", info.FullName);
 			}
 
 			Touch();
-			String normalizedDirectory = NormalizeDirectory(directory);
-			String fileName = name ?? info.Name;
-			ValidateDirectory(normalizedDirectory);
 			ValidateName(fileName);
 
 			DatEntry entry = new(normalizedDirectory, fileName)

@@ -12,6 +12,7 @@ namespace DatExplorerIII.Tests
 	using DatExplorerIII.Scripts;
 	using DatExplorerIII.Services;
 	using DatExplorerIII.ViewModels;
+	using DatExplorerIII.ViewModels.Viewer;
 
 	/// <summary>The decompiler of the compiled scripts (.int), the colors of the sources (.ssl), and how the viewer shows them.</summary>
 	public sealed class ScriptTests : IDisposable

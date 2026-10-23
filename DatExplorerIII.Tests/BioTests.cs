@@ -5,6 +5,7 @@ namespace DatExplorerIII.Tests
 	using System.Text;
 	using DatExplorerIII.Services;
 	using DatExplorerIII.ViewModels;
+	using DatExplorerIII.ViewModels.Viewer;
 
 	/// <summary>The biographies of the premade characters (.bio): what does not fit in the box of the game is marked.</summary>
 	public sealed class BioTests
@@ -106,6 +107,21 @@ namespace DatExplorerIII.Tests
 			Assert.True(viewer.IsHighlighted);
 			viewer.Show(bio, bio.Length, ".txt");
 			Assert.False(viewer.IsHighlighted);
+		}
+
+		[Fact]
+		public void TheTextBox_HoldsTheText_OnlyWhenItHasNoColors()
+		{
+			// The colored text is drawn by another box: the plain one is kept empty (a long text, even hidden, takes long to make).
+			TextViewerViewModel viewer = new(new ManualUiThread());
+			Byte[] bio = Encoding.ASCII.GetBytes(Biography(30));
+
+			viewer.Show(bio, bio.Length, ".bio");
+			Assert.Equal(String.Empty, viewer.PlainText);
+			Assert.NotEqual(String.Empty, viewer.Text);
+
+			viewer.Show(bio, bio.Length, ".txt");
+			Assert.Equal(viewer.Text, viewer.PlainText);
 		}
 	}
 }

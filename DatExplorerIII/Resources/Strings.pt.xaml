@@ -366,6 +366,7 @@
     <sys:String x:Key="Str.ViewerVideoSubtitles">{0} legendas ({1})</sys:String>
     <sys:String x:Key="Str.ViewerFontAaf">Fonte AAF · {0} caracteres · altura {1} · espaçamento {2} · espaço {3} · espaçamento entre linhas {4}</sys:String>
     <sys:String x:Key="Str.ViewerFontFon">Fonte FON · {0} caracteres · altura {1} · espaçamento {2}</sys:String>
+    <sys:String x:Key="Str.ViewerMask">Máscara do mapa-múndi · {0}×{1} · 1 bit por pixel · {2}% dos pixels ativos</sys:String>
     <sys:String x:Key="Str.TableVariable">Variável</sys:String>
     <sys:String x:Key="Str.TableValue">Valor inicial</sys:String>
     <sys:String x:Key="Str.TableComment">Comentário</sys:String>

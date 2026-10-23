@@ -13,6 +13,7 @@ namespace DatExplorerIII.ViewModels
 	using Models;
 	using Scripts;
 	using Services;
+	using ViewModels.Viewer;
 
 	/// <summary>A file of the comparison of two archives, as a line of the list.</summary>
 	public sealed class ComparisonRow : ObservableObject

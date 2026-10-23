@@ -1,4 +1,4 @@
-namespace DatExplorerIII.ViewModels
+namespace DatExplorerIII.ViewModels.Viewer
 {
 	/// <summary>A viewer with a position bar that the user takes and moves: what plays waits while the bar is held.</summary>
 	public interface ISeekable

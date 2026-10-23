@@ -1,0 +1,199 @@
+﻿<UserControl
+    x:Class="DatExplorerIII.Views.Viewer.TextView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
+    xmlns:behaviors="clr-namespace:DatExplorerIII.Views.Behaviors"
+    xmlns:infrastructure="clr-namespace:DatExplorerIII.Infrastructure"
+    xmlns:viewer="clr-namespace:DatExplorerIII.Views.Viewer">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="ViewerResources.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <infrastructure:ScrollBarPaddingConverter x:Key="ScrollBarPadding" />
+
+            <!--  The menu of a text: what a read-only text can do (copy, select all, search, go to a line or to a message), in the language of the program.  -->
+            <ContextMenu x:Key="TextMenu" x:Shared="False">
+                <MenuItem
+                    Command="ApplicationCommands.Copy"
+                    CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                    Header="{DynamicResource Str.TextCopy}"
+                    InputGestureText="Ctrl+C" />
+                <MenuItem
+                    Command="ApplicationCommands.SelectAll"
+                    CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                    Header="{DynamicResource Str.TextSelectAll}"
+                    InputGestureText="Ctrl+A" />
+                <Separator />
+                <MenuItem
+                    Command="{Binding FindCommand}"
+                    Header="{DynamicResource Str.TextFind}"
+                    InputGestureText="Ctrl+F" />
+                <MenuItem
+                    Command="{Binding FindNextCommand}"
+                    Header="{DynamicResource Str.TextFindNext}"
+                    InputGestureText="F3" />
+                <MenuItem
+                    Command="{Binding GoToLineCommand}"
+                    Header="{DynamicResource Str.TextGoToLine}"
+                    InputGestureText="Ctrl+G" />
+                <MenuItem
+                    Command="{Binding GoToIdCommand}"
+                    Header="{DynamicResource Str.TextGoToId}"
+                    Visibility="{Binding IsMessageFile, Converter={StaticResource BoolToVisibility}}" />
+            </ContextMenu>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!--  A narrow pane puts what does not fit on the next line.  -->
+        <WrapPanel Margin="0,0,0,2">
+            <StackPanel
+                Margin="0,0,0,4"
+                VerticalAlignment="Center"
+                Orientation="Horizontal">
+                <TextBlock Style="{StaticResource ToolbarLabel}" Text="{DynamicResource Str.ViewerEncoding}" />
+                <ComboBox
+                    MinWidth="190"
+                    DisplayMemberPath="Display"
+                    ItemsSource="{Binding Options}"
+                    SelectedItem="{Binding SelectedEncoding}" />
+            </StackPanel>
+            <CheckBox
+                Margin="14,0,0,4"
+                VerticalAlignment="Center"
+                Content="{DynamicResource Str.ViewerWrap}"
+                IsChecked="{Binding WrapLines}"
+                Style="{StaticResource ToolbarCheckBox}" />
+            <Button
+                Margin="8,0,0,4"
+                VerticalAlignment="Center"
+                AutomationProperties.Name="{DynamicResource Str.ViewerCopy}"
+                Command="{Binding CopyCommand, Mode=OneTime}"
+                ToolTip="{DynamicResource Str.ViewerCopy}">
+                <TextBlock FontFamily="{StaticResource IconFont}" Text="&#xE8C8;" />
+            </Button>
+            <Button
+                x:Name="MessageProblemsButton"
+                Margin="4,0,0,4"
+                VerticalAlignment="Center"
+                AutomationProperties.Name="{DynamicResource Str.MsgProblemsCommand}"
+                Command="{Binding ShowProblemsCommand, Mode=OneTime}"
+                ToolTip="{DynamicResource Str.MsgProblemsCommand}"
+                Visibility="{Binding CanShowProblems, Converter={StaticResource BoolToVisibility}}">
+                <TextBlock FontFamily="{StaticResource IconFont}" Text="&#xE7BA;" />
+            </Button>
+        </WrapPanel>
+
+        <TextBox
+            x:Name="PlainTextBox"
+            Grid.Row="1"
+            AcceptsReturn="True"
+            ContextMenu="{StaticResource TextMenu}"
+            FontFamily="Consolas"
+            HorizontalScrollBarVisibility="Auto"
+            IsReadOnly="True"
+            IsReadOnlyCaretVisible="True"
+            Text="{Binding PlainText, Mode=OneWay}"
+            VerticalScrollBarVisibility="Auto">
+            <TextBox.InputBindings>
+                <KeyBinding
+                    Key="F"
+                    Command="{Binding FindCommand}"
+                    Modifiers="Control" />
+                <KeyBinding Key="F3" Command="{Binding FindNextCommand}" />
+                <KeyBinding
+                    Key="G"
+                    Command="{Binding GoToLineCommand}"
+                    Modifiers="Control" />
+            </TextBox.InputBindings>
+            <TextBox.Style>
+                <Style BasedOn="{StaticResource {x:Type TextBox}}" TargetType="TextBox">
+                    <Setter Property="TextWrapping" Value="NoWrap" />
+                    <!--  The scroll bars are drawn over the text: the padding leaves them room (the horizontal one only when the lines do not wrap).  -->
+                    <Setter Property="Padding" Value="{Binding Width, Source={StaticResource ScrollBarMetrics}, Converter={StaticResource ScrollBarPadding}, ConverterParameter='10,5,6,6|rb'}" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding WrapLines}" Value="True">
+                            <Setter Property="TextWrapping" Value="Wrap" />
+                            <Setter Property="Padding" Value="{Binding Width, Source={StaticResource ScrollBarMetrics}, Converter={StaticResource ScrollBarPadding}, ConverterParameter='10,5,6,6|r'}" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding IsHighlighted}" Value="True">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBox.Style>
+        </TextBox>
+
+        <!--
+            A text with colors (message files, scripts): an editor that draws only the lines that can be seen, so that a long script
+            shows at once. The text and its colors are given by the code behind; the frame looks like the one of a text box.
+        -->
+        <Border
+            Grid.Row="1"
+            Background="{DynamicResource ControlFillColorDefaultBrush}"
+            BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+            BorderThickness="1"
+            CornerRadius="4"
+            Visibility="{Binding IsHighlighted, Converter={StaticResource BoolToVisibility}}">
+            <avalonEdit:TextEditor
+                x:Name="HighlightedEditor"
+                Background="Transparent"
+                FontFamily="Consolas"
+                Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                HorizontalScrollBarVisibility="Auto"
+                IsReadOnly="True"
+                VerticalScrollBarVisibility="Auto">
+                <avalonEdit:TextEditor.InputBindings>
+                    <KeyBinding
+                        Key="F"
+                        Command="{Binding FindCommand}"
+                        Modifiers="Control" />
+                    <KeyBinding Key="F3" Command="{Binding FindNextCommand}" />
+                    <KeyBinding
+                        Key="G"
+                        Command="{Binding GoToLineCommand}"
+                        Modifiers="Control" />
+                </avalonEdit:TextEditor.InputBindings>
+                <avalonEdit:TextEditor.Style>
+                    <Style TargetType="avalonEdit:TextEditor">
+                        <Setter Property="Padding" Value="{Binding Width, Source={StaticResource ScrollBarMetrics}, Converter={StaticResource ScrollBarPadding}, ConverterParameter='10,5,6,6|rb'}" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding WrapLines}" Value="True">
+                                <Setter Property="Padding" Value="{Binding Width, Source={StaticResource ScrollBarMetrics}, Converter={StaticResource ScrollBarPadding}, ConverterParameter='10,5,6,6|r'}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </avalonEdit:TextEditor.Style>
+            </avalonEdit:TextEditor>
+        </Border>
+
+        <!--  The state of the text on the left, and what is wrong with it (a binary file, a message file with problems...) on the right.  -->
+        <Grid Grid.Row="2" Margin="0,6,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock
+                Opacity="0.7"
+                Text="{Binding Status}"
+                TextTrimming="CharacterEllipsis" />
+            <TextBlock
+                Grid.Column="1"
+                Margin="12,0,0,0"
+                Style="{StaticResource Notice}"
+                Text="{Binding Notice}"
+                TextTrimming="CharacterEllipsis"
+                TextWrapping="NoWrap"
+                ToolTip="{Binding NoticeTip}" />
+        </Grid>
+    </Grid>
+</UserControl>

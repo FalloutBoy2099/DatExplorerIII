@@ -4,6 +4,7 @@ namespace DatExplorerIII.Services
 	using System.Collections.Generic;
 	using Models;
 	using ViewModels;
+	using ViewModels.Viewer;
 
 	/// <summary>
 	/// Everything the view models need to ask from the user, so that they do not depend on windows.

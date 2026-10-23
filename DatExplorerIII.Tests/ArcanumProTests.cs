@@ -11,6 +11,7 @@ namespace DatExplorerIII.Tests
 	using DatExplorerIII.Formats;
 	using DatExplorerIII.Models;
 	using DatExplorerIII.ViewModels;
+	using DatExplorerIII.ViewModels.Viewer;
 
 	/// <summary>
 	/// The prototype files (.pro) of Arcanum.

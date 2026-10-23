@@ -366,6 +366,7 @@
     <sys:String x:Key="Str.ViewerVideoSubtitles">{0} undertexter ({1})</sys:String>
     <sys:String x:Key="Str.ViewerFontAaf">AAF-teckensnitt · {0} tecken · höjd {1} · teckenavstånd {2} · mellanslagsbredd {3} · radavstånd {4}</sys:String>
     <sys:String x:Key="Str.ViewerFontFon">FON-teckensnitt · {0} tecken · höjd {1} · teckenavstånd {2}</sys:String>
+    <sys:String x:Key="Str.ViewerMask">Mask för världskartan · {0}×{1} · 1 bit per pixel · {2} % av pixlarna satta</sys:String>
     <sys:String x:Key="Str.TableVariable">Variabel</sys:String>
     <sys:String x:Key="Str.TableValue">Startvärde</sys:String>
     <sys:String x:Key="Str.TableComment">Kommentar</sys:String>

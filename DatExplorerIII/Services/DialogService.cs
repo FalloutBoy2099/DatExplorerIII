@@ -8,7 +8,9 @@ namespace DatExplorerIII.Services
 	using Microsoft.Win32;
 	using Models;
 	using ViewModels;
+	using ViewModels.Viewer;
 	using Views;
+	using Views.Viewer;
 
 	/// <summary>
 	/// <see cref="IDialogService"/> backed by WPF windows and the Windows common dialogs.

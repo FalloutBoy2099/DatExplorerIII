@@ -4,7 +4,9 @@ namespace DatExplorerIII.Services
 	using System.Collections.Generic;
 	using System.IO;
 	using System.Linq;
+	using System.Runtime.ExceptionServices;
 	using System.Threading;
+	using System.Threading.Tasks;
 	using Core;
 	using Formats;
 	using Models;
@@ -40,17 +42,25 @@ namespace DatExplorerIII.Services
 			}
 		}
 
-		/// <summary>Checks every message file of an archive.</summary>
+		/// <summary>Checks every message file of an archive (a few at the same time); the reports are in the order of the paths.</summary>
 		public static IReadOnlyList<MsgFileReport> ScanArchive(DatArchive archive, String label, IProgress<DatProgress>? progress = null, CancellationToken cancellation = default)
 		{
 			List<DatEntry> entries = archive.Entries.Where(entry => IsMsgName(entry.Name) && !entry.IsDamaged).OrderBy(entry => entry.FullPath, StringComparer.OrdinalIgnoreCase).ToList();
-			List<MsgFileReport> reports = new(entries.Count);
-			for (Int32 index = 0; index < entries.Count; index++)
+			MsgFileReport[] reports = new MsgFileReport[entries.Count];
+			Int32 done = 0;
+			ParallelOptions options = new() { MaxDegreeOfParallelism = Math.Min(4, Environment.ProcessorCount), CancellationToken = cancellation };
+			try
 			{
-				cancellation.ThrowIfCancellationRequested();
-				progress?.Report(new DatProgress(entries[index].FullPath, index + 1, entries.Count));
-				MsgFileReport report = ScanEntry(archive, entries[index]);
-				reports.Add(label.Length == 0 ? report : report with { Path = label + ":" + Path.DirectorySeparatorChar + report.Path });
+				Parallel.For(0, entries.Count, options, index =>
+				{
+					MsgFileReport report = ScanEntry(archive, entries[index]);
+					reports[index] = label.Length == 0 ? report : report with { Path = label + ":" + Path.DirectorySeparatorChar + report.Path };
+					progress?.Report(new DatProgress(entries[index].FullPath, Interlocked.Increment(ref done), entries.Count));
+				});
+			}
+			catch (AggregateException exception) when (exception.InnerException != null)
+			{
+				ExceptionDispatchInfo.Capture(exception.InnerException).Throw();
 			}
 
 			return reports;

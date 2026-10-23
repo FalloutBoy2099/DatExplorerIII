@@ -7,6 +7,7 @@ namespace DatExplorerIII.Tests
 	using DatExplorerIII.Formats;
 	using DatExplorerIII.Services;
 	using DatExplorerIII.ViewModels;
+	using DatExplorerIII.ViewModels.Viewer;
 
 	/// <summary>The viewer of a sound: play and pause, a bar to move in it, and the sound that goes on from where the bar was left.</summary>
 	public sealed class AudioViewerTests

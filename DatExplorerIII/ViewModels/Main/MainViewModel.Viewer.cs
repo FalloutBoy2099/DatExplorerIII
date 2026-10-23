@@ -7,6 +7,7 @@ namespace DatExplorerIII.ViewModels.Main
 	using Core;
 	using Models;
 	using Services;
+	using ViewModels.Viewer;
 
 	public sealed partial class MainViewModel
 	{

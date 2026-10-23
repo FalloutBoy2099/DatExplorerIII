@@ -2,6 +2,7 @@ namespace DatExplorerIII.ViewModels.Main
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Diagnostics;
 	using System.IO;
 	using System.Linq;
 	using System.Runtime.CompilerServices;
@@ -52,9 +53,12 @@ namespace DatExplorerIII.ViewModels.Main
 			_messageScan = null;
 		}
 
+		/// <summary>How often the files that were checked in the background get their result in the list, in milliseconds.</summary>
+		private const Int32 MessageScanFlushMilliseconds = 100;
+
 		/// <summary>
 		/// Checks the message files of a list in the background. The files that were checked already get their result at once;
-		/// the others get theirs one after the other, as the check goes.
+		/// the others get theirs as the check goes, a few at a time (one call to the interface for each file would slow both down).
 		/// </summary>
 		private void StartMessageScan(DatArchive archive, IReadOnlyList<ListEntry> items)
 		{
@@ -84,6 +88,31 @@ namespace DatExplorerIII.ViewModels.Main
 			CancellationToken token = source.Token;
 			MessageScan = Task.Run(() =>
 			{
+				List<(ListEntry Item, MsgFileReport Report)> ready = new();
+				Stopwatch sinceShown = Stopwatch.StartNew();
+
+				void ShowReady()
+				{
+					if (ready.Count == 0)
+					{
+						return;
+					}
+
+					List<(ListEntry Item, MsgFileReport Report)> batch = ready.ToList();
+					ready.Clear();
+					_uiThread.Invoke(() =>
+					{
+						if (!token.IsCancellationRequested)
+						{
+							foreach ((ListEntry item, MsgFileReport report) in batch)
+							{
+								item.SetMessages(report.Without(DisabledMessageChecks));
+							}
+						}
+					});
+					sinceShown.Restart();
+				}
+
 				try
 				{
 					foreach (ListEntry item in pending)
@@ -95,14 +124,14 @@ namespace DatExplorerIII.ViewModels.Main
 
 						MsgFileReport report = MsgScanner.ScanEntry(archive, item.Entry!);
 						_messageReports.AddOrUpdate(item.Entry!, report);
-						_uiThread.Invoke(() =>
+						ready.Add((item, report));
+						if (sinceShown.ElapsedMilliseconds >= MessageScanFlushMilliseconds)
 						{
-							if (!token.IsCancellationRequested)
-							{
-								item.SetMessages(report.Without(DisabledMessageChecks));
-							}
-						});
+							ShowReady();
+						}
 					}
+
+					ShowReady();
 				}
 				catch (Exception exception) when (exception is ObjectDisposedException or IOException or DatException)
 				{

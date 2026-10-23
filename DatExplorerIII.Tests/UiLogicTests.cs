@@ -11,6 +11,7 @@ namespace DatExplorerIII.Tests
 	using DatExplorerIII.Models;
 	using DatExplorerIII.Services;
 	using DatExplorerIII.ViewModels;
+	using DatExplorerIII.ViewModels.Viewer;
 
 	/// <summary>
 	/// The logic around the windows: file policy, import planning, conflicts, window placement, temporary files,

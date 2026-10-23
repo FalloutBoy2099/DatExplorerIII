@@ -5,6 +5,7 @@ namespace DatExplorerIII.Tests
 	using System.Text;
 	using DatExplorerIII.Services;
 	using DatExplorerIII.ViewModels;
+	using DatExplorerIII.ViewModels.Viewer;
 
 	/// <summary>The list files (.lst): the comments, from the semicolon to the end of the line, have their color.</summary>
 	public sealed class LstTests

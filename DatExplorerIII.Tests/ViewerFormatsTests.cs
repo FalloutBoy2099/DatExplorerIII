@@ -15,6 +15,7 @@ namespace DatExplorerIII.Tests
 	using DatExplorerIII.Models;
 	using DatExplorerIII.Services;
 	using DatExplorerIII.ViewModels;
+	using DatExplorerIII.ViewModels.Viewer;
 
 	/// <summary>
 	/// The readers of the Fallout file formats (pictures, palettes, sounds), the decoding of texts, and the choice of the viewer.
@@ -438,6 +439,64 @@ namespace DatExplorerIII.Tests
 			Byte[] empty = (Byte[])valid.Clone();
 			BinaryPrimitives.WriteUInt16LittleEndian(empty.AsSpan(4), 0);
 			Assert.Throws<InvalidDataException>(() => RixReader.Read(empty));
+		}
+
+		private static Byte[] BuildMask()
+		{
+			// A mask of 44 bytes a line: the first 8 pixels of the first line are set, and a bit after the end of the second line.
+			Byte[] data = new Byte[13200];
+			data[0] = 0xFF;
+			data[44 + 43] = 0x01;
+			return data;
+		}
+
+		[Fact]
+		public void Msk_IsRead_BitByBit()
+		{
+			MaskImage mask = MskReader.Read(BuildMask());
+			Assert.Equal(350, mask.Width);
+			Assert.Equal(300, mask.Height);
+			Assert.True(mask.Pixels[0]);
+			Assert.True(mask.Pixels[7]);
+			Assert.False(mask.Pixels[8]);
+
+			// The last bit of a line is not a pixel (a line has 350 pixels in 352 bits): it does not show in the next line.
+			Assert.False(mask.Pixels[350 + 349]);
+			Assert.Equal(8, mask.SetCount);
+		}
+
+		[Fact]
+		public void Msk_LastPixelOfALine_IsRead()
+		{
+			Byte[] data = new Byte[13200];
+			data[43] = 0x04;
+			MaskImage mask = MskReader.Read(data);
+			Assert.True(mask.Pixels[349]);
+			Assert.Equal(1, mask.SetCount);
+		}
+
+		[Fact]
+		public void Msk_OfAnotherSize_IsRefused()
+		{
+			Assert.Throws<InvalidDataException>(() => MskReader.Read(new Byte[13199]));
+			Assert.Throws<InvalidDataException>(() => MskReader.Read(Array.Empty<Byte>()));
+		}
+
+		[Fact]
+		public void Msk_IsDrawnWhiteOnBlack()
+		{
+			PixelImage picture = ImageRenderer.Render(MskReader.Read(BuildMask()));
+			Assert.Equal(350, picture.Width);
+			Assert.Equal(255, picture.Pixels[0]);
+			Assert.Equal(0, picture.Pixels[8 * 4]);
+			Assert.Equal(255, picture.Pixels[3]);
+		}
+
+		[Fact]
+		public void Msk_IsShownAsAPicture()
+		{
+			Assert.True(FileViewers.TryGetKind("wrldmp00.msk", out FileViewerKind kind));
+			Assert.Equal(FileViewerKind.Image, kind);
 		}
 
 		#endregion

@@ -1,0 +1,177 @@
+﻿<UserControl
+    x:Class="DatExplorerIII.Views.Viewer.AudioView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:behaviors="clr-namespace:DatExplorerIII.Views.Behaviors"
+    xmlns:infrastructure="clr-namespace:DatExplorerIII.Infrastructure"
+    xmlns:viewer="clr-namespace:DatExplorerIII.Views.Viewer">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="ViewerResources.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <infrastructure:EnvelopeGeometryConverter x:Key="EnvelopeGeometry" />
+
+            <infrastructure:FractionOfWidthConverter x:Key="FractionOfWidth" />
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!--  A wrap panel: in a narrow pane the volume and the repeat go to a second line instead of being cut.  -->
+        <WrapPanel Margin="0,0,0,2">
+            <Button
+                Margin="0,0,0,4"
+                Padding="16,6"
+                Command="{Binding PlayStopCommand, Mode=OneTime}">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        FontFamily="{StaticResource IconFont}"
+                        FontSize="16">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Text" Value="&#xE768;" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsPlaying}" Value="True">
+                                        <Setter Property="Text" Value="&#xE769;" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    <TextBlock Margin="8,0,0,0" VerticalAlignment="Center">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Text" Value="{DynamicResource Str.ViewerPlay}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsPlaying}" Value="True">
+                                        <Setter Property="Text" Value="{DynamicResource Str.ViewerPause}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </StackPanel>
+            </Button>
+
+            <StackPanel
+                Margin="16,0,0,4"
+                Orientation="Horizontal"
+                Visibility="{Binding CanChooseChannels, Converter={StaticResource BoolToVisibility}}">
+                <TextBlock Style="{StaticResource ToolbarLabel}" Text="{DynamicResource Str.ViewerChannels}" />
+                <ComboBox
+                    MinWidth="120"
+                    DisplayMemberPath="Display"
+                    ItemsSource="{Binding ChannelChoices}"
+                    SelectedItem="{Binding SelectedChannels}" />
+            </StackPanel>
+
+            <StackPanel
+                Margin="16,0,0,4"
+                Orientation="Horizontal"
+                Visibility="{Binding CanChangeVolume, Converter={StaticResource BoolToVisibility}}">
+                <TextBlock
+                    Margin="0,0,6,0"
+                    VerticalAlignment="Center"
+                    FontFamily="{StaticResource IconFont}"
+                    FontSize="16"
+                    Text="&#xE767;"
+                    ToolTip="{DynamicResource Str.ViewerVolume}" />
+                <Slider
+                    Width="90"
+                    VerticalAlignment="Center"
+                    AutomationProperties.Name="{DynamicResource Str.ViewerVolume}"
+                    IsMoveToPointEnabled="True"
+                    LargeChange="10"
+                    Maximum="100"
+                    Minimum="0"
+                    SmallChange="5"
+                    ToolTip="{DynamicResource Str.ViewerVolume}"
+                    Value="{Binding Volume}" />
+            </StackPanel>
+
+            <ToggleButton
+                Margin="12,0,0,4"
+                Padding="10,6"
+                AutomationProperties.Name="{DynamicResource Str.ViewerLoop}"
+                IsChecked="{Binding IsLooping}"
+                ToolTip="{DynamicResource Str.ViewerLoop}">
+                <TextBlock
+                    FontFamily="{StaticResource IconFont}"
+                    FontSize="16"
+                    Text="&#xE8EE;" />
+            </ToggleButton>
+
+            <TextBlock
+                Margin="12,0,0,4"
+                VerticalAlignment="Center"
+                Style="{StaticResource Notice}"
+                Text="{Binding Warning}" />
+        </WrapPanel>
+
+        <Grid
+            x:Name="ShapeBox"
+            Grid.Row="1"
+            Height="110"
+            Margin="8,0"
+            VerticalAlignment="Center">
+            <Path
+                Data="{Binding Envelope, Converter={StaticResource EnvelopeGeometry}}"
+                Fill="{DynamicResource AccentFillColorDefaultBrush}"
+                Stretch="Fill" />
+
+            <!--  The mark of how far the sound has played.  -->
+            <Rectangle
+                Width="2"
+                HorizontalAlignment="Left"
+                Fill="{DynamicResource TextFillColorPrimaryBrush}"
+                IsHitTestVisible="False"
+                Opacity="0.85">
+                <Rectangle.Margin>
+                    <MultiBinding Converter="{StaticResource FractionOfWidth}">
+                        <Binding Path="PlayedFraction" />
+                        <Binding ElementName="ShapeBox" Path="ActualWidth" />
+                        <Binding Path="Width" RelativeSource="{RelativeSource Self}" />
+                    </MultiBinding>
+                </Rectangle.Margin>
+            </Rectangle>
+        </Grid>
+
+        <Grid Grid.Row="2" Margin="0,6,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Slider
+                IsMoveToPointEnabled="True"
+                LargeChange="1000"
+                Maximum="{Binding Maximum}"
+                Minimum="0"
+                SmallChange="100"
+                Thumb.DragCompleted="OnSeekCompleted"
+                Thumb.DragStarted="OnSeekStarted"
+                Value="{Binding Position, Delay=30}" />
+            <TextBlock
+                Grid.Column="1"
+                Margin="12,0,0,0"
+                VerticalAlignment="Center"
+                Opacity="0.8"
+                Text="{Binding PositionText}" />
+        </Grid>
+
+        <TextBlock
+            Grid.Row="3"
+            Margin="0,6,0,0"
+            Opacity="0.7"
+            Text="{Binding Info}"
+            TextTrimming="CharacterEllipsis" />
+    </Grid>
+</UserControl>

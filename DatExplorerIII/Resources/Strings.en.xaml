@@ -371,6 +371,7 @@
     <sys:String x:Key="Str.ViewerVideoSubtitles">{0} subtitles ({1})</sys:String>
     <sys:String x:Key="Str.ViewerFontAaf">AAF font · {0} characters · height {1} · spacing {2} · space {3} · line spacing {4}</sys:String>
     <sys:String x:Key="Str.ViewerFontFon">FON font · {0} characters · height {1} · spacing {2}</sys:String>
+    <sys:String x:Key="Str.ViewerMask">World map mask · {0}×{1} · 1 bit per pixel · {2}% of the pixels set</sys:String>
     <sys:String x:Key="Str.TableVariable">Variable</sys:String>
     <sys:String x:Key="Str.TableValue">Initial value</sys:String>
     <sys:String x:Key="Str.TableComment">Comment</sys:String>

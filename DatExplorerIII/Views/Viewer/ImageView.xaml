@@ -1,0 +1,280 @@
+﻿<UserControl
+    x:Class="DatExplorerIII.Views.Viewer.ImageView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:behaviors="clr-namespace:DatExplorerIII.Views.Behaviors"
+    xmlns:infrastructure="clr-namespace:DatExplorerIII.Infrastructure"
+    xmlns:viewer="clr-namespace:DatExplorerIII.Views.Viewer">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="ViewerResources.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <infrastructure:EndingTextMarginConverter x:Key="EndingTextMargin" />
+
+            <!--  The grid that shows through the transparent parts of a sprite  -->
+            <DrawingBrush
+                x:Key="CheckerBrush"
+                TileMode="Tile"
+                Viewbox="0,0,16,16"
+                ViewboxUnits="Absolute"
+                Viewport="0,0,16,16"
+                ViewportUnits="Absolute">
+                <DrawingBrush.Drawing>
+                    <DrawingGroup>
+                        <GeometryDrawing Brush="#26808080">
+                            <GeometryDrawing.Geometry>
+                                <RectangleGeometry Rect="0,0,16,16" />
+                            </GeometryDrawing.Geometry>
+                        </GeometryDrawing>
+                        <GeometryDrawing Brush="#26FFFFFF">
+                            <GeometryDrawing.Geometry>
+                                <GeometryGroup>
+                                    <RectangleGeometry Rect="0,0,8,8" />
+                                    <RectangleGeometry Rect="8,8,8,8" />
+                                </GeometryGroup>
+                            </GeometryDrawing.Geometry>
+                        </GeometryDrawing>
+                    </DrawingGroup>
+                </DrawingBrush.Drawing>
+            </DrawingBrush>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <StackPanel>
+            <WrapPanel Margin="0,0,0,2">
+                <StackPanel
+                    Margin="0,0,14,4"
+                    Orientation="Horizontal"
+                    Visibility="{Binding HasPaletteChoices, Converter={StaticResource BoolToVisibility}}">
+                    <TextBlock Style="{StaticResource ToolbarLabel}" Text="{DynamicResource Str.ViewerPalette}" />
+                    <ComboBox
+                        MinWidth="150"
+                        DisplayMemberPath="Display"
+                        ItemsSource="{Binding PaletteChoices}"
+                        SelectedItem="{Binding SelectedPalette}" />
+                </StackPanel>
+
+                <StackPanel Margin="0,0,14,4" Orientation="Horizontal">
+                    <TextBlock Style="{StaticResource ToolbarLabel}" Text="{DynamicResource Str.ViewerZoom}" />
+                    <ComboBox
+                        MinWidth="76"
+                        DisplayMemberPath="Display"
+                        ItemsSource="{Binding ZoomOptions}"
+                        SelectedItem="{Binding SelectedZoom}" />
+                </StackPanel>
+            </WrapPanel>
+
+            <!--  A picture with a palette of its own: can the game use it as an image of the ending? On a line of its own, with the toggle.  -->
+            <WrapPanel Margin="0,0,0,4" Visibility="{Binding HasEnding, Converter={StaticResource BoolToVisibility}}">
+                <StackPanel
+                    x:Name="EndingStatusPanel"
+                    Margin="0,0,14,4"
+                    VerticalAlignment="Center"
+                    Background="Transparent"
+                    Orientation="Horizontal"
+                    ToolTip="{Binding EndingTip}"
+                    Visibility="{Binding HasEnding, Converter={StaticResource BoolToVisibility}}">
+                    <TextBlock
+                        Margin="0,0,6,0"
+                        VerticalAlignment="Center"
+                        FontFamily="{StaticResource IconFont}">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Text" Value="&#xE711;" />
+                                <Setter Property="Foreground" Value="#E5484D" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsEndingUsable}" Value="True">
+                                        <Setter Property="Text" Value="&#xE73E;" />
+                                        <Setter Property="Foreground" Value="#3FB950" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    <TextBlock VerticalAlignment="Center" Text="{Binding EndingStatus}" />
+                </StackPanel>
+
+                <ToggleButton
+                    x:Name="EndingTextToggle"
+                    Margin="0,0,4,4"
+                    VerticalAlignment="Center"
+                    IsChecked="{Binding ShowEndingText}"
+                    ToolTip="{DynamicResource Str.ViewerEndingTextTip}"
+                    Visibility="{Binding IsEndingUsable, Converter={StaticResource BoolToVisibility}}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock
+                            Margin="0,0,6,0"
+                            VerticalAlignment="Center"
+                            FontFamily="{StaticResource IconFont}"
+                            Text="&#xE8D2;" />
+                        <TextBlock VerticalAlignment="Center" Text="{DynamicResource Str.ViewerEndingText}" />
+                    </StackPanel>
+                </ToggleButton>
+                <Button
+                    x:Name="EndingTextAnother"
+                    Margin="0,0,0,4"
+                    VerticalAlignment="Center"
+                    AutomationProperties.Name="{DynamicResource Str.ViewerEndingAnother}"
+                    Command="{Binding NewEndingTextCommand, Mode=OneTime}"
+                    ToolTip="{DynamicResource Str.ViewerEndingAnother}"
+                    Visibility="{Binding EndingTextVisible, Converter={StaticResource BoolToVisibility}}">
+                    <TextBlock FontFamily="{StaticResource IconFont}" Text="&#xE8B1;" />
+                </Button>
+            </WrapPanel>
+        </StackPanel>
+
+        <Border
+            Grid.Row="1"
+            Background="{StaticResource CheckerBrush}"
+            BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+            BorderThickness="1"
+            PreviewMouseDown="OnImageMouseDown"
+            PreviewMouseWheel="OnImageWheel">
+            <Grid>
+                <Viewbox
+                    Stretch="Uniform"
+                    StretchDirection="Both"
+                    Visibility="{Binding IsFit, Converter={StaticResource BoolToVisibility}}">
+                    <!--  The text is in the pixels of the picture: it follows the magnification.  -->
+                    <Grid>
+                        <Image
+                            behaviors:PixelImageSource.Image="{Binding Picture}"
+                            RenderOptions.BitmapScalingMode="NearestNeighbor"
+                            SnapsToDevicePixels="True" />
+                        <Border
+                            Width="{Binding EndingTextWidth}"
+                            Margin="{Binding EndingTextLeft, Converter={StaticResource EndingTextMargin}}"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Bottom"
+                            Background="#CC000000"
+                            Visibility="{Binding EndingTextVisible, Converter={StaticResource BoolToVisibility}}">
+                            <TextBlock
+                                Padding="4,2"
+                                FontFamily="Arial"
+                                FontSize="14"
+                                Foreground="White"
+                                Text="{Binding EndingText}"
+                                TextAlignment="Center"
+                                TextWrapping="Wrap" />
+                        </Border>
+                    </Grid>
+                </Viewbox>
+                <ScrollViewer
+                    behaviors:RightDragScroll.IsEnabled="True"
+                    HorizontalScrollBarVisibility="Auto"
+                    Style="{StaticResource CornerScrollViewer}"
+                    VerticalScrollBarVisibility="Auto"
+                    Visibility="{Binding IsFit, Converter={StaticResource InverseBoolToVisibility}}">
+                    <Viewbox
+                        Width="{Binding DisplayWidth}"
+                        Height="{Binding DisplayHeight}"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Stretch="Fill">
+                        <Grid>
+                            <Image
+                                behaviors:PixelImageSource.Image="{Binding Picture}"
+                                RenderOptions.BitmapScalingMode="NearestNeighbor"
+                                SnapsToDevicePixels="True" />
+                            <Border
+                                Width="{Binding EndingTextWidth}"
+                                Margin="{Binding EndingTextLeft, Converter={StaticResource EndingTextMargin}}"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Bottom"
+                                Background="#CC000000"
+                                Visibility="{Binding EndingTextVisible, Converter={StaticResource BoolToVisibility}}">
+                                <TextBlock
+                                    Padding="4,2"
+                                    FontFamily="Arial"
+                                    FontSize="14"
+                                    Foreground="White"
+                                    Text="{Binding EndingText}"
+                                    TextAlignment="Center"
+                                    TextWrapping="Wrap" />
+                            </Border>
+                        </Grid>
+                    </Viewbox>
+                </ScrollViewer>
+            </Grid>
+        </Border>
+
+        <StackPanel Grid.Row="2" Margin="0,6,0,0">
+            <!--  The direction and the animation are under the picture; the palette and the magnification are above it.  -->
+            <WrapPanel>
+                <StackPanel
+                    Margin="0,0,14,4"
+                    Orientation="Horizontal"
+                    Visibility="{Binding HasDirections, Converter={StaticResource BoolToVisibility}}">
+                    <TextBlock Style="{StaticResource ToolbarLabel}" Text="{DynamicResource Str.ViewerDirection}" />
+                    <ComboBox
+                        MinWidth="56"
+                        ItemsSource="{Binding Directions}"
+                        SelectedItem="{Binding SelectedDirectionNumber}" />
+                    <Button
+                        Margin="4,0,0,0"
+                        Command="{Binding PreviousDirectionCommand, Mode=OneTime}"
+                        ToolTip="{DynamicResource Str.ViewerPreviousDirection}">
+                        <TextBlock FontFamily="{StaticResource IconFont}" Text="&#xE76B;" />
+                    </Button>
+                    <Button
+                        Margin="4,0,0,0"
+                        Command="{Binding NextDirectionCommand, Mode=OneTime}"
+                        ToolTip="{DynamicResource Str.ViewerNextDirection}">
+                        <TextBlock FontFamily="{StaticResource IconFont}" Text="&#xE76C;" />
+                    </Button>
+                </StackPanel>
+
+                <StackPanel
+                    Margin="0,0,14,4"
+                    Orientation="Horizontal"
+                    Visibility="{Binding IsAnimated, Converter={StaticResource BoolToVisibility}}">
+                    <Button Command="{Binding PreviousCommand, Mode=OneTime}" ToolTip="{DynamicResource Str.ViewerPreviousFrame}">
+                        <TextBlock FontFamily="{StaticResource IconFont}" Text="&#xE892;" />
+                    </Button>
+                    <Button
+                        Margin="4,0,0,0"
+                        Command="{Binding PlayCommand, Mode=OneTime}"
+                        ToolTip="{DynamicResource Str.ViewerPlay}">
+                        <TextBlock FontFamily="{StaticResource IconFont}">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Text" Value="&#xE768;" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsPlaying}" Value="True">
+                                            <Setter Property="Text" Value="&#xE769;" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Button>
+                    <Button
+                        Margin="4,0,0,0"
+                        Command="{Binding NextCommand, Mode=OneTime}"
+                        ToolTip="{DynamicResource Str.ViewerNextFrame}">
+                        <TextBlock FontFamily="{StaticResource IconFont}" Text="&#xE893;" />
+                    </Button>
+                    <TextBlock
+                        Margin="8,0,0,0"
+                        VerticalAlignment="Center"
+                        Text="{Binding FrameLabel}" />
+                </StackPanel>
+
+            </WrapPanel>
+            <TextBlock
+                Margin="0,2,0,0"
+                Opacity="0.7"
+                Text="{Binding Info}"
+                TextTrimming="CharacterEllipsis" />
+        </StackPanel>
+    </Grid>
+</UserControl>

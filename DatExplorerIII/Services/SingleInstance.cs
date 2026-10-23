@@ -16,7 +16,8 @@ namespace DatExplorerIII.Services
 	/// <remarks>
 	/// The messages are: the number of files (32 bit), then each path as a UTF-8 text with its length (32 bit). The server first
 	/// sends its process identifier (32 bit), so that the sender can allow it to come to the front, and answers with a byte
-	/// once it has read the files.
+	/// once it has read the files. While it listens, the server also holds a named event: a new launch that does not find it
+	/// knows at once that nobody listens (waiting for a pipe that does not exist would take the whole time out).
 	/// </remarks>
 	public sealed class SingleInstance : IDisposable
 	{
@@ -28,6 +29,7 @@ namespace DatExplorerIII.Services
 		private readonly Action<IReadOnlyList<String>> _received;
 		private CancellationTokenSource? _stop;
 		private Task? _loop;
+		private EventWaitHandle? _marker;
 
 		public SingleInstance(String pipeName, Action<IReadOnlyList<String>> received)
 		{
@@ -61,6 +63,7 @@ namespace DatExplorerIII.Services
 				return false;
 			}
 
+			_marker = new EventWaitHandle(false, EventResetMode.ManualReset, MarkerName(_pipeName));
 			_stop = new CancellationTokenSource();
 			_loop = Task.Run(() => ListenAsync(first, _stop.Token));
 			return true;
@@ -73,6 +76,8 @@ namespace DatExplorerIII.Services
 			Task? loop = _loop;
 			_stop = null;
 			_loop = null;
+			_marker?.Dispose();
+			_marker = null;
 
 			if (stop != null)
 			{
@@ -103,6 +108,14 @@ namespace DatExplorerIII.Services
 		{
 			try
 			{
+				// Nobody listens: no need to wait for the pipe.
+				if (!EventWaitHandle.TryOpenExisting(MarkerName(pipeName), out EventWaitHandle? marker))
+				{
+					return false;
+				}
+
+				marker.Dispose();
+
 				using NamedPipeClientStream client = new(".", pipeName, PipeDirection.InOut, PipeOptions.CurrentUserOnly);
 				client.Connect(timeoutMilliseconds);
 
@@ -128,6 +141,9 @@ namespace DatExplorerIII.Services
 				return false;
 			}
 		}
+
+		/// <summary>The name of the event that tells that an instance listens on a pipe.</summary>
+		private static String MarkerName(String pipeName) => pipeName + ".Listening";
 
 		private NamedPipeServerStream CreateServer()
 		{

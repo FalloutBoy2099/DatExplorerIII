@@ -6,7 +6,7 @@
     xmlns:infrastructure="clr-namespace:DatExplorerIII.Infrastructure"
     xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
     xmlns:sys="clr-namespace:System;assembly=System.Runtime"
-    xmlns:views="clr-namespace:DatExplorerIII.Views">
+    xmlns:viewer="clr-namespace:DatExplorerIII.Views.Viewer">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -143,7 +143,7 @@
             Grid.Column="4"
             Padding="8,0,0,0"
             DataContext="{Binding Preview}">
-            <views:ViewerControl />
+            <viewer:ViewerControl />
         </Border>
     </Grid>
 </UserControl>

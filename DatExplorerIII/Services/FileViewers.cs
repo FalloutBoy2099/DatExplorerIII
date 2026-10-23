@@ -69,9 +69,9 @@ namespace DatExplorerIII.Services
 				kinds[extension] = FileViewerKind.Text;
 			}
 
-			// Pictures: animations (.frm, or .fr0 to .fr5 for one direction), splash screens and palettes of Fallout, the art
-			// of Arcanum (.art), and the usual picture files.
-			foreach (String extension in new[] { ".frm", ".fr0", ".fr1", ".fr2", ".fr3", ".fr4", ".fr5", ".rix", ".pal", ".act", ".art", ".png", ".bmp", ".jpg", ".jpeg", ".gif", ".aaf", ".fon" })
+			// Pictures: animations (.frm, or .fr0 to .fr5 for one direction), splash screens and palettes of Fallout, the masks
+			// of the world map (.msk), the art of Arcanum (.art), and the usual picture files.
+			foreach (String extension in new[] { ".frm", ".fr0", ".fr1", ".fr2", ".fr3", ".fr4", ".fr5", ".rix", ".pal", ".act", ".art", ".png", ".bmp", ".jpg", ".jpeg", ".gif", ".aaf", ".fon", ".msk" })
 			{
 				kinds[extension] = FileViewerKind.Image;
 			}

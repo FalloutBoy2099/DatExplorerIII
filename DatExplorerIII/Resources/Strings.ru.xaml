@@ -366,6 +366,7 @@
     <sys:String x:Key="Str.ViewerVideoSubtitles">Субтитров: {0} ({1})</sys:String>
     <sys:String x:Key="Str.ViewerFontAaf">Шрифт AAF · символов: {0} · высота {1} · интервал {2} · ширина пробела {3} · межстрочный интервал {4}</sys:String>
     <sys:String x:Key="Str.ViewerFontFon">Шрифт FON · символов: {0} · высота {1} · интервал {2}</sys:String>
+    <sys:String x:Key="Str.ViewerMask">Маска карты мира · {0}×{1} · 1 бит на пиксель · установлено {2}% пикселей</sys:String>
     <sys:String x:Key="Str.TableVariable">Переменная</sys:String>
     <sys:String x:Key="Str.TableValue">Начальное значение</sys:String>
     <sys:String x:Key="Str.TableComment">Комментарий</sys:String>

@@ -6,6 +6,7 @@
     xmlns:infrastructure="clr-namespace:DatExplorerIII.Infrastructure"
     xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
     xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+    xmlns:viewer="clr-namespace:DatExplorerIII.Views.Viewer"
     xmlns:views="clr-namespace:DatExplorerIII.Views">
     <UserControl.Resources>
         <ResourceDictionary>
@@ -389,7 +390,7 @@
                                         Padding="8,0,0,0"
                                         behaviors:ScrollSync.IsEnabled="{Binding IsCompareSyncScroll}"
                                         behaviors:ScrollSync.Partner="{Binding ElementName=RightViewerHost}">
-                                        <views:ViewerControl DataContext="{Binding Comparison.Current.LeftViewer}" />
+                                        <viewer:ViewerControl DataContext="{Binding Comparison.Current.LeftViewer}" />
                                     </Border>
                                 </Grid>
                             </views:SplitPair.First>
@@ -411,7 +412,7 @@
                                         Padding="8,0,0,0"
                                         behaviors:ScrollSync.IsEnabled="{Binding IsCompareSyncScroll}"
                                         behaviors:ScrollSync.Partner="{Binding ElementName=LeftViewerHost}">
-                                        <views:ViewerControl DataContext="{Binding Comparison.Current.RightViewer}" />
+                                        <viewer:ViewerControl DataContext="{Binding Comparison.Current.RightViewer}" />
                                     </Border>
                                 </Grid>
                             </views:SplitPair.Second>

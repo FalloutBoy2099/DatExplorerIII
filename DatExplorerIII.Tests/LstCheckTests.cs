@@ -9,6 +9,7 @@ namespace DatExplorerIII.Tests
 	using DatExplorerIII.Core;
 	using DatExplorerIII.Services;
 	using DatExplorerIII.ViewModels;
+	using DatExplorerIII.ViewModels.Viewer;
 
 	/// <summary>The lists of files (.lst) name files of their folder: the check says which are not there, and which the list does not name.</summary>
 	public sealed class LstCheckTests : IDisposable

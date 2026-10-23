@@ -1,0 +1,49 @@
+﻿<UserControl
+    x:Class="DatExplorerIII.Views.Viewer.ViewerControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:behaviors="clr-namespace:DatExplorerIII.Views.Behaviors"
+    xmlns:infrastructure="clr-namespace:DatExplorerIII.Infrastructure"
+    xmlns:viewer="clr-namespace:DatExplorerIII.Views.Viewer"
+    FontSize="12">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="ViewerResources.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid>
+        <!--  Nothing to show: no file, a file that cannot be shown, an error  -->
+        <TextBlock
+            Margin="16"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Opacity="0.7"
+            Text="{Binding Message}"
+            TextAlignment="Center"
+            TextWrapping="Wrap"
+            Visibility="{Binding HasMessage, Converter={StaticResource BoolToVisibility}}" />
+
+        <TextBlock
+            Margin="16"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Opacity="0.7"
+            Text="{DynamicResource Str.ViewerLoading}"
+            Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibility}}" />
+
+        <!--  What the file is: each kind of file has a control, which the viewer shows when it holds that kind (the others are hidden).  -->
+        <viewer:TextView DataContext="{Binding Text}" Visibility="{Binding DataContext.IsText, RelativeSource={RelativeSource AncestorType=viewer:ViewerControl}, Converter={StaticResource BoolToVisibility}}" />
+        <viewer:ImageView DataContext="{Binding Image}" Visibility="{Binding DataContext.IsImage, RelativeSource={RelativeSource AncestorType=viewer:ViewerControl}, Converter={StaticResource BoolToVisibility}}" />
+        <viewer:AudioView DataContext="{Binding Audio}" Visibility="{Binding DataContext.IsAudio, RelativeSource={RelativeSource AncestorType=viewer:ViewerControl}, Converter={StaticResource BoolToVisibility}}" />
+        <viewer:VideoView DataContext="{Binding Video}" Visibility="{Binding DataContext.IsVideo, RelativeSource={RelativeSource AncestorType=viewer:ViewerControl}, Converter={StaticResource BoolToVisibility}}" />
+        <viewer:SheetView DataContext="{Binding Character}" Visibility="{Binding DataContext.IsCharacter, RelativeSource={RelativeSource AncestorType=viewer:ViewerControl}, Converter={StaticResource BoolToVisibility}}" />
+        <viewer:SheetView DataContext="{Binding Prototype}" Visibility="{Binding DataContext.IsPrototype, RelativeSource={RelativeSource AncestorType=viewer:ViewerControl}, Converter={StaticResource BoolToVisibility}}" />
+        <viewer:SheetView DataContext="{Binding Map}" Visibility="{Binding DataContext.IsMap, RelativeSource={RelativeSource AncestorType=viewer:ViewerControl}, Converter={StaticResource BoolToVisibility}}" />
+        <viewer:TableView DataContext="{Binding Table}" Visibility="{Binding DataContext.IsTable, RelativeSource={RelativeSource AncestorType=viewer:ViewerControl}, Converter={StaticResource BoolToVisibility}}" />
+    </Grid>
+
+</UserControl>

@@ -77,6 +77,15 @@ namespace DatExplorerIII.Tests
 		}
 
 		[Fact]
+		public void WithoutARunningInstance_TheLaunchDoesNotWait()
+		{
+			// The time out is for an instance that is slow to answer: when none listens, the launch knows it at once.
+			System.Diagnostics.Stopwatch watch = System.Diagnostics.Stopwatch.StartNew();
+			Assert.False(SingleInstance.TrySend(NewPipeName(), ["a.dat"], 5000));
+			Assert.True(watch.ElapsedMilliseconds < 1000, $"{watch.ElapsedMilliseconds} ms");
+		}
+
+		[Fact]
 		public void OnlyTheFirstInstanceListens()
 		{
 			String name = NewPipeName();

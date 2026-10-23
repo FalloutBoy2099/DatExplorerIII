@@ -56,6 +56,8 @@ try {
 			'--self-contained', $selfContained,
 			'--output', $folder,
 			'-p:PublishSingleFile=true',
+			# The code is compiled ahead for the processor: less to compile when the program starts.
+			'-p:PublishReadyToRun=true',
 			'-p:DebugType=None',
 			'-p:DebugSymbols=false'
 		)

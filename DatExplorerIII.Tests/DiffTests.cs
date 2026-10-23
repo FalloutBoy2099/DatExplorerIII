@@ -12,6 +12,7 @@ namespace DatExplorerIII.Tests
 	using DatExplorerIII.Services;
 	using DatExplorerIII.ViewModels;
 	using DatExplorerIII.ViewModels.Main;
+	using DatExplorerIII.ViewModels.Viewer;
 
 	/// <summary>Showing the differences between two versions of a file made of text.</summary>
 	public sealed class DiffTests : IDisposable

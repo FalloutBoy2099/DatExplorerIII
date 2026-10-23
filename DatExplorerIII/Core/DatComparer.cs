@@ -97,7 +97,10 @@ namespace DatExplorerIII.Core
 			return items;
 		}
 
-		/// <summary>Whether two files have the same content (for the files made of text, as <paramref name="text"/> says). A file that cannot be read is not the same as another.</summary>
+		/// <summary>
+		/// Whether two files have the same content (for the files made of text, as <paramref name="text"/> says). Two files stored with the
+		/// same compressed bytes are the same without being inflated; otherwise a file that cannot be read is not the same as another.
+		/// </summary>
 		public static Boolean ContentEquals(DatArchive left, DatEntry leftEntry, DatArchive right, DatEntry rightEntry, TextEquality? text = null)
 		{
 			Boolean isText = text != null && text.AppliesTo(leftEntry.Name);
@@ -108,14 +111,47 @@ namespace DatExplorerIII.Core
 
 			try
 			{
-				Byte[] leftData = left.ReadData(leftEntry);
-				Byte[] rightData = right.ReadData(rightEntry);
+				Byte[] leftData;
+				Byte[] rightData;
+				if (SameCompression(left, leftEntry, right, rightEntry))
+				{
+					// The same compressed bytes are the same file: most files that did not change are found without inflating them.
+					Byte[] leftStored = left.ReadStored(leftEntry);
+					Byte[] rightStored = right.ReadStored(rightEntry);
+					if (leftStored.AsSpan().SequenceEqual(rightStored))
+					{
+						return true;
+					}
+
+					leftData = left.Unpack(leftEntry, leftStored);
+					rightData = right.Unpack(rightEntry, rightStored);
+				}
+				else
+				{
+					leftData = left.ReadData(leftEntry);
+					rightData = right.ReadData(rightEntry);
+				}
+
 				return leftData.AsSpan().SequenceEqual(rightData) || (isText && text!.AreEqual(new ComparedFile(leftEntry.Name, left.Format, leftData), new ComparedFile(rightEntry.Name, right.Format, rightData)));
 			}
 			catch (Exception exception) when (exception is DatException or IOException or UnauthorizedAccessException or InvalidDataException)
 			{
 				return false;
 			}
+		}
+
+		/// <summary>
+		/// True when two stored files are compressed the same way with the same compressed size: equal compressed bytes then mean equal
+		/// files (the files of a ZIP are read by the ZIP, not as stored bytes).
+		/// </summary>
+		private static Boolean SameCompression(DatArchive left, DatEntry leftEntry, DatArchive right, DatEntry rightEntry)
+		{
+			return leftEntry is { IsNew: false, IsCompressed: true }
+				&& rightEntry is { IsNew: false, IsCompressed: true }
+				&& leftEntry.PackedSize == rightEntry.PackedSize
+				&& left.Format != DatFormat.Zip
+				&& right.Format != DatFormat.Zip
+				&& (left.Format == DatFormat.Fallout1) == (right.Format == DatFormat.Fallout1);
 		}
 
 		/// <summary>The files of an archive by lower case path (the first one when two have the same path).</summary>

@@ -366,6 +366,7 @@
     <sys:String x:Key="Str.ViewerVideoSubtitles">Titulky: {0} ({1})</sys:String>
     <sys:String x:Key="Str.ViewerFontAaf">Písmo AAF · znaků: {0} · výška {1} · mezery {2} · mezera {3} · řádkování {4}</sys:String>
     <sys:String x:Key="Str.ViewerFontFon">Písmo FON · znaků: {0} · výška {1} · mezery {2}</sys:String>
+    <sys:String x:Key="Str.ViewerMask">Maska mapy světa · {0}×{1} · 1 bit na pixel · {2} % nastavených pixelů</sys:String>
     <sys:String x:Key="Str.TableVariable">Proměnná</sys:String>
     <sys:String x:Key="Str.TableValue">Počáteční hodnota</sys:String>
     <sys:String x:Key="Str.TableComment">Komentář</sys:String>

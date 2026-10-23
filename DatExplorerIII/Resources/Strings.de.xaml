@@ -366,6 +366,7 @@
     <sys:String x:Key="Str.ViewerVideoSubtitles">{0} Untertitel ({1})</sys:String>
     <sys:String x:Key="Str.ViewerFontAaf">AAF-Schrift · {0} Zeichen · Höhe {1} · Abstand {2} · Leerzeichen {3} · Zeilenabstand {4}</sys:String>
     <sys:String x:Key="Str.ViewerFontFon">FON-Schrift · {0} Zeichen · Höhe {1} · Abstand {2}</sys:String>
+    <sys:String x:Key="Str.ViewerMask">Maske der Weltkarte · {0}×{1} · 1 Bit pro Pixel · {2} % der Pixel gesetzt</sys:String>
     <sys:String x:Key="Str.TableVariable">Variable</sys:String>
     <sys:String x:Key="Str.TableValue">Anfangswert</sys:String>
     <sys:String x:Key="Str.TableComment">Kommentar</sys:String>

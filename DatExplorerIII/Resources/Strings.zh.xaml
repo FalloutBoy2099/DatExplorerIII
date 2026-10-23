@@ -366,6 +366,7 @@
     <sys:String x:Key="Str.ViewerVideoSubtitles">{0} 条字幕（{1}）</sys:String>
     <sys:String x:Key="Str.ViewerFontAaf">AAF 字体 · {0} 个字符 · 高度 {1} · 间距 {2} · 空格 {3} · 行距 {4}</sys:String>
     <sys:String x:Key="Str.ViewerFontFon">FON 字体 · {0} 个字符 · 高度 {1} · 间距 {2}</sys:String>
+    <sys:String x:Key="Str.ViewerMask">世界地图遮罩 · {0}×{1} · 每像素 1 位 · 已设置像素 {2}%</sys:String>
     <sys:String x:Key="Str.TableVariable">变量</sys:String>
     <sys:String x:Key="Str.TableValue">初始值</sys:String>
     <sys:String x:Key="Str.TableComment">注释</sys:String>

@@ -6,7 +6,9 @@ namespace DatExplorerIII.Core
 	using System.IO;
 	using System.IO.Compression;
 	using System.Linq;
+	using System.Runtime.ExceptionServices;
 	using System.Threading;
+	using System.Threading.Tasks;
 	using Models;
 
 	public sealed partial class DatArchive
@@ -23,6 +25,14 @@ namespace DatExplorerIII.Core
 
 		/// <summary>The best compression ratio of zlib is about 1032 to 1.</summary>
 		private const Int64 MaxZlibRatio = 1100;
+
+		/// <summary>The largest file inflated straight into an array of its announced size (the files of the games are much smaller).</summary>
+		private const Int32 DirectInflateLimit = 64 * 1024 * 1024;
+
+		/// <summary>How many files are extracted at the same time, at most, and how many bytes they may hold together.</summary>
+		private const Int32 ExtractBatchFiles = 64;
+
+		private const Int64 ExtractBatchBytes = 64L * 1024 * 1024;
 
 		/// <summary>
 		/// Opens a DAT archive. The format (Fallout 1, Fallout 2 or Arcanum) is detected from the content.
@@ -469,7 +479,13 @@ namespace DatExplorerIII.Core
 				return ReadZipData(entry);
 			}
 
-			Byte[] stored = ReadStored(entry);
+			return Unpack(entry, ReadStored(entry));
+		}
+
+		/// <summary>The content of a stored file of the archive from its data as it is stored (<see cref="ReadStored"/>).</summary>
+		/// <exception cref="DatException">The data is damaged.</exception>
+		internal Byte[] Unpack(DatEntry entry, Byte[] stored)
+		{
 			if (!entry.IsCompressed)
 			{
 				return stored;
@@ -489,7 +505,8 @@ namespace DatExplorerIII.Core
 		}
 
 		/// <summary>
-		/// Inflates data of announced size. The output grows as the data is really produced, so a lying size costs nothing.
+		/// Inflates data of announced size. A file of usual size is inflated straight into an array of that size; a larger one goes
+		/// into an output that grows as the data is really produced, so that a lying size costs nothing.
 		/// </summary>
 		private static Byte[] InflateZlib(Byte[] stored, Int32 unpackedSize)
 		{
@@ -500,7 +517,17 @@ namespace DatExplorerIII.Core
 
 			using MemoryStream source = new(stored);
 			using ZLibStream inflater = new(source, CompressionMode.Decompress);
-			using MemoryStream result = new(Math.Min(unpackedSize, 1 << 20));
+			if (unpackedSize <= DirectInflateLimit)
+			{
+				// Data that ends too soon throws (EndOfStreamException); reading on checks the trailer (the checksum of the data).
+				Byte[] data = new Byte[unpackedSize];
+				inflater.ReadExactly(data);
+				Span<Byte> after = stackalloc Byte[1];
+				_ = inflater.Read(after);
+				return data;
+			}
+
+			using MemoryStream result = new(1 << 20);
 
 			Byte[] buffer = new Byte[81920];
 			while (result.Length < unpackedSize)
@@ -525,33 +552,62 @@ namespace DatExplorerIII.Core
 		public DatVerifyResult Verify(IProgress<DatProgress>? progress = null, CancellationToken cancellationToken = default)
 		{
 			List<DatEntry> stored = _entries.Where(entry => !entry.IsNew).ToList();
-			List<DatEntry> damaged = new();
 			DatProgressThrottle throttle = new(progress, stored.Count);
 
+			// The files are read and inflated on a few threads at once; what was found is noted afterwards, in the order of the files.
+			DatErrorKind?[] failures = new DatErrorKind?[stored.Count];
+			Int32 done = 0;
+			ForEachParallel(0, stored.Count, cancellationToken, index =>
+			{
+				DatEntry entry = stored[index];
+				if (!entry.IsDamaged)
+				{
+					try
+					{
+						ReadData(entry);
+					}
+					catch (DatException exception) when (exception.Kind is DatErrorKind.CorruptData or DatErrorKind.OutsideArchive)
+					{
+						failures[index] = exception.Kind;
+					}
+				}
+
+				throttle.Report(entry.FullPath, Interlocked.Increment(ref done));
+			});
+
+			List<DatEntry> damaged = new();
 			for (Int32 index = 0; index < stored.Count; index++)
 			{
-				cancellationToken.ThrowIfCancellationRequested();
 				DatEntry entry = stored[index];
-				throttle.Report(entry.FullPath, index + 1);
+				if (failures[index] is DatErrorKind kind)
+				{
+					MarkDamaged(entry, kind == DatErrorKind.CorruptData ? DatIssueKind.EntryCorrupt : DatIssueKind.EntryOutsideArchive);
+				}
 
 				if (entry.IsDamaged)
 				{
-					damaged.Add(entry);
-					continue;
-				}
-
-				try
-				{
-					ReadData(entry);
-				}
-				catch (DatException exception) when (exception.Kind is DatErrorKind.CorruptData or DatErrorKind.OutsideArchive)
-				{
-					MarkDamaged(entry, exception.Kind == DatErrorKind.CorruptData ? DatIssueKind.EntryCorrupt : DatIssueKind.EntryOutsideArchive);
 					damaged.Add(entry);
 				}
 			}
 
 			return new DatVerifyResult(stored.Count, damaged);
+		}
+
+		/// <summary>How many files are read at the same time: the reads of the archive take turns, their decompression does not.</summary>
+		private static Int32 ReadThreads => Math.Min(4, Environment.ProcessorCount);
+
+		/// <summary>Runs a step for each index on a few threads at once. The error of a step is thrown as it is, not wrapped.</summary>
+		private static void ForEachParallel(Int32 from, Int32 to, CancellationToken cancellationToken, Action<Int32> body)
+		{
+			ParallelOptions options = new() { MaxDegreeOfParallelism = ReadThreads, CancellationToken = cancellationToken };
+			try
+			{
+				Parallel.For(from, to, options, body);
+			}
+			catch (AggregateException exception) when (exception.InnerException != null)
+			{
+				ExceptionDispatchInfo.Capture(exception.InnerException).Throw();
+			}
 		}
 
 		/// <summary>
@@ -575,30 +631,67 @@ namespace DatExplorerIII.Core
 			Int32 succeeded = 0;
 			DatProgressThrottle throttle = new(progress, entries.Count);
 
-			for (Int32 index = 0; index < entries.Count; index++)
+			// The files are read and inflated a batch at a time on a few threads, then written one after the other, in their order (two
+			// files of the same path are written as they come).
+			Int32 start = 0;
+			while (start < entries.Count)
 			{
 				cancellationToken.ThrowIfCancellationRequested();
-				DatEntry entry = entries[index];
-				throttle.Report(entry.FullPath, index + 1);
-
-				if (entry.IsDamaged)
+				Int32 end = start;
+				Int64 bytes = 0;
+				while (end < entries.Count && end - start < ExtractBatchFiles && (end == start || bytes + Math.Max(0, entries[end].UnpackedSize) <= ExtractBatchBytes))
 				{
-					failures.Add(entry.FullPath);
-					continue;
+					bytes += Math.Max(0, entries[end].UnpackedSize);
+					end++;
 				}
 
-				try
+				Byte[]?[] data = new Byte[end - start][];
+				Int32 first = start;
+				ForEachParallel(start, end, cancellationToken, index =>
 				{
-					String target = ResolveTarget(rootWithSeparator, entry, stripPrefix, flatNames?[entry]);
-					Byte[] data = ReadData(entry);
-					Directory.CreateDirectory(Path.GetDirectoryName(target)!);
-					File.WriteAllBytes(target, data);
-					succeeded++;
-				}
-				catch (Exception exception) when (exception is DatException or IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
+					DatEntry entry = entries[index];
+					if (entry.IsDamaged)
+					{
+						return;
+					}
+
+					try
+					{
+						data[index - first] = ReadData(entry);
+					}
+					catch (Exception exception) when (exception is DatException or IOException or UnauthorizedAccessException)
+					{
+						// Counted as a failure below.
+					}
+				});
+
+				for (Int32 index = start; index < end; index++)
 				{
-					failures.Add(entry.FullPath);
+					cancellationToken.ThrowIfCancellationRequested();
+					DatEntry entry = entries[index];
+					throttle.Report(entry.FullPath, index + 1);
+
+					Byte[]? content = data[index - start];
+					if (content == null)
+					{
+						failures.Add(entry.FullPath);
+						continue;
+					}
+
+					try
+					{
+						String target = ResolveTarget(rootWithSeparator, entry, stripPrefix, flatNames?[entry]);
+						Directory.CreateDirectory(Path.GetDirectoryName(target)!);
+						File.WriteAllBytes(target, content);
+						succeeded++;
+					}
+					catch (Exception exception) when (exception is DatException or IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
+					{
+						failures.Add(entry.FullPath);
+					}
 				}
+
+				start = end;
 			}
 
 			return new DatExtractResult(succeeded, failures);

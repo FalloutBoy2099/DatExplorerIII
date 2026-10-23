@@ -1,4 +1,4 @@
-namespace DatExplorerIII.ViewModels
+namespace DatExplorerIII.ViewModels.Viewer
 {
 	using System;
 	using System.ComponentModel;

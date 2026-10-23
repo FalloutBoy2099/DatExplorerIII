@@ -50,6 +50,18 @@ namespace DatExplorerIII.Services
 			return Create(image.Width, image.Height, bgra);
 		}
 
+		/// <summary>Draws a mask: the pixels that are set are white, the others black.</summary>
+		public static PixelImage Render(MaskImage mask)
+		{
+			Byte[] bgra = new Byte[mask.Width * mask.Height * 4];
+			for (Int32 i = 0; i < mask.Pixels.Length; i++)
+			{
+				SetGray(bgra, i * 4, mask.Pixels[i] ? (Byte)255 : (Byte)0);
+			}
+
+			return Create(mask.Width, mask.Height, bgra);
+		}
+
 		/// <summary>Draws the 256 colors of a palette as a grid of 16 by 16 squares.</summary>
 		public static PixelImage RenderPalette(Palette palette)
 		{

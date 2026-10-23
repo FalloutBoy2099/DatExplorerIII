@@ -366,6 +366,7 @@
     <sys:String x:Key="Str.ViewerVideoSubtitles">Napisy: {0} ({1})</sys:String>
     <sys:String x:Key="Str.ViewerFontAaf">Czcionka AAF · znaków: {0} · wysokość {1} · odstępy {2} · spacja {3} · interlinia {4}</sys:String>
     <sys:String x:Key="Str.ViewerFontFon">Czcionka FON · znaków: {0} · wysokość {1} · odstępy {2}</sys:String>
+    <sys:String x:Key="Str.ViewerMask">Maska mapy świata · {0}×{1} · 1 bit na piksel · {2}% ustawionych pikseli</sys:String>
     <sys:String x:Key="Str.TableVariable">Zmienna</sys:String>
     <sys:String x:Key="Str.TableValue">Wartość początkowa</sys:String>
     <sys:String x:Key="Str.TableComment">Komentarz</sys:String>

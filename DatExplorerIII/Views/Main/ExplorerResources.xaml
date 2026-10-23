@@ -128,6 +128,7 @@
         </StackPanel>
     </DataTemplate>
 
+    <!--  All the icons have the same size (the panel makes only those that can be seen, and places them by that size): the name takes two lines.  -->
     <DataTemplate x:Key="IconItemTemplate">
         <StackPanel Width="84" Margin="1">
             <Grid HorizontalAlignment="Center">
@@ -143,7 +144,7 @@
                     Style="{StaticResource MessageWarning}" />
             </Grid>
             <TextBlock
-                MaxHeight="34"
+                Height="34"
                 Margin="0,6,0,0"
                 HorizontalAlignment="Center"
                 Text="{Binding Name}"
@@ -176,8 +177,9 @@
             Header="{DynamicResource Str.ColPacked}" />
     </GridView>
 
+    <!--  Only the icons that can be seen are made: a folder of thousands of files shows at once.  -->
     <ItemsPanelTemplate x:Key="WrapItemsPanel">
-        <WrapPanel />
+        <views:VirtualizingWrapPanel />
     </ItemsPanelTemplate>
 
     <Style

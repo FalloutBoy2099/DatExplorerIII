@@ -12,7 +12,9 @@ namespace DatExplorerIII.Tests
 	using DatExplorerIII.Models;
 	using DatExplorerIII.Services;
 	using DatExplorerIII.ViewModels;
+	using DatExplorerIII.ViewModels.Viewer;
 	using DatExplorerIII.Views;
+	using DatExplorerIII.Views.Viewer;
 
 	/// <summary>
 	/// The maps of Fallout (.map) and the colors of the message files (.msg).
@@ -515,31 +517,46 @@ namespace DatExplorerIII.Tests
 		}
 
 		[Fact]
-		public void HighlightedDocument_HasOneParagraphPerLine_AndTheSameText()
-		{
-			const String text = "# comment\r\n{1}{snd}{Hello %s}\r\n{2}{}{two\r\nlines}\r\n";
-			System.Windows.Documents.FlowDocument document = HighlightedDocument.Build(text, MsgSyntax.Tokenize(text));
-
-			String shown = new System.Windows.Documents.TextRange(document.ContentStart, document.ContentEnd).Text;
-			Assert.Equal(text.Replace("\r\n", "\n").Split('\n'), shown.Replace("\r\n", "\n").TrimEnd('\n').Split('\n').Concat(new[] { String.Empty }));
-			Assert.Equal(5, document.Blocks.Count);
-		}
-
-		[Fact]
-		public void TheParagraphs_AreMadeOneAtATime_AndAreTheSameAsTheWholeDocument()
+		public void TheColorsOfALine_AreTheParts_CutAtTheEndsOfTheLine()
 		{
 			const String text = "# comment\r\n{1}{snd}{Hello %s}\r\n{2}{}{two\r\nlines}\r\n";
 			IReadOnlyList<SyntaxSpan> spans = MsgSyntax.Tokenize(text);
 
-			// The first paragraph is there without the others being made (the viewer shows a screen at once).
-			using IEnumerator<System.Windows.Documents.Paragraph> paragraphs = HighlightedDocument.Paragraphs(text, spans).GetEnumerator();
-			Assert.True(paragraphs.MoveNext());
-			Assert.Equal("# comment", new System.Windows.Documents.TextRange(paragraphs.Current.ContentStart, paragraphs.Current.ContentEnd).Text);
+			// Each line, without its break: its parts cover it exactly, and each has the kind of the part of the text it comes from.
+			Int32 lineStart = 0;
+			foreach (String line in text.Split("\r\n"))
+			{
+				Int32 lineEnd = lineStart + line.Length;
+				List<(Int32 Start, Int32 End, SyntaxKind Kind)> parts = SyntaxColorizer.PartsOf(spans, lineStart, lineEnd).ToList();
+				Assert.Equal(line, String.Concat(parts.Select(part => text[part.Start..part.End])));
+				foreach ((Int32 start, Int32 end, SyntaxKind kind) in parts)
+				{
+					Assert.Equal(spans.Single(span => span.Start <= start && end <= span.Start + span.Length).Kind, kind);
+				}
 
-			List<String> all = HighlightedDocument.Paragraphs(text, spans).Select(paragraph => new System.Windows.Documents.TextRange(paragraph.ContentStart, paragraph.ContentEnd).Text).ToList();
-			System.Windows.Documents.FlowDocument document = HighlightedDocument.Build(text, spans);
-			Assert.Equal(document.Blocks.Count, all.Count);
-			Assert.Equal("{2}{}{two", all[2]);
+				lineStart = lineEnd + 2;
+			}
+
+			Assert.Equal(SyntaxKind.Comment, SyntaxColorizer.PartsOf(spans, 0, 9).Single().Kind);
+		}
+
+		[Fact]
+		public void TheColorsOfALine_OfALongText_AreFoundWithoutGoingThroughTheText()
+		{
+			// Ten thousand lines of three parts: the parts of a line in the middle are those of that line only.
+			List<SyntaxSpan> spans = new();
+			for (Int32 line = 0; line < 10000; line++)
+			{
+				Int32 start = line * 12;
+				spans.Add(new SyntaxSpan(start, 3, SyntaxKind.Brace));
+				spans.Add(new SyntaxSpan(start + 3, 5, SyntaxKind.Message));
+				spans.Add(new SyntaxSpan(start + 8, 4, SyntaxKind.Comment));
+			}
+
+			List<(Int32 Start, Int32 End, SyntaxKind Kind)> parts = SyntaxColorizer.PartsOf(spans, 5000 * 12, (5000 * 12) + 10).ToList();
+			Assert.Equal([(60000, 60003, SyntaxKind.Brace), (60003, 60008, SyntaxKind.Message), (60008, 60010, SyntaxKind.Comment)], parts);
+			Assert.Empty(SyntaxColorizer.PartsOf(spans, 120000, 120000));
+			Assert.Empty(SyntaxColorizer.PartsOf(new List<SyntaxSpan>(), 0, 10));
 		}
 
 		#endregion

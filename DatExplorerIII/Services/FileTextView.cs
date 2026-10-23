@@ -8,6 +8,7 @@ namespace DatExplorerIII.Services
 	using Models;
 	using Scripts;
 	using ViewModels;
+	using ViewModels.Viewer;
 
 	/// <summary>Whether a file can be written as lines of text to be compared.</summary>
 	public enum FileTextResult

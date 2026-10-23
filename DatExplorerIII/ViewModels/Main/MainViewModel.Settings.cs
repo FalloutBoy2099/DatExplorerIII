@@ -5,6 +5,7 @@ namespace DatExplorerIII.ViewModels.Main
 	using System.Threading.Tasks;
 	using Models;
 	using Services;
+	using ViewModels.Viewer;
 
 	/// <summary>
 	/// The settings window: the options of the program that are not in the menus, and how the changes are taken.

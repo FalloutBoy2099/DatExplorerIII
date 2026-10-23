@@ -1,4 +1,4 @@
-namespace DatExplorerIII.ViewModels
+namespace DatExplorerIII.ViewModels.Viewer
 {
 	using System;
 	using System.Collections.Generic;
@@ -17,12 +17,12 @@ namespace DatExplorerIII.ViewModels
 	public sealed class TextViewerViewModel : ObservableObject
 	{
 		/// <summary>
-		/// The longest text that is colored, in characters (the viewer reads at most 4 MB of a file). The viewer adds the paragraphs
-		/// of a colored text a few at a time, so that a long one does not freeze the window: it only takes longer to be all there.
+		/// The longest text that is colored, in characters (the viewer reads at most 4 MB of a file). The viewer draws only the lines
+		/// of a colored text that can be seen, so a long one shows as fast as a short one.
 		/// </summary>
 		public const Int32 MaxColoredLength = 4 * 1024 * 1024;
 
-		/// <summary>The most parts a colored text can have: the document of the viewer has a run for each.</summary>
+		/// <summary>The most parts a colored text can have: they are kept in memory as long as the text is shown.</summary>
 		public const Int32 MaxColoredParts = 500_000;
 
 		private Byte[] _data = Array.Empty<Byte>();
@@ -30,6 +30,7 @@ namespace DatExplorerIII.ViewModels
 		private IReadOnlyList<TextEncodingOption> _options;
 		private TextEncodingOption _selectedEncoding;
 		private String _text = String.Empty;
+		private String _plainText = String.Empty;
 		private String _status = String.Empty;
 		private String _notice = String.Empty;
 		private Boolean _wrapLines = true;
@@ -100,6 +101,16 @@ namespace DatExplorerIII.ViewModels
 		{
 			get => _text;
 			private set => SetProperty(ref _text, value);
+		}
+
+		/// <summary>
+		/// The text for the plain text box: the text when it has no colors, nothing when it has some (the colored text is shown by
+		/// another box, and a text box that holds a long text, even hidden, takes seconds to make).
+		/// </summary>
+		public String PlainText
+		{
+			get => _plainText;
+			private set => SetProperty(ref _plainText, value);
 		}
 
 		/// <summary>The encoding, the size and the number of lines.</summary>
@@ -383,6 +394,7 @@ namespace DatExplorerIII.ViewModels
 			_missingLines = null;
 			SyntaxSpans = null;
 			Text = String.Empty;
+			PlainText = String.Empty;
 			Status = String.Empty;
 			Notice = String.Empty;
 			NoticeTip = null;
@@ -419,6 +431,7 @@ namespace DatExplorerIII.ViewModels
 			DecodedText decoded = TextDecoder.Decode(_data, _selectedEncoding.CodePage);
 			Text = decoded.Text;
 			SyntaxSpans = Colorize(decoded);
+			PlainText = SyntaxSpans == null ? decoded.Text : String.Empty;
 
 			String encoding = decoded.IsDetected ? Loc.Format("Str.EncodingDetected", decoded.EncodingName) : decoded.EncodingName;
 			Int32 lines = 1 + decoded.Text.Count(character => character == '\n');

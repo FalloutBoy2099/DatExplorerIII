@@ -6,6 +6,7 @@ namespace DatExplorerIII.Tests
 	using DatExplorerIII.Formats;
 	using DatExplorerIII.Models;
 	using DatExplorerIII.ViewModels;
+	using DatExplorerIII.ViewModels.Viewer;
 
 	/// <summary>The comments (two slashes) of the message files and of the dialogs: at the end of a line, and between the lines.</summary>
 	public sealed class BraceCommentsTests

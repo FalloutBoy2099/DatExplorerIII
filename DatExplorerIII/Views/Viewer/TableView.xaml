@@ -1,0 +1,128 @@
+﻿<UserControl
+    x:Class="DatExplorerIII.Views.Viewer.TableView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:behaviors="clr-namespace:DatExplorerIII.Views.Behaviors"
+    xmlns:infrastructure="clr-namespace:DatExplorerIII.Infrastructure"
+    xmlns:viewer="clr-namespace:DatExplorerIII.Views.Viewer">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="ViewerResources.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <Style
+                x:Key="StripedRow"
+                BasedOn="{StaticResource {x:Type DataGridRow}}"
+                TargetType="DataGridRow">
+                <!--  The rows are drawn on the background of the window: without it the even ones are white on a dark theme.  -->
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
+                <Setter Property="MinHeight" Value="0" />
+                <Style.Triggers>
+                    <Trigger Property="ItemsControl.AlternationIndex" Value="1">
+                        <Setter Property="Background" Value="{StaticResource StripeBrush}" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+
+            <!--  The same for a table that has comments between its lines (a message file, a dialog): they are in the color of the comments, in italics.  -->
+            <Style
+                x:Key="StripedCommentRow"
+                BasedOn="{StaticResource StripedRow}"
+                TargetType="DataGridRow">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsComment}" Value="True">
+                        <Setter Property="Foreground" Value="{DynamicResource SystemFillColorSuccessBrush}" />
+                        <Setter Property="FontStyle" Value="Italic" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
+            <!--  The table of a message file, a dialog or the variables: the lines have the other style only when a column marks the comments.  -->
+            <Style
+                x:Key="TableGrid"
+                BasedOn="{StaticResource {x:Type DataGrid}}"
+                TargetType="DataGrid">
+                <Setter Property="RowStyle" Value="{StaticResource StripedRow}" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding HasCommentRows}" Value="True">
+                        <Setter Property="RowStyle" Value="{StaticResource StripedCommentRow}" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
+            <!--  A cell of a table: as high as its text (the theme gives the cells room that a table of thousands of lines cannot afford).  -->
+            <Style
+                x:Key="CompactCell"
+                BasedOn="{StaticResource {x:Type DataGridCell}}"
+                TargetType="DataGridCell">
+                <Setter Property="MinHeight" Value="0" />
+                <Setter Property="Padding" Value="4,1" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+            </Style>
+
+            <!--  The text of a cell of a table can go on several lines  -->
+            <Style x:Key="WrapCell" TargetType="TextBlock">
+                <Setter Property="TextWrapping" Value="Wrap" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="Margin" Value="0" />
+            </Style>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Style="{StaticResource Notice}" Text="{Binding Notice}" />
+
+        <DataGrid
+            Grid.Row="1"
+            AlternationCount="2"
+            AutoGenerateColumns="True"
+            AutoGeneratingColumn="OnAutoGeneratingColumn"
+            Background="Transparent"
+            CanUserAddRows="False"
+            CanUserDeleteRows="False"
+            CellStyle="{StaticResource CompactCell}"
+            GridLinesVisibility="Horizontal"
+            HeadersVisibility="Column"
+            IsReadOnly="True"
+            ItemsSource="{Binding Rows}"
+            SelectionUnit="FullRow"
+            Style="{StaticResource TableGrid}" />
+
+        <Grid Grid.Row="2" Margin="0,6,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock
+                VerticalAlignment="Center"
+                Opacity="0.7"
+                Text="{Binding Status}"
+                TextTrimming="CharacterEllipsis" />
+
+            <!--  The comments of the file (two slashes): at the end of the lines, and between them.  -->
+            <StackPanel
+                Grid.Column="1"
+                Orientation="Horizontal"
+                Visibility="{Binding HasComments, Converter={StaticResource BoolToVisibility}}">
+                <CheckBox
+                    Margin="12,0,0,0"
+                    Content="{DynamicResource Str.TableShowLineComments}"
+                    IsChecked="{Binding ShowLineComments}"
+                    Style="{StaticResource ToolbarCheckBox}" />
+                <CheckBox
+                    Margin="12,0,0,0"
+                    Content="{DynamicResource Str.TableShowBlockComments}"
+                    IsChecked="{Binding ShowBlockComments}"
+                    Style="{StaticResource ToolbarCheckBox}" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

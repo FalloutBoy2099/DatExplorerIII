@@ -13,6 +13,7 @@ namespace DatExplorerIII.Tests
 	using DatExplorerIII.Models;
 	using DatExplorerIII.Services;
 	using DatExplorerIII.ViewModels;
+	using DatExplorerIII.ViewModels.Viewer;
 
 	/// <summary>The fonts (.aaf, .fon), the lip synchronization files (.lip), the variables (.gam) and the subtitles (.sve) of Fallout.</summary>
 	public sealed class FalloutFilesTests : IDisposable

@@ -10,6 +10,7 @@ namespace DatExplorerIII.ViewModels.Main
 	using Infrastructure;
 	using Models;
 	using Services;
+	using ViewModels.Viewer;
 
 	/// <summary>
 	/// State and behavior of the main window. The behavior is split by feature in the other files of this class.

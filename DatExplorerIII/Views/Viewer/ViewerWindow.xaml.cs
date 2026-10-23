@@ -1,8 +1,9 @@
-namespace DatExplorerIII.Views
+namespace DatExplorerIII.Views.Viewer
 {
 	using System;
 	using System.Windows;
 	using ViewModels;
+	using ViewModels.Viewer;
 
 	/// <summary>
 	/// A window that shows one file. Several of them can be open at the same time.

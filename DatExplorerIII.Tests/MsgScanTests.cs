@@ -10,6 +10,7 @@ namespace DatExplorerIII.Tests
 	using DatExplorerIII.Models;
 	using DatExplorerIII.Services;
 	using DatExplorerIII.ViewModels;
+	using DatExplorerIII.ViewModels.Viewer;
 	using DatExplorerIII.Views;
 
 	/// <summary>The check of the message files: of a folder, an archive, and a command line; and the window that lists the problems.</summary>

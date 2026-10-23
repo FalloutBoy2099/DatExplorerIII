@@ -14,6 +14,7 @@ namespace DatExplorerIII.Tests
 	using DatExplorerIII.Models;
 	using DatExplorerIII.Services;
 	using DatExplorerIII.ViewModels;
+	using DatExplorerIII.ViewModels.Viewer;
 
 	/// <summary>
 	/// The files of Arcanum (messages, dialogs, art) and the usual picture and sound files.
