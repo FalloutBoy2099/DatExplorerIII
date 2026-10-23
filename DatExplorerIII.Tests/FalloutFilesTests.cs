@@ -9,9 +9,16 @@ namespace DatExplorerIII.Tests
 	using System.Text;
 	using System.Threading.Tasks;
 	using DatExplorerIII.Core;
-	using DatExplorerIII.Formats;
-	using DatExplorerIII.Models;
-	using DatExplorerIII.Services;
+	using DatExplorerIII.Formats.Audio;
+	using DatExplorerIII.Formats.GameFiles;
+	using DatExplorerIII.Formats.Graphics;
+	using DatExplorerIII.Models.Audio;
+	using DatExplorerIII.Models.GameFiles;
+	using DatExplorerIII.Models.Graphics;
+	using DatExplorerIII.Models.Interface;
+	using DatExplorerIII.Services.Media;
+	using DatExplorerIII.Services.Platform;
+	using DatExplorerIII.Services.Texts;
 	using DatExplorerIII.ViewModels;
 	using DatExplorerIII.ViewModels.Viewer;
 
@@ -29,8 +36,7 @@ namespace DatExplorerIII.Tests
 					Directory.Delete(folder, true);
 				}
 				catch (IOException)
-				{
-				}
+				{ }
 			}
 		}
 
@@ -88,8 +94,7 @@ namespace DatExplorerIII.Tests
 					AafReader.Read(data[..length]);
 				}
 				catch (InvalidDataException)
-				{
-				}
+				{ }
 			}
 		}
 
@@ -176,8 +181,7 @@ namespace DatExplorerIII.Tests
 					FonReader.Read(data[..length]);
 				}
 				catch (InvalidDataException)
-				{
-				}
+				{ }
 			}
 		}
 
@@ -245,8 +249,7 @@ namespace DatExplorerIII.Tests
 					LipReader.Read(data[..length]);
 				}
 				catch (InvalidDataException)
-				{
-				}
+				{ }
 			}
 		}
 
@@ -409,7 +412,7 @@ namespace DatExplorerIII.Tests
 
 		#region Helpers
 
-		private readonly List<String> _folders = new();
+		private readonly List<String> _folders = [];
 
 		/// <summary>A folder with the files, that is opened as an archive.</summary>
 		private String Folder(params (String Directory, String Name, Byte[] Content)[] files)

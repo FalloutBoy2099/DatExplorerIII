@@ -7,9 +7,10 @@ namespace DatExplorerIII.ViewModels.Viewer
 	using System.Threading;
 	using System.Threading.Tasks;
 	using Core;
-	using Formats;
-	using Models;
-	using Services;
+	using Models.Archives;
+	using Models.Interface;
+	using Services.ArcanumScripts;
+	using Services.Interface;
 	using Scripts;
 
 	/// <summary>The scripts: a compiled script of Fallout (.int) is shown as the source it decompiles to, one of Arcanum (.scr) as a text.</summary>
@@ -29,9 +30,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 				token.ThrowIfCancellationRequested();
 				String note = Loc.Get("Str.ViewerDecompiled");
 				if (script.Messages.Count > 0)
-				{
 					note += Loc.Format("Str.ViewerDecompiledWarnings", script.Messages.Count);
-				}
 
 				Byte[] text = System.Text.Encoding.UTF8.GetBytes(script.Text);
 				Text.Show(text, text.Length, ".ssl", note);

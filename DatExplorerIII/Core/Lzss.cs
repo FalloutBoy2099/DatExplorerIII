@@ -23,9 +23,7 @@ namespace DatExplorerIII.Core
 		{
 			// A match of 18 bytes takes 2 bytes (and a flag bit): the data cannot expand more than about 8.5 times.
 			if (unpackedSize < 0 || unpackedSize > source.Length * 10L + 64)
-			{
 				throw new InvalidDataException("The announced size of the file is impossible.");
-			}
 
 			Byte[] output = new Byte[unpackedSize];
 			Byte[] dictionary = new Byte[DictionarySize];
@@ -39,9 +37,7 @@ namespace DatExplorerIII.Core
 				position += 2;
 
 				if (blockSize == 0)
-				{
 					break;
-				}
 
 				if (blockSize < 0)
 				{
@@ -97,9 +93,7 @@ namespace DatExplorerIII.Core
 			}
 
 			if (outputIndex != unpackedSize)
-			{
 				throw new InvalidDataException("The compressed data of the file is truncated.");
-			}
 
 			return output;
 		}

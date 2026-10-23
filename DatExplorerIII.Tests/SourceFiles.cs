@@ -18,9 +18,7 @@ namespace DatExplorerIII.Tests
 				{
 					String candidate = Path.Combine(folder, "DatExplorerIII", "DatExplorerIII.csproj");
 					if (File.Exists(candidate))
-					{
 						return Path.GetDirectoryName(candidate)!;
-					}
 
 					folder = Path.GetDirectoryName(folder);
 				}

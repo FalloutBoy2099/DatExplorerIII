@@ -2,8 +2,8 @@ namespace DatExplorerIII.Tests
 {
 	using System;
 	using System.Globalization;
-	using DatExplorerIII.Models;
-	using DatExplorerIII.Services;
+	using DatExplorerIII.Models.Interface;
+	using DatExplorerIII.Services.Interface;
 	using DatExplorerIII.ViewModels;
 
 	/// <summary>The size of the scroll bars: a slider that is never smaller than the user wants, and the settings that say so.</summary>

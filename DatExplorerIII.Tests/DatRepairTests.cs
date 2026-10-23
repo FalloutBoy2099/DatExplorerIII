@@ -7,7 +7,7 @@ namespace DatExplorerIII.Tests
 	using System.Linq;
 	using System.Text;
 	using DatExplorerIII.Core;
-	using DatExplorerIII.Models;
+	using DatExplorerIII.Models.Archives;
 
 	/// <summary>
 	/// Reading damaged archives: recovery, verification, repair, and the guarantee that a hostile file
@@ -61,7 +61,7 @@ namespace DatExplorerIII.Tests
 			Int32 count = BinaryPrimitives.ReadInt32LittleEndian(file.AsSpan(position));
 			position += 4;
 
-			List<Int32> positions = new();
+			List<Int32> positions = [];
 			for (Int32 i = 0; i < count; i++)
 			{
 				positions.Add(position);
@@ -314,9 +314,7 @@ namespace DatExplorerIII.Tests
 					}
 
 					if (random.Next(8) == 0)
-					{
 						Array.Resize(ref bytes, random.Next(bytes.Length));
-					}
 
 					File.WriteAllBytes(target, bytes);
 

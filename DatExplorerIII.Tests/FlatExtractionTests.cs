@@ -6,7 +6,7 @@ namespace DatExplorerIII.Tests
 	using System.IO.Compression;
 	using System.Linq;
 	using DatExplorerIII.Core;
-	using DatExplorerIII.Models;
+	using DatExplorerIII.Models.Archives;
 
 	/// <summary>Extraction with no folders: the files that share a name get the suffix _1, _2...</summary>
 	public sealed class FlatExtractionTests : IDisposable

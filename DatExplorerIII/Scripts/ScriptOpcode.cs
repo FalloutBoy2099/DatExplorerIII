@@ -34,9 +34,7 @@ namespace DatExplorerIII.Scripts
 
 			UInt32 argument = 0;
 			if (op == Opcode.O_STRINGOP || op == Opcode.O_FLOATOP || op == Opcode.O_INTOP)
-			{
 				argument = reader.ReadUInt32();
-			}
 
 			return new ScriptOpcode(op, argument);
 		}
@@ -45,14 +43,10 @@ namespace DatExplorerIII.Scripts
 		{
 			ScriptOpcode opcode = Read(reader);
 			if (opcode.Operator != expected)
-			{
 				throw new ScriptFormatException(String.Format(CultureInfo.InvariantCulture, "Error: Unexpected opcode (0x{0:X4} expected, but 0x{1:X4} found)", (UInt16)expected, (UInt16)opcode.Operator));
-			}
 
 			if (argumentFound && opcode.HasArgument && opcode.Argument != expectedArgument)
-			{
 				throw new ScriptFormatException(String.Format(CultureInfo.InvariantCulture, "Error: Unexpected argument of opcode. (0x{0:X8} expected, but 0x{1:X8} found)", expectedArgument, opcode.Argument));
-			}
 
 			return opcode;
 		}

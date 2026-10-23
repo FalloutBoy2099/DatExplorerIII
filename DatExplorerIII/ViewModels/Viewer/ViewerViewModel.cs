@@ -8,11 +8,13 @@ namespace DatExplorerIII.ViewModels.Viewer
 	using System.Threading;
 	using System.Threading.Tasks;
 	using Core;
-	using Formats;
 	using Infrastructure;
-	using Models;
+	using Models.Archives;
+	using Models.GameFiles;
+	using Models.Interface;
 	using Scripts;
-	using Services;
+	using Services.Interface;
+	using Services.Platform;
 
 	/// <summary>
 	/// The viewer of a file: it reads the file, then shows it as a text, a picture or a sound according to its extension.
@@ -178,14 +180,12 @@ namespace DatExplorerIII.ViewModels.Viewer
 			try
 			{
 				if (quick)
-				{
 					await Task.Delay(QuickSuccessionDelay, token);
-				}
 
 				Byte[] data = await Task.Run(() => archive.ReadData(entry), token);
 				List<PaletteChoice> palettes = kind == FileViewerKind.Image && IsAnimation(entry.Name)
 					? await Task.Run(() => ReadPalettes(archive, entry), token)
-					: new List<PaletteChoice>();
+					: [];
 				token.ThrowIfCancellationRequested();
 
 				await ShowContentAsync(archive, entry, kind, data, palettes, token);
@@ -197,32 +197,24 @@ namespace DatExplorerIII.ViewModels.Viewer
 			catch (InvalidDataException)
 			{
 				if (!token.IsCancellationRequested)
-				{
 					Show(null, Loc.Get("Str.ViewerInvalid"));
-				}
 			}
 			catch (Exception exception) when (exception is DatException or IOException or UnauthorizedAccessException)
 			{
 				if (!token.IsCancellationRequested)
-				{
 					Show(null, ErrorText.Describe(exception));
-				}
 			}
 			catch (Exception exception) when (exception is not OperationCanceledException)
 			{
 				// A damaged file must never bring the program down: whatever the reader tripped on, the viewer says it cannot show it.
 				ErrorLog.Write(exception);
 				if (!token.IsCancellationRequested)
-				{
 					Show(null, Loc.Get("Str.ViewerInvalid"));
-				}
 			}
 			finally
 			{
 				if (_loading == loading)
-				{
 					IsLoading = false;
-				}
 			}
 		}
 
@@ -253,9 +245,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 			Table.RefreshLanguage();
 			Map.RefreshLanguage();
 			if (_kind == null && _message.Length > 0 && Title.Length == 0)
-			{
 				Message = Loc.Get("Str.ViewerNoPreview");
-			}
 		}
 
 		public void Dispose()
@@ -283,44 +273,28 @@ namespace DatExplorerIII.ViewModels.Viewer
 
 			// What the other viewers still hold (a movie can take tens of megabytes) is let go of.
 			if (kind != FileViewerKind.Text)
-			{
 				Text.Clear();
-			}
 
 			if (kind != FileViewerKind.Image)
-			{
 				Image.Clear();
-			}
 
 			if (kind != FileViewerKind.Audio)
-			{
 				Audio.Clear();
-			}
 
 			if (kind != FileViewerKind.Video)
-			{
 				Video.Clear();
-			}
 
 			if (kind != FileViewerKind.Character)
-			{
 				Character.Clear();
-			}
 
 			if (kind != FileViewerKind.Prototype)
-			{
 				Prototype.Clear();
-			}
 
 			if (kind != FileViewerKind.Table)
-			{
 				Table.Clear();
-			}
 
 			if (kind != FileViewerKind.Map)
-			{
 				Map.Clear();
-			}
 		}
 
 	}

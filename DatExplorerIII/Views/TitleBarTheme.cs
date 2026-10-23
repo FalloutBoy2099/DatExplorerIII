@@ -4,7 +4,7 @@ namespace DatExplorerIII.Views
 	using System.Runtime.InteropServices;
 	using System.Windows;
 	using System.Windows.Interop;
-	using Services;
+	using Services.Interface;
 
 	/// <summary>
 	/// Gives the title bar of a window the dark or light look of the application theme.

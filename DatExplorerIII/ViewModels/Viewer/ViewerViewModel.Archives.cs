@@ -7,9 +7,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 	using System.Threading;
 	using System.Threading.Tasks;
 	using Core;
-	using Formats;
-	using Models;
-	using Services;
+	using Models.Archives;
 
 	/// <summary>The archives that are open: a file of the game is looked for in all of them.</summary>
 	public sealed partial class ViewerViewModel
@@ -32,9 +30,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 				{
 					DatEntry? entry = candidate.Find(path);
 					if (entry == null || entry.IsDamaged)
-					{
 						continue;
-					}
 
 					return candidate.ReadData(entry);
 				}

@@ -6,8 +6,9 @@ namespace DatExplorerIII.ViewModels
 	using System.Linq;
 	using System.Windows.Input;
 	using Infrastructure;
-	using Models;
-	using Services;
+	using Models.GameFiles;
+	using Services.Checks;
+	using Services.Interface;
 
 	/// <summary>A problem of a message file, as the list shows it.</summary>
 	public sealed record MsgIssueRow(String File, MsgIssueSeverity Severity, String SeverityText, Int32 Line, Int32 Column, String Message, String Excerpt);
@@ -82,9 +83,7 @@ namespace DatExplorerIII.ViewModels
 			private set
 			{
 				if (SetProperty(ref _files, value))
-				{
 					OnPropertyChanged(nameof(HasFiles));
-				}
 			}
 		}
 
@@ -181,9 +180,7 @@ namespace DatExplorerIII.ViewModels
 		private void SetFilter(ref Boolean field, Boolean value)
 		{
 			if (field == value)
-			{
 				return;
-			}
 
 			field = value;
 			Rebuild(_selectedFile?.Path);

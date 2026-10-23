@@ -2,8 +2,10 @@ namespace DatExplorerIII.ViewModels
 {
 	using System;
 	using Infrastructure;
-	using Models;
-	using Services;
+	using Models.Archives;
+	using Models.GameFiles;
+	using Services.Checks;
+	using Services.Interface;
 
 	/// <summary>
 	/// A line of the file list: a sub folder or a file of the current folder.

@@ -8,11 +8,13 @@ namespace DatExplorerIII.ViewModels
 	using System.Threading.Tasks;
 	using System.Windows.Input;
 	using Core;
-	using Formats;
+	using Formats.GameFiles;
 	using Infrastructure;
-	using Models;
+	using Models.Archives;
+	using Models.Comparison;
 	using Scripts;
-	using Services;
+	using Services.Interface;
+	using Services.Texts;
 	using ViewModels.Viewer;
 
 	/// <summary>A file of the comparison of two archives, as a line of the list.</summary>
@@ -107,9 +109,7 @@ namespace DatExplorerIII.ViewModels
 			set
 			{
 				if (SetProperty(ref _name, value))
-				{
 					OnPropertyChanged(nameof(Display));
-				}
 			}
 		}
 
@@ -120,7 +120,7 @@ namespace DatExplorerIII.ViewModels
 
 		public Int32 Depth { get; }
 
-		public List<ComparisonFolder> Children { get; } = new();
+		public List<ComparisonFolder> Children { get; } = [];
 
 		/// <summary>How many files of the folder and of its sub folders are not identical in the two archives.</summary>
 		public Int32 Differences
@@ -156,9 +156,7 @@ namespace DatExplorerIII.ViewModels
 			set
 			{
 				if (SetProperty(ref _isSelected, value) && value)
-				{
 					Selected?.Invoke(this);
-				}
 			}
 		}
 	}
@@ -179,7 +177,7 @@ namespace DatExplorerIII.ViewModels
 		private Boolean _showDifferences;
 		private CancellationTokenSource? _diffCancellation;
 		private ComparisonFolder _selectedFolder;
-		private readonly Dictionary<String, ComparisonFolder> _folderByPath = new(StringComparer.OrdinalIgnoreCase);
+		private readonly Dictionary<String, ComparisonFolder> _folderByPath = [with(StringComparer.OrdinalIgnoreCase)];
 
 		private readonly Func<IEnumerable<DatArchive>> _archives;
 
@@ -220,9 +218,7 @@ namespace DatExplorerIII.ViewModels
 			set
 			{
 				if (SetProperty(ref _showDifferences, value))
-				{
 					ShowSelection();
-				}
 			}
 		}
 
@@ -245,9 +241,7 @@ namespace DatExplorerIII.ViewModels
 			set
 			{
 				if (value is not null)
-				{
 					SelectFolder(value);
-				}
 			}
 		}
 
@@ -258,18 +252,14 @@ namespace DatExplorerIII.ViewModels
 			set
 			{
 				if (SetProperty(ref _includeSubfolders, value))
-				{
 					ApplyFilter();
-				}
 			}
 		}
 
 		private void SelectFolder(ComparisonFolder folder)
 		{
 			if (ReferenceEquals(folder, _selectedFolder))
-			{
 				return;
-			}
 
 			ComparisonFolder previous = _selectedFolder;
 			_selectedFolder = folder;
@@ -311,7 +301,7 @@ namespace DatExplorerIII.ViewModels
 				}
 			}
 
-			List<ComparisonFolder> flat = new();
+			List<ComparisonFolder> flat = [];
 			void Walk(ComparisonFolder folder)
 			{
 				flat.Add(folder);
@@ -380,9 +370,7 @@ namespace DatExplorerIII.ViewModels
 			set
 			{
 				if (SetProperty(ref _showIdentical, value))
-				{
 					ApplyFilter();
-				}
 			}
 		}
 
@@ -392,9 +380,7 @@ namespace DatExplorerIII.ViewModels
 			set
 			{
 				if (SetProperty(ref _showDifferent, value))
-				{
 					ApplyFilter();
-				}
 			}
 		}
 
@@ -404,9 +390,7 @@ namespace DatExplorerIII.ViewModels
 			set
 			{
 				if (SetProperty(ref _showLeftOnly, value))
-				{
 					ApplyFilter();
-				}
 			}
 		}
 
@@ -416,9 +400,7 @@ namespace DatExplorerIII.ViewModels
 			set
 			{
 				if (SetProperty(ref _showRightOnly, value))
-				{
 					ApplyFilter();
-				}
 			}
 		}
 
@@ -600,9 +582,7 @@ namespace DatExplorerIII.ViewModels
 						FileTextResult rightResult = FileTextView.TryGetLines(name, rightData, ResourcesFor(Right.Archive, others), GameOf(Right.Archive), out IReadOnlyList<String> rightLines);
 
 						if (leftResult != FileTextResult.Lines || rightResult != FileTextResult.Lines)
-						{
 							return (leftResult != FileTextResult.Lines ? leftResult : rightResult, (IReadOnlyList<DiffRow>)[], true, (IReadOnlyList<DiffNote>)[]);
-						}
 
 						IReadOnlyList<DiffRow> rows = TextDiff.Compare(leftLines, rightLines, usesOptions ? options : null, out Boolean exact);
 						return (FileTextResult.Lines, rows, exact, isText ? TextContentComparer.Notes(leftData, rightData, options) : []);
@@ -612,17 +592,13 @@ namespace DatExplorerIII.ViewModels
 			catch (Exception exception) when (exception is DatException or IOException or UnauthorizedAccessException or InvalidDataException or OperationCanceledException)
 			{
 				if (!cancellation.IsCancellationRequested)
-				{
 					Diff.ShowMessage("Str.CompareDiffNotText");
-				}
 
 				return;
 			}
 
 			if (cancellation.IsCancellationRequested)
-			{
 				return;
-			}
 
 			switch (outcome.Result)
 			{
@@ -654,9 +630,7 @@ namespace DatExplorerIII.ViewModels
 					{
 						DatEntry? entry = candidate.Find(path);
 						if (entry != null && !entry.IsDamaged)
-						{
 							return candidate.ReadData(entry);
-						}
 					}
 					catch (Exception exception) when (exception is DatException or IOException or InvalidOperationException)
 					{

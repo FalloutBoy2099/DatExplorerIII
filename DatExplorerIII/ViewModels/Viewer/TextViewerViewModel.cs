@@ -6,10 +6,13 @@ namespace DatExplorerIII.ViewModels.Viewer
 	using System.Linq;
 	using System.Text.RegularExpressions;
 	using System.Windows.Input;
-	using Formats;
+	using Formats.GameFiles;
 	using Infrastructure;
-	using Models;
-	using Services;
+	using Models.GameFiles;
+	using Services.Checks;
+	using Services.Interface;
+	using Services.Syntax;
+	using Services.Texts;
 
 	/// <summary>
 	/// A text shown in the viewer, with the choice of the encoding it is read with.
@@ -86,14 +89,10 @@ namespace DatExplorerIII.ViewModels.Viewer
 			set
 			{
 				if (_refreshingLanguage || value is null)
-				{
 					return;
-				}
 
 				if (SetProperty(ref _selectedEncoding, value) && _data.Length > 0)
-				{
 					Decode();
-				}
 			}
 		}
 
@@ -133,9 +132,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 			set
 			{
 				if (SetProperty(ref _problemsRequested, value))
-				{
 					OnPropertyChanged(nameof(CanShowProblems));
-				}
 			}
 		}
 
@@ -178,9 +175,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 		{
 			String? answer = Ask?.Invoke(Loc.Get("Str.TextFind").TrimEnd('.'), Loc.Get("Str.TextFindLabel"), _findText, null);
 			if (String.IsNullOrEmpty(answer))
-			{
 				return;
-			}
 
 			_findText = answer;
 			FindFrom(answer);
@@ -191,9 +186,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 		{
 			Int32 index = _text.IndexOf(needle, Math.Min(_cursor, _text.Length), StringComparison.OrdinalIgnoreCase);
 			if (index < 0 && _cursor > 0)
-			{
 				index = _text.IndexOf(needle, StringComparison.OrdinalIgnoreCase);
-			}
 
 			if (index < 0)
 			{
@@ -213,9 +206,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 				"1",
 				value => Int32.TryParse(value, NumberStyles.None, CultureInfo.CurrentCulture, out Int32 number) && number >= 1 && number <= lines ? null : Loc.Format("Str.TextLineRange", lines));
 			if (answer == null || !Int32.TryParse(answer, NumberStyles.None, CultureInfo.CurrentCulture, out Int32 line))
-			{
 				return;
-			}
 
 			Int32 start = 0;
 			for (Int32 skipped = 1; skipped < line; skipped++)
@@ -226,9 +217,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 			Int32 end = _text.IndexOf('\n', start);
 			Int32 length = (end < 0 ? _text.Length : end) - start;
 			if (length > 0 && _text[start + length - 1] == '\r')
-			{
 				length--;
-			}
 
 			RevealPart(start, length);
 		}
@@ -241,9 +230,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 				String.Empty,
 				value => UInt32.TryParse(value, NumberStyles.None, CultureInfo.CurrentCulture, out _) ? null : Loc.Get("Str.TextIdInvalid"));
 			if (answer == null || !UInt32.TryParse(answer, NumberStyles.None, CultureInfo.CurrentCulture, out UInt32 id))
-			{
 				return;
-			}
 
 			// The number of a message is the first part of a line: {id}{sound}{text} (a number may have leading zeros).
 			Match match = Regex.Match(_text, @"^[ \t]*(?<id>\{[ \t]*0*" + id.ToString(CultureInfo.InvariantCulture) + @"[ \t]*\})", RegexOptions.Multiline | RegexOptions.CultureInvariant);
@@ -292,9 +279,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 			private set
 			{
 				if (SetProperty(ref _syntaxSpans, value))
-				{
 					OnPropertyChanged(nameof(IsHighlighted));
-				}
 			}
 		}
 
@@ -334,16 +319,12 @@ namespace DatExplorerIII.ViewModels.Viewer
 		/// <summary>"2 missing files, 5 files not listed".</summary>
 		private static String ListNotice(LstReport list)
 		{
-			List<String> parts = new();
+			List<String> parts = [];
 			if (list.Missing.Count > 0)
-			{
 				parts.Add(Loc.Plural("Str.PluralLstMissing", list.Missing.Count));
-			}
 
 			if (list.Unlisted.Count > 0)
-			{
 				parts.Add(Loc.Plural("Str.PluralLstUnlisted", list.Unlisted.Count));
-			}
 
 			return String.Join(Loc.Get("Str.MsgListSeparator"), parts);
 		}
@@ -352,15 +333,13 @@ namespace DatExplorerIII.ViewModels.Viewer
 		private static String ListTip(LstReport list)
 		{
 			const Int32 limit = 25;
-			List<String> lines = new();
+			List<String> lines = [];
 			if (list.Missing.Count > 0)
 			{
 				lines.Add(Loc.Get("Str.LstTipMissing"));
 				lines.AddRange(list.Missing.Take(limit).Select(file => "  " + file.Name + " (" + file.Line + ")"));
 				if (list.Missing.Count > limit)
-				{
 					lines.Add("  …");
-				}
 			}
 
 			if (list.Unlisted.Count > 0)
@@ -368,9 +347,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 				lines.Add(Loc.Get("Str.LstTipUnlisted"));
 				lines.AddRange(list.Unlisted.Take(limit).Select(file => "  " + file));
 				if (list.Unlisted.Count > limit)
-				{
 					lines.Add("  …");
-				}
 			}
 
 			return String.Join(Environment.NewLine, lines);
@@ -421,9 +398,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 			OnPropertyChanged(nameof(SelectedEncoding));
 
 			if (_data.Length > 0)
-			{
 				Decode();
-			}
 		}
 
 		private void Decode()
@@ -462,9 +437,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 		{
 			List<MsgIssue> issues = MsgValidator.Validate(text).Where(issue => !DisabledMessageChecks.Contains(issue.Kind)).ToList();
 			if (issues.Count == 0)
-			{
 				return _note;
-			}
 
 			return MsgIssueSummary.Describe(issues);
 		}
@@ -490,9 +463,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 			}
 
 			if (decoded.LooksBinary || tokenize == null)
-			{
 				return null;
-			}
 
 			if (decoded.Text.Length > MaxColoredLength)
 			{

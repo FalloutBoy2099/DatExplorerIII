@@ -30,9 +30,7 @@ namespace DatExplorerIII.Views.Behaviors
 		private static void OnCommandChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
 		{
 			if (sender is not UIElement element)
-			{
 				return;
-			}
 
 			element.DragOver -= OnDragOver;
 			element.Drop -= OnDrop;
@@ -48,9 +46,7 @@ namespace DatExplorerIII.Views.Behaviors
 		private static String[]? PathsOf(IDataObject data)
 		{
 			if (data.GetDataPresent(FileDrag.InternalFormat) || !data.GetDataPresent(DataFormats.FileDrop))
-			{
 				return null;
-			}
 
 			return data.GetData(DataFormats.FileDrop) as String[];
 		}
@@ -68,9 +64,7 @@ namespace DatExplorerIII.Views.Behaviors
 			ICommand? command = GetCommand((DependencyObject)sender);
 			String[]? paths = PathsOf(e.Data);
 			if (command != null && paths != null && command.CanExecute(paths))
-			{
 				command.Execute(paths);
-			}
 
 			e.Handled = true;
 		}

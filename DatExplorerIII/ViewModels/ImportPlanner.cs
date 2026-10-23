@@ -5,8 +5,8 @@ namespace DatExplorerIII.ViewModels
 	using System.IO;
 	using System.Threading;
 	using Core;
-	using Models;
-	using Services;
+	using Models.Archives;
+	using Services.Interface;
 
 	/// <summary>
 	/// Decides which files are imported and where they go.
@@ -20,7 +20,7 @@ namespace DatExplorerIII.ViewModels
 		/// <param name="mergeFolderContents">True to import the content of a folder, false to import the folder itself.</param>
 		public static List<ImportItem> Collect(IReadOnlyList<String> paths, Boolean mergeFolderContents, CancellationToken token)
 		{
-			List<ImportItem> items = new();
+			List<ImportItem> items = [];
 			EnumerationOptions options = new()
 			{
 				RecurseSubdirectories = true,
@@ -60,8 +60,8 @@ namespace DatExplorerIII.ViewModels
 		/// <returns>The steps to run, or null when the user cancelled.</returns>
 		public static List<ImportStep>? Plan(DatArchive archive, String targetPath, IReadOnlyList<ImportItem> items, ConflictResolver resolver, out List<DatEntry> replaced)
 		{
-			List<ImportStep> steps = new(items.Count);
-			replaced = new List<DatEntry>();
+			List<ImportStep> steps = [with(items.Count)];
+			replaced = [];
 
 			foreach (ImportItem item in items)
 			{

@@ -6,7 +6,7 @@ namespace DatExplorerIII.ViewModels.Main
 	using System.Threading;
 	using System.Threading.Tasks;
 	using Core;
-	using Models;
+	using Models.Archives;
 
 	/// <summary>What the main view model gives to the parts it owns (the comparison), without making it public.</summary>
 	public sealed partial class MainViewModel

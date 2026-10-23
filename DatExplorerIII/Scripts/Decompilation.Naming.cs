@@ -24,9 +24,7 @@ namespace DatExplorerIII.Scripts
 			}
 
 			if (appendSemicolon)
-			{
 				result += ";";
-			}
 
 			return result;
 		}
@@ -34,9 +32,7 @@ namespace DatExplorerIII.Scripts
 		private static String CreateProcedureArguments(UInt32 argumentCount)
 		{
 			if (argumentCount == 0)
-			{
 				return String.Empty;
-			}
 
 			List<String> arguments = [];
 			for (UInt32 index = 0; index < argumentCount; index++)

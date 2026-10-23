@@ -5,7 +5,9 @@ namespace DatExplorerIII
 	using System.IO;
 	using System.Windows;
 	using System.Windows.Threading;
-	using Services;
+	using Services.Checks;
+	using Services.Interface;
+	using Services.Platform;
 	using ViewModels;
 	using ViewModels.Main;
 	using Views;
@@ -50,9 +52,7 @@ namespace DatExplorerIII
 			viewModel.PropertyChanged += (_, args) =>
 			{
 				if (args.PropertyName == nameof(MainViewModel.IsSingleInstance))
-				{
 					ApplySingleInstance(viewModel.IsSingleInstance);
-				}
 			};
 
 			window.Loaded += async (_, _) =>
@@ -103,7 +103,7 @@ namespace DatExplorerIII
 
 		private static List<String> FullPaths(IEnumerable<String> arguments)
 		{
-			List<String> paths = new();
+			List<String> paths = [];
 			foreach (String argument in arguments)
 			{
 				try
@@ -123,18 +123,14 @@ namespace DatExplorerIII
 		private static async void OnOtherLaunch(Views.Main.MainWindow window, MainViewModel viewModel, IReadOnlyList<String> paths)
 		{
 			if (window.WindowState == WindowState.Minimized)
-			{
 				SystemCommands.RestoreWindow(window);
-			}
 
 			window.Activate();
 			window.Topmost = true;
 			window.Topmost = false;
 
 			if (paths.Count > 0)
-			{
 				await viewModel.OpenFromAnotherInstanceAsync(paths);
-			}
 		}
 
 		private static void OnUnhandledException(Object sender, DispatcherUnhandledExceptionEventArgs e)

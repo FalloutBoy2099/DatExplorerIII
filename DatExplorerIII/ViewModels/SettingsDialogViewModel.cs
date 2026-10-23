@@ -4,8 +4,11 @@ namespace DatExplorerIII.ViewModels
 	using System.Collections.Generic;
 	using System.Linq;
 	using Infrastructure;
-	using Models;
-	using Services;
+	using Models.Comparison;
+	using Models.GameFiles;
+	using Models.Interface;
+	using Services.Interface;
+	using Services.Platform;
 
 	/// <summary>A kind of problem of the message files, which the user can turn off.</summary>
 	public sealed class MsgCheckOption : ObservableObject

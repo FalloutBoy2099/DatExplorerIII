@@ -8,8 +8,11 @@ namespace DatExplorerIII.Tests
 	using System.Threading;
 	using System.Xml.Linq;
 	using DatExplorerIII.Core;
-	using DatExplorerIII.Models;
-	using DatExplorerIII.Services;
+	using DatExplorerIII.Models.Archives;
+	using DatExplorerIII.Models.Comparison;
+	using DatExplorerIII.Models.Interface;
+	using DatExplorerIII.Services.Interface;
+	using DatExplorerIII.Services.Platform;
 	using DatExplorerIII.ViewModels;
 	using DatExplorerIII.ViewModels.Viewer;
 
@@ -255,9 +258,7 @@ namespace DatExplorerIII.Tests
 			for (DirectoryInfo? directory = new(AppContext.BaseDirectory); directory != null; directory = directory.Parent)
 			{
 				if (File.Exists(Path.Combine(directory.FullName, "DatExplorerIII.sln")))
-				{
 					return directory.FullName;
-				}
 			}
 
 			return null;
@@ -293,7 +294,7 @@ namespace DatExplorerIII.Tests
 		[Fact]
 		public void RecentFiles_KeepTheLastTenOpened_MostRecentFirst()
 		{
-			List<String> list = new();
+			List<String> list = [];
 			for (Int32 i = 1; i <= 12; i++)
 			{
 				RecentFiles.Add(list, @"C:\dat\file" + i + ".dat");
@@ -442,14 +443,12 @@ namespace DatExplorerIII.Tests
 		{
 			String? solution = FindSolutionFolder();
 			if (solution == null)
-			{
 				return;
-			}
 
 			HashSet<String> keys = EnglishKeys();
-			HashSet<String> prefixes = new() { "Str.Err", "Str.Issue", "Str.Theme", "Str.Stat", "Str.Damage", "Str.Skill", "Str.Trait", "Str.ProItem", "Str.ProScenery", "Str.ProBody", "Str.ArcProType", "Str.MapScriptType", "Str.MapExitKind", "Str.CompareState", "Str.MsgIssue", "Str.MsgSeverity", "Str.MsgCheck" };
+			HashSet<String> prefixes = ["Str.Err", "Str.Issue", "Str.Theme", "Str.Stat", "Str.Damage", "Str.Skill", "Str.Trait", "Str.ProItem", "Str.ProScenery", "Str.ProBody", "Str.ArcProType", "Str.MapScriptType", "Str.MapExitKind", "Str.CompareState", "Str.MsgIssue", "Str.MsgSeverity", "Str.MsgCheck"];
 			Regex usage = new(@"Str\.[A-Za-z0-9]+(\.[A-Za-z0-9]+)?", RegexOptions.Compiled);
-			List<String> missing = new();
+			List<String> missing = [];
 
 			String project = Path.Combine(solution, "DatExplorerIII");
 			IEnumerable<String> sources = Directory.EnumerateFiles(project, "*.*", SearchOption.AllDirectories)
@@ -461,9 +460,7 @@ namespace DatExplorerIII.Tests
 				{
 					String key = match.Value;
 					if (!keys.Contains(key) && !prefixes.Contains(key) && !prefixes.Any(prefix => key.StartsWith(prefix + ".")))
-					{
 						missing.Add($"{key} ({Path.GetFileName(path)})");
-					}
 				}
 			}
 

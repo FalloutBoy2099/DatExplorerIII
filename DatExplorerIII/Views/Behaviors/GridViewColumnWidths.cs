@@ -39,9 +39,7 @@ namespace DatExplorerIII.Views.Behaviors
 		private static void OnWidthsChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
 		{
 			if (sender is ListView list && !StateOf(list).Giving)
-			{
 				Apply(list);
-			}
 		}
 
 		private static State StateOf(ListView list)
@@ -75,15 +73,11 @@ namespace DatExplorerIII.Views.Behaviors
 		private static void OnDragCompleted(Object sender, DragCompletedEventArgs e)
 		{
 			if (sender is not ListView { View: GridView view } list || e.OriginalSource is not DependencyObject source || VisualTree.FindAncestor<GridViewColumnHeader>(source) == null)
-			{
 				return;
-			}
 
 			List<Double> widths = view.Columns.Select(column => Math.Round(Double.IsNaN(column.Width) ? column.ActualWidth : column.Width)).ToList();
 			if (widths.Any(width => width <= 0))
-			{
 				return;
-			}
 
 			State state = StateOf(list);
 			state.Giving = true;

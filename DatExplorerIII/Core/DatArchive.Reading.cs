@@ -9,7 +9,7 @@ namespace DatExplorerIII.Core
 	using System.Runtime.ExceptionServices;
 	using System.Threading;
 	using System.Threading.Tasks;
-	using Models;
+	using Models.Archives;
 
 	public sealed partial class DatArchive
 	{
@@ -59,9 +59,7 @@ namespace DatExplorerIII.Core
 		private static FileStream OpenStream(String filePath)
 		{
 			if (String.IsNullOrWhiteSpace(filePath))
-			{
 				throw new DatException(DatErrorKind.InvalidFileName, "Invalid DAT file name.");
-			}
 
 			try
 			{
@@ -94,9 +92,7 @@ namespace DatExplorerIII.Core
 		{
 			Int64 length = stream.Length;
 			if (length == 0)
-			{
 				throw new DatException(DatErrorKind.EmptyFile, "The DAT file is empty.");
-			}
 
 			try
 			{
@@ -108,24 +104,17 @@ namespace DatExplorerIII.Core
 						return ReadZipArchive(filePath, stream, length);
 					}
 					catch (DatException exception) when (exception.Kind == DatErrorKind.NotADat)
-					{
-					}
+					{ }
 				}
 
 				if (TryReadArcanumFooter(stream, length, out ArcanumFooter arcanumFooter))
-				{
 					return ReadArcanumArchive(filePath, stream, arcanumFooter, length, mode);
-				}
 
 				if (length >= Fallout2FooterSize && TryReadFooter(stream, length, out Int32 treeSize))
-				{
 					return ReadFallout2Archive(filePath, stream, treeSize, length, mode);
-				}
 
 				if (mode == DatOpenMode.Recover && TryFindFooter(stream, out Int64 archiveEnd, out Int32 foundTreeSize))
-				{
 					return ReadFallout2Archive(filePath, stream, foundTreeSize, archiveEnd, mode);
-				}
 
 				if (length >= Fallout1HeaderSize)
 				{
@@ -157,9 +146,7 @@ namespace DatExplorerIII.Core
 		{
 			DatArchive fallout2 = new(filePath, DatFormat.Fallout2);
 			if (archiveEnd < stream.Length)
-			{
 				fallout2._issues.Add(new DatIssue(DatIssueKind.TrailingData, null, stream.Length - archiveEnd));
-			}
 
 			fallout2.ReadFallout2(stream, treeSize, archiveEnd, mode);
 			fallout2.FinishReading(mode);
@@ -206,15 +193,11 @@ namespace DatExplorerIII.Core
 				{
 					Int64 position = start + i;
 					if (BinaryPrimitives.ReadUInt32LittleEndian(buffer.AsSpan(i + 4)) != (UInt32)(position + Fallout2FooterSize))
-					{
 						continue;
-					}
 
 					Int32 candidate = BinaryPrimitives.ReadInt32LittleEndian(buffer.AsSpan(i));
 					if (candidate < 4 || candidate > position)
-					{
 						continue;
-					}
 
 					// The tree starts with the number of files, which cannot be more than the tree can hold.
 					Int64 treeStart = position - candidate;
@@ -224,9 +207,7 @@ namespace DatExplorerIII.Core
 					stream.Position = resume;
 					Int32 fileCount = BinaryPrimitives.ReadInt32LittleEndian(countBuffer);
 					if (fileCount < 0 || fileCount > candidate / MinimumFallout2EntrySize + 1)
-					{
 						continue;
-					}
 
 					archiveEnd = position + Fallout2FooterSize;
 					treeSize = candidate;
@@ -234,9 +215,7 @@ namespace DatExplorerIII.Core
 				}
 
 				if (start == floor)
-				{
 					break;
-				}
 
 				// Overlap by 7 bytes so that a footer cut by the window boundary is seen whole by the next window.
 				windowEnd = start + Fallout2FooterSize - 1;
@@ -251,9 +230,7 @@ namespace DatExplorerIII.Core
 		private void ReadFallout2(FileStream stream, Int32 treeSize, Int64 archiveEnd, DatOpenMode mode)
 		{
 			if (treeSize < 4 || treeSize + (Int64)Fallout2FooterSize > archiveEnd)
-			{
 				throw new DatException(DatErrorKind.InvalidTree, "The directory tree of the DAT file is invalid.");
-			}
 
 			_treeSize = treeSize;
 			_archiveEnd = archiveEnd;
@@ -277,9 +254,7 @@ namespace DatExplorerIII.Core
 			if (parsed < Math.Max(fileCount, 0) || fileCount < 0)
 			{
 				if (mode == DatOpenMode.Strict)
-				{
 					throw new DatException(DatErrorKind.InvalidTree, "The directory tree of the DAT file is damaged.");
-				}
 
 				_issues.Add(new DatIssue(DatIssueKind.TruncatedTree, null, parsed));
 			}
@@ -289,15 +264,11 @@ namespace DatExplorerIII.Core
 		{
 			entry = null;
 			if (position + 4 > tree.Length)
-			{
 				return false;
-			}
 
 			Int32 nameLength = BinaryPrimitives.ReadInt32LittleEndian(tree.AsSpan(position));
 			if (nameLength <= 0 || (Int64)position + 4 + nameLength + 13 > tree.Length)
-			{
 				return false;
-			}
 
 			position += 4;
 			String path = NameEncoding.GetString(tree, position, nameLength);
@@ -311,9 +282,7 @@ namespace DatExplorerIII.Core
 
 			// Some tools do not set the flag; a size difference means that the data is compressed.
 			if (!compressed && unpackedSize != packedSize)
-			{
 				compressed = true;
-			}
 
 			entry = CreateEntry(path, compressed, unpackedSize, packedSize, offset);
 			return true;
@@ -334,7 +303,7 @@ namespace DatExplorerIII.Core
 
 			try
 			{
-				List<String> directories = new(directoryCount);
+				List<String> directories = [with(directoryCount)];
 				for (Int32 index = 0; index < directoryCount; index++)
 				{
 					String name = ReadString(buffered).Trim('\\');
@@ -349,9 +318,7 @@ namespace DatExplorerIII.Core
 					if (fileCount < 0)
 					{
 						if (mode == DatOpenMode.Strict)
-						{
 							throw new DatException(DatErrorKind.InvalidTree, "The directory contents of the DAT file are corrupted.");
-						}
 
 						_issues.Add(new DatIssue(DatIssueKind.TruncatedTree, null, _entries.Count));
 						return;
@@ -381,9 +348,7 @@ namespace DatExplorerIII.Core
 		{
 			Int32 length = stream.ReadByte();
 			if (length < 0)
-			{
 				throw new EndOfStreamException();
-			}
 
 			Byte[] bytes = new Byte[length];
 			stream.ReadExactly(bytes);
@@ -454,9 +419,7 @@ namespace DatExplorerIII.Core
 			{
 				FileStream stream = _stream ?? throw new DatException(DatErrorKind.NotOnDisk, "The archive is not stored on disk.");
 				if (size < 0 || entry.Offset + (Int64)size > _dataLimit)
-				{
 					throw new DatException(DatErrorKind.OutsideArchive, $"The file '{entry.FullPath}' is outside of the archive.", entry.FullPath);
-				}
 
 				Byte[] data = new Byte[size];
 				stream.Position = entry.Offset;
@@ -470,14 +433,10 @@ namespace DatExplorerIII.Core
 		public Byte[] ReadData(DatEntry entry)
 		{
 			if (entry.IsNew)
-			{
 				return File.ReadAllBytes(entry.SourceFile!);
-			}
 
 			if (Format == DatFormat.Zip)
-			{
 				return ReadZipData(entry);
-			}
 
 			return Unpack(entry, ReadStored(entry));
 		}
@@ -487,9 +446,7 @@ namespace DatExplorerIII.Core
 		internal Byte[] Unpack(DatEntry entry, Byte[] stored)
 		{
 			if (!entry.IsCompressed)
-			{
 				return stored;
-			}
 
 			try
 			{
@@ -511,9 +468,7 @@ namespace DatExplorerIII.Core
 		private static Byte[] InflateZlib(Byte[] stored, Int32 unpackedSize)
 		{
 			if (unpackedSize < 0 || unpackedSize > stored.Length * MaxZlibRatio + 1024)
-			{
 				throw new InvalidDataException("The announced size of the file is impossible.");
-			}
 
 			using MemoryStream source = new(stored);
 			using ZLibStream inflater = new(source, CompressionMode.Decompress);
@@ -534,9 +489,7 @@ namespace DatExplorerIII.Core
 			{
 				Int32 read = inflater.Read(buffer, 0, (Int32)Math.Min(buffer.Length, unpackedSize - result.Length));
 				if (read == 0)
-				{
 					throw new InvalidDataException("The compressed data of the file is truncated.");
-				}
 
 				result.Write(buffer, 0, read);
 			}
@@ -575,19 +528,15 @@ namespace DatExplorerIII.Core
 				throttle.Report(entry.FullPath, Interlocked.Increment(ref done));
 			});
 
-			List<DatEntry> damaged = new();
+			List<DatEntry> damaged = [];
 			for (Int32 index = 0; index < stored.Count; index++)
 			{
 				DatEntry entry = stored[index];
 				if (failures[index] is DatErrorKind kind)
-				{
 					MarkDamaged(entry, kind == DatErrorKind.CorruptData ? DatIssueKind.EntryCorrupt : DatIssueKind.EntryOutsideArchive);
-				}
 
 				if (entry.IsDamaged)
-				{
 					damaged.Add(entry);
-				}
 			}
 
 			return new DatVerifyResult(stored.Count, damaged);
@@ -627,7 +576,7 @@ namespace DatExplorerIII.Core
 		{
 			String root = Path.GetFullPath(destination);
 			String rootWithSeparator = Path.EndsInDirectorySeparator(root) ? root : root + Path.DirectorySeparatorChar;
-			List<String> failures = new();
+			List<String> failures = [];
 			Int32 succeeded = 0;
 			DatProgressThrottle throttle = new(progress, entries.Count);
 
@@ -651,9 +600,7 @@ namespace DatExplorerIII.Core
 				{
 					DatEntry entry = entries[index];
 					if (entry.IsDamaged)
-					{
 						return;
-					}
 
 					try
 					{
@@ -714,8 +661,8 @@ namespace DatExplorerIII.Core
 		/// </summary>
 		public static Dictionary<DatEntry, String> GetFlatNames(IEnumerable<DatEntry> entries)
 		{
-			Dictionary<DatEntry, String> names = new();
-			HashSet<String> taken = new(StringComparer.OrdinalIgnoreCase);
+			Dictionary<DatEntry, String> names = [];
+			HashSet<String> taken = [with(StringComparer.OrdinalIgnoreCase)];
 			foreach (DatEntry entry in entries)
 			{
 				String name = entry.Name;
@@ -746,9 +693,7 @@ namespace DatExplorerIII.Core
 
 			String target = Path.GetFullPath(Path.Combine(rootWithSeparator, relative));
 			if (Path.IsPathRooted(relative) || !target.StartsWith(rootWithSeparator, StringComparison.OrdinalIgnoreCase))
-			{
 				throw new DatException(DatErrorKind.PathNotAllowed, $"The path '{entry.FullPath}' is not allowed.", entry.FullPath);
-			}
 
 			return target;
 		}

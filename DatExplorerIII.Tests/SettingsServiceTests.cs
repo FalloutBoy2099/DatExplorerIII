@@ -2,7 +2,7 @@ namespace DatExplorerIII.Tests
 {
 	using System;
 	using System.IO;
-	using DatExplorerIII.Services;
+	using DatExplorerIII.Services.Platform;
 
 	/// <summary>The settings are kept in a folder named after the program; the ones of its former name are taken over.</summary>
 	public sealed class SettingsServiceTests : IDisposable
@@ -12,9 +12,7 @@ namespace DatExplorerIII.Tests
 		public void Dispose()
 		{
 			if (Directory.Exists(_root))
-			{
 				Directory.Delete(_root, true);
-			}
 		}
 
 		private String Folder(String name)

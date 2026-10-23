@@ -1,8 +1,11 @@
 namespace DatExplorerIII.Tests
 {
 	using System;
-	using DatExplorerIII.Models;
-	using DatExplorerIII.Services;
+	using DatExplorerIII.Models.Comparison;
+	using DatExplorerIII.Models.GameFiles;
+	using DatExplorerIII.Models.Interface;
+	using DatExplorerIII.Services.Interface;
+	using DatExplorerIII.Services.Platform;
 	using DatExplorerIII.ViewModels;
 
 	/// <summary>A settings file that a person edited, or that another version wrote, never takes the program down or costs every setting.</summary>

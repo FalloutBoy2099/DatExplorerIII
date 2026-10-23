@@ -6,15 +6,17 @@ namespace DatExplorerIII.Tests
 	using System.Linq;
 	using System.Text;
 	using DatExplorerIII.Core;
-	using DatExplorerIII.Models;
-	using DatExplorerIII.Services;
+	using DatExplorerIII.Models.Comparison;
+	using DatExplorerIII.Models.Interface;
+	using DatExplorerIII.Services.Platform;
+	using DatExplorerIII.Services.Texts;
 	using DatExplorerIII.ViewModels;
 
 	/// <summary>What the comparison of two archives ignores: the lines of a text, the way a text file is written, the settings.</summary>
 	public sealed class ComparisonOptionsTests : IDisposable
 	{
 		private readonly String _root = Path.Combine(Path.GetTempPath(), "DatExplorerIII.Tests", Path.GetRandomFileName());
-		private readonly List<DatArchive> _archives = new();
+		private readonly List<DatArchive> _archives = [];
 
 		public ComparisonOptionsTests()
 		{

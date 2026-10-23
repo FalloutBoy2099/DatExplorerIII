@@ -3,8 +3,10 @@ namespace DatExplorerIII.ViewModels.Main
 	using System;
 	using System.Collections.Generic;
 	using System.Threading.Tasks;
-	using Models;
-	using Services;
+	using Models.Comparison;
+	using Models.GameFiles;
+	using Models.Interface;
+	using Services.Interface;
 	using ViewModels.Viewer;
 
 	/// <summary>
@@ -109,9 +111,7 @@ namespace DatExplorerIII.ViewModels.Main
 		{
 			SettingsDialogViewModel model = new(_settings.Data);
 			if (!_dialogs.ShowSettings(model))
-			{
 				return;
-			}
 
 			await ApplySettingsAsync(model);
 		}
@@ -156,9 +156,7 @@ namespace DatExplorerIII.ViewModels.Main
 			OnPropertyChanged(nameof(ComparisonOptions));
 
 			if (optionsChanged && Comparison.IsComparing)
-			{
 				await Comparison.CompareAgainAsync();
-			}
 		}
 	}
 }

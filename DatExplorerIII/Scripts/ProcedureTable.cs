@@ -27,9 +27,7 @@ namespace DatExplorerIII.Scripts
 			{
 				ProcedureDescriptor procedure = ProcedureDescriptor.Read(reader);
 				if (procedure.ArgumentCount > MaxArguments)
-				{
 					throw new ScriptFormatException("Error: Invalid number of arguments of a procedure");
-				}
 
 				_procedures.Add(procedure);
 				_sizes.Add(0);
@@ -57,9 +55,7 @@ namespace DatExplorerIII.Scripts
 			for (Int32 index = 0; index < offsets.Count - 1; index++)
 			{
 				if (offsets[index + 1].BodyOffset < offsets[index].BodyOffset)
-				{
 					throw new ScriptFormatException("Error: Procedures are not sorted in ascending address order");
-				}
 
 				_sizes[(Int32)offsets[index].ProcedureIndex] = offsets[index + 1].BodyOffset - offsets[index].BodyOffset;
 			}

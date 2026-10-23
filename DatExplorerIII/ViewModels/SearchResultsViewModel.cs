@@ -5,8 +5,8 @@ namespace DatExplorerIII.ViewModels
 	using System.Linq;
 	using System.Windows.Input;
 	using Infrastructure;
-	using Models;
-	using Services;
+	using Models.Archives;
+	using Services.Interface;
 
 	/// <summary>The column of the list of the files found that it is sorted by.</summary>
 	public enum SearchSortColumn
@@ -103,9 +103,7 @@ namespace DatExplorerIII.ViewModels
 		private void Open(Object? parameter)
 		{
 			if ((parameter as ListEntry ?? SelectedItem)?.Entry is { } entry)
-			{
 				_goTo(entry);
-			}
 		}
 
 		private IReadOnlyList<ListEntry> Sorted()
@@ -127,9 +125,7 @@ namespace DatExplorerIII.ViewModels
 			};
 
 			if (primary != 0)
-			{
 				return _sortDescending ? -primary : primary;
-			}
 
 			// What ties is in the order of the names, then of the folders, whatever the direction.
 			return byName != 0 ? byName : byFolder;

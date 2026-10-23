@@ -4,7 +4,7 @@ namespace DatExplorerIII.Views
 	using System.Collections.Generic;
 	using System.Windows;
 	using System.Windows.Controls;
-	using Models;
+	using Models.Interface;
 
 	/// <summary>
 	/// A themed message box with configurable buttons.

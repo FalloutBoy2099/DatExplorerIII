@@ -7,8 +7,11 @@ namespace DatExplorerIII.Tests
 	using System.Text;
 	using System.Threading;
 	using DatExplorerIII.Core;
-	using DatExplorerIII.Models;
-	using DatExplorerIII.Services;
+	using DatExplorerIII.Models.Archives;
+	using DatExplorerIII.Models.GameFiles;
+	using DatExplorerIII.Models.Interface;
+	using DatExplorerIII.Services.Checks;
+	using DatExplorerIII.Services.Interface;
 	using DatExplorerIII.ViewModels;
 	using DatExplorerIII.ViewModels.Viewer;
 	using DatExplorerIII.Views;
@@ -335,7 +338,7 @@ namespace DatExplorerIII.Tests
 		public void TheFilters_HideTheSeverities_AndTheSelectedFileStaysWhenItIsStillThere()
 		{
 			MsgIssuesViewModel issues = Issues(new ManualUiThread());
-			List<String?> changes = new();
+			List<String?> changes = [];
 			issues.PropertyChanged += (_, args) => changes.Add(args.PropertyName);
 			issues.SelectedFile = issues.Files[1];
 
@@ -470,9 +473,7 @@ namespace DatExplorerIII.Tests
 			thread.Start();
 			thread.Join();
 			if (failure != null)
-			{
 				throw new InvalidOperationException("The window failed.", failure);
-			}
 		}
 
 		[Fact]
@@ -508,11 +509,11 @@ namespace DatExplorerIII.Tests
 		public void TheButtonOfTheProblems_IsThereForAMessageFileOnly_AndGivesItsReport()
 		{
 			TextViewerViewModel viewer = new(new ManualUiThread());
-			List<MsgFileReport> asked = new();
+			List<MsgFileReport> asked = [];
 			viewer.ProblemsRequested = asked.Add;
 			viewer.SourcePath = "text\\game\\a.msg";
 			Byte[] broken = Encoding.ASCII.GetBytes("{x}{}{a}\n");
-			List<String?> changes = new();
+			List<String?> changes = [];
 			viewer.PropertyChanged += (_, args) => changes.Add(args.PropertyName);
 
 			Assert.False(viewer.CanShowProblems);

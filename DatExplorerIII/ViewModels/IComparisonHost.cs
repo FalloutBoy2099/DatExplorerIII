@@ -6,7 +6,7 @@ namespace DatExplorerIII.ViewModels
 	using System.Threading;
 	using System.Threading.Tasks;
 	using Core;
-	using Models;
+	using Models.Archives;
 
 	/// <summary>What the comparison needs of the main view model: the archives that are open, and the operations on them.</summary>
 	internal interface IComparisonHost

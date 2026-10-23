@@ -5,8 +5,9 @@ namespace DatExplorerIII.ViewModels.Main
 	using System.Linq;
 	using System.Threading.Tasks;
 	using Core;
-	using Models;
-	using Services;
+	using Models.Archives;
+	using Models.Interface;
+	using Services.Interface;
 
 	public sealed partial class MainViewModel
 	{
@@ -15,14 +16,10 @@ namespace DatExplorerIII.ViewModels.Main
 		{
 			DatArchive archive = document.Archive;
 			if (archive.DamagedCount == 0)
-			{
 				return true;
-			}
 
 			if (!_dialogs.Confirm(Title, Loc.Format("Str.SaveDamagedPrompt", archive.DamagedCount), DialogIcon.Warning))
-			{
 				return false;
-			}
 
 			archive.RemoveDamaged();
 			document.Refresh();
@@ -38,9 +35,7 @@ namespace DatExplorerIII.ViewModels.Main
 		internal async Task SaveDocumentAsAsync(DatDocument? document)
 		{
 			if (document == null || !ConfirmRemoveDamaged(document))
-			{
 				return;
-			}
 
 			DatArchive archive = document.Archive;
 			String current = archive.FilePath;
@@ -51,9 +46,7 @@ namespace DatExplorerIII.ViewModels.Main
 			String suggested = archive.IsFolderBacked ? name + "_new.dat" : Path.GetFileName(current);
 			SaveAsChoice? choice = _dialogs.PickSaveAsFile(suggested, parent, archive.Format, archive.IsFolderBacked);
 			if (choice == null)
-			{
 				return;
-			}
 
 			String target = Path.GetFullPath(choice.Path);
 			if (Directory.Exists(target))
@@ -98,9 +91,7 @@ namespace DatExplorerIII.ViewModels.Main
 		internal async Task SaveDocumentAsync(DatDocument? document, Boolean quick)
 		{
 			if (document == null)
-			{
 				return;
-			}
 
 			DatArchive archive = document.Archive;
 
@@ -112,16 +103,12 @@ namespace DatExplorerIII.ViewModels.Main
 			}
 
 			if (!ConfirmRemoveDamaged(document))
-			{
 				return;
-			}
 
 			Boolean repair = archive.RequiresRebuild;
 			String message = Loc.Get("Str.ConfirmSave");
 			if (archive.Format == DatFormat.Fallout1)
-			{
 				message += Environment.NewLine + Environment.NewLine + Loc.Get("Str.Fallout1SaveNote");
-			}
 
 			if (repair)
 			{
@@ -133,9 +120,7 @@ namespace DatExplorerIII.ViewModels.Main
 			}
 
 			if (!_dialogs.Confirm(Title, message))
-			{
 				return;
-			}
 
 			Boolean saved = await RunBusyAsync(
 				Loc.Get("Str.Saving"),

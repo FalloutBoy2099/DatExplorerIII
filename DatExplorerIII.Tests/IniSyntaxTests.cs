@@ -2,7 +2,7 @@ namespace DatExplorerIII.Tests
 {
 	using System;
 	using System.Linq;
-	using DatExplorerIII.Services;
+	using DatExplorerIII.Services.Syntax;
 	using Xunit;
 
 	public class IniSyntaxTests

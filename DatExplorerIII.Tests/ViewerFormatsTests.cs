@@ -11,9 +11,21 @@ namespace DatExplorerIII.Tests
 	using System.Threading.Tasks;
 	using System.Windows.Threading;
 	using DatExplorerIII.Core;
-	using DatExplorerIII.Formats;
-	using DatExplorerIII.Models;
-	using DatExplorerIII.Services;
+	using DatExplorerIII.Formats.Audio;
+	using DatExplorerIII.Formats.GameFiles;
+	using DatExplorerIII.Formats.Graphics;
+	using DatExplorerIII.Formats.Movies;
+	using DatExplorerIII.Formats.Prototypes;
+	using DatExplorerIII.Models.Archives;
+	using DatExplorerIII.Models.Audio;
+	using DatExplorerIII.Models.GameFiles;
+	using DatExplorerIII.Models.Graphics;
+	using DatExplorerIII.Models.Interface;
+	using DatExplorerIII.Models.Prototypes;
+	using DatExplorerIII.Services.Checks;
+	using DatExplorerIII.Services.Media;
+	using DatExplorerIII.Services.Platform;
+	using DatExplorerIII.Services.Texts;
 	using DatExplorerIII.ViewModels;
 	using DatExplorerIII.ViewModels.Viewer;
 
@@ -506,7 +518,7 @@ namespace DatExplorerIII.Tests
 		/// <summary>Writes bits the way the ACM files hold them: least significant first.</summary>
 		private sealed class BitWriter
 		{
-			private readonly List<Byte> _bytes = new();
+			private readonly List<Byte> _bytes = [];
 			private Int32 _bitCount;
 
 			public void Write(Int32 value, Int32 bits)
@@ -514,14 +526,10 @@ namespace DatExplorerIII.Tests
 				for (Int32 i = 0; i < bits; i++)
 				{
 					if (_bitCount % 8 == 0)
-					{
 						_bytes.Add(0);
-					}
 
 					if (((value >> i) & 1) != 0)
-					{
 						_bytes[^1] |= (Byte)(1 << (_bitCount % 8));
-					}
 
 					_bitCount++;
 				}
@@ -1067,8 +1075,7 @@ namespace DatExplorerIII.Tests
 					MveFrameReader reader = movie.CreateFrameReader();
 					Byte[] bgra = new Byte[reader.FrameBytes];
 					while (reader.ReadFrame(bgra))
-					{
-					}
+					{ }
 				}
 				catch (InvalidDataException)
 				{
@@ -1118,7 +1125,7 @@ namespace DatExplorerIII.Tests
 
 			// The pictures one after the other.
 			MveFrameReader sequential = movie.CreateFrameReader();
-			List<Byte[]> expected = new();
+			List<Byte[]> expected = [];
 			Byte[] buffer = new Byte[sequential.FrameBytes];
 			while (sequential.ReadFrame(buffer))
 			{
@@ -1208,9 +1215,7 @@ namespace DatExplorerIII.Tests
 			thread.Join();
 
 			if (error != null)
-			{
 				ExceptionDispatchInfo.Capture(error).Throw();
-			}
 		}
 
 		[Fact]
@@ -1390,7 +1395,7 @@ namespace DatExplorerIII.Tests
 		/// <summary>Writes the numbers of a prototype file: big endian 32 bit numbers and a few single bytes.</summary>
 		private sealed class ProBuilder
 		{
-			private readonly List<Byte> _bytes = new();
+			private readonly List<Byte> _bytes = [];
 
 			public ProBuilder Int(params Int32[] values)
 			{
@@ -1502,9 +1507,7 @@ namespace DatExplorerIII.Tests
 			builder.Int(skills);
 			builder.Int(1, 60, 10);
 			if (withDamageType)
-			{
 				builder.Int(3);
-			}
 
 			return builder.ToArray();
 		}
@@ -1613,9 +1616,7 @@ namespace DatExplorerIII.Tests
 				}
 
 				if (random.Next(4) == 0)
-				{
 					data = data.AsSpan(0, random.Next(data.Length)).ToArray();
-				}
 
 				try
 				{

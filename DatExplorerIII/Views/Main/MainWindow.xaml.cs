@@ -28,9 +28,7 @@ namespace DatExplorerIII.Views.Main
 		private void OnViewModelPropertyChanged(Object? sender, PropertyChangedEventArgs e)
 		{
 			if (e.PropertyName == nameof(MainViewModel.IsWindowFrameVisible))
-			{
 				ApplyWindowFrame();
-			}
 		}
 
 		private void OnClosing(Object? sender, CancelEventArgs e)

@@ -44,9 +44,7 @@ namespace DatExplorerIII.Scripts
 			{
 				String testName = _namespace[_procedures[index].NameOffset].ToLowerInvariant();
 				if (testName == lowerName)
-				{
 					return (Int32)index;
-				}
 			}
 
 			return -1;
@@ -57,9 +55,7 @@ namespace DatExplorerIII.Scripts
 			for (UInt32 index = 0; index < _procedures.Count; index++)
 			{
 				if (_procedures[index].NameOffset == nameOffset)
-				{
 					return (Int32)index;
-				}
 			}
 
 			return -1;
@@ -70,9 +66,7 @@ namespace DatExplorerIII.Scripts
 			for (Int32 index = 0; index < _exportedVariableValues.Count; index += 2)
 			{
 				if (_exportedVariableValues[index + 1].Argument == nameOffset)
-				{
 					return index;
-				}
 			}
 
 			return -1;
@@ -81,9 +75,7 @@ namespace DatExplorerIII.Scripts
 		private void SetExternalVariable(UInt32 nameOffset)
 		{
 			if (!_definitions.ContainsKey(nameOffset))
-			{
 				_definitions[nameOffset] = new DefinitionObject(DefinitionObjectType.Variable, ObjectAttributes.Import, 0);
-			}
 		}
 
 		/// <summary>
@@ -118,17 +110,13 @@ namespace DatExplorerIII.Scripts
 		private void TryRenameImportedVariables()
 		{
 			if (_globalVariables.Count != 0)
-			{
 				return;
-			}
 
 			for (Int32 index = 0; index < _namespace.Count; index++)
 			{
 				UInt32 offset = _namespace.GetOffsetByIndex(index);
 				if (!_definitions.ContainsKey(offset))
-				{
 					_definitions[offset] = new DefinitionObject(DefinitionObjectType.Variable, ObjectAttributes.Import, 0);
-				}
 			}
 		}
 	}

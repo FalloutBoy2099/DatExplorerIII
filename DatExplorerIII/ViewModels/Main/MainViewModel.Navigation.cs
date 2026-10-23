@@ -4,8 +4,9 @@ namespace DatExplorerIII.ViewModels.Main
 	using System.Collections.Generic;
 	using System.Linq;
 	using Core;
-	using Models;
-	using Services;
+	using Models.Archives;
+	using Models.Interface;
+	using Services.Interface;
 
 	public sealed partial class MainViewModel
 	{
@@ -13,9 +14,7 @@ namespace DatExplorerIII.ViewModels.Main
 		public void OnTreeSelectionChanged(FolderNode? node)
 		{
 			if (node != null && node != _selectedFolder)
-			{
 				SelectedFolder = node;
-			}
 		}
 
 		public void SetSelectedItems(IReadOnlyList<ListEntry> items)
@@ -30,9 +29,7 @@ namespace DatExplorerIII.ViewModels.Main
 		public void SelectFolder(FolderNode node)
 		{
 			if (_selectedFolder != null && _selectedFolder != node)
-			{
 				_selectedFolder.IsSelected = false;
-			}
 
 			node.ExpandParents();
 			node.IsSelected = true;
@@ -42,25 +39,19 @@ namespace DatExplorerIII.ViewModels.Main
 		private void GoUp()
 		{
 			if (SelectedFolder?.Parent is { } parent)
-			{
 				SelectFolder(parent);
-			}
 		}
 
 		private void GoTo(DatDocument document, DatEntry entry)
 		{
 			if (!Roots.Contains(document.Root))
-			{
 				return;
-			}
 
 			SelectFolder(document.FindNode(entry.Directory) ?? document.Root);
 
 			ListEntry? item = Items.FirstOrDefault(candidate => candidate.Entry == entry);
 			if (item != null)
-			{
 				RevealRequested?.Invoke(item);
-			}
 		}
 
 		public void SortBy(DatSortColumn column)
@@ -111,9 +102,7 @@ namespace DatExplorerIII.ViewModels.Main
 		private Int32 Compare(ListEntry a, ListEntry b)
 		{
 			if (a.IsFolder != b.IsFolder)
-			{
 				return a.IsFolder ? -1 : 1;
-			}
 
 			Int32 byName = String.Compare(a.Name, b.Name, StringComparison.CurrentCultureIgnoreCase);
 			Int32 primary = _sortColumn switch
@@ -125,9 +114,7 @@ namespace DatExplorerIII.ViewModels.Main
 			};
 
 			if (primary != 0)
-			{
 				return _sortDescending ? -primary : primary;
-			}
 
 			return byName;
 		}
@@ -142,9 +129,7 @@ namespace DatExplorerIII.ViewModels.Main
 		{
 			String text = _searchText.Trim();
 			if (text.Length == 0 || Items.Count == 0)
-			{
 				return null;
-			}
 
 			Int32 count = Items.Count;
 			ListEntry? current = forward ? SelectedItems.LastOrDefault() : SelectedItems.FirstOrDefault();
@@ -169,9 +154,7 @@ namespace DatExplorerIII.ViewModels.Main
 			for (Int32 index = 0; index < Items.Count; index++)
 			{
 				if (Items[index] == item)
-				{
 					return index;
-				}
 			}
 
 			return -1;
@@ -182,9 +165,7 @@ namespace DatExplorerIII.ViewModels.Main
 			DatDocument? document = CurrentDocument;
 			String text = _searchText.Trim();
 			if (document == null)
-			{
 				return;
-			}
 
 			if (text.Length < 2)
 			{

@@ -24,15 +24,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Using Include="Xunit" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<None Include="..\DatExplorerIII\Resources\Strings.*.xaml" Link="Strings\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\DatExplorerIII\DatExplorerIII.csproj" />
+	</ItemGroup>
+	
+	<ItemGroup>
+		<Using Include="Xunit" />
 	</ItemGroup>
 
 </Project>

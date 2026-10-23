@@ -5,8 +5,8 @@ namespace DatExplorerIII.ViewModels.Main
 	using System.IO;
 	using System.Linq;
 	using Core;
-	using Models;
-	using Services;
+	using Models.Archives;
+	using Services.Interface;
 
 	public sealed partial class MainViewModel
 	{
@@ -18,9 +18,7 @@ namespace DatExplorerIII.ViewModels.Main
 		{
 			FolderNode? folder = SelectedFolder;
 			if (folder == null || items.Count == 0)
-			{
 				return null;
-			}
 
 			List<DatEntry> entries = CollectEntries(folder.Document, items).ToList();
 			List<String> top = items.Select(item => item.Name).ToList();
@@ -30,20 +28,16 @@ namespace DatExplorerIII.ViewModels.Main
 		public IReadOnlyList<String>? PrepareDragOut(FolderNode node)
 		{
 			if (node.IsRoot)
-			{
 				return null;
-			}
 
 			String parentPath = node.Parent?.Path ?? String.Empty;
-			return ExtractForDrag(node.Document, node.Document.Archive.GetEntriesUnder(node.Path).ToList(), parentPath, new List<String> { node.Name });
+			return ExtractForDrag(node.Document, node.Document.Archive.GetEntriesUnder(node.Path).ToList(), parentPath, [node.Name]);
 		}
 
 		private IReadOnlyList<String>? ExtractForDrag(DatDocument document, List<DatEntry> entries, String stripPrefix, List<String> topLevelNames)
 		{
 			if (entries.Count == 0 || Busy.IsBusy)
-			{
 				return null;
-			}
 
 			if (entries.Sum(entry => (Int64)entry.UnpackedSize) > MaxDragBytes)
 			{

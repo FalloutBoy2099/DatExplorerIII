@@ -4,7 +4,7 @@ namespace DatExplorerIII.Core
 	using System.Buffers.Binary;
 	using System.Collections.Generic;
 	using System.IO;
-	using Models;
+	using Models.Archives;
 
 	/// <summary>
 	/// The DAT archives of Temple of Elemental Evil (Troika): the footer is the one of the archives of Arcanum (see
@@ -37,9 +37,7 @@ namespace DatExplorerIII.Core
 		{
 			Int32 indexLength = footer.IndexSize - footer.Size;
 			if (indexLength < 4 || footer.IndexSize > length)
-			{
 				return false;
-			}
 
 			Byte[] index = new Byte[indexLength];
 			stream.Position = length - footer.IndexSize;
@@ -47,9 +45,7 @@ namespace DatExplorerIII.Core
 
 			Int32 count = BinaryPrimitives.ReadInt32LittleEndian(index);
 			if (count <= 0)
-			{
 				return false;
-			}
 
 			return !FillsIndex(index, count, ArcanumEntryFixedSize) && FillsIndex(index, count, ToeeEntryFixedSize);
 		}
@@ -61,21 +57,15 @@ namespace DatExplorerIII.Core
 			for (Int32 i = 0; i < count; i++)
 			{
 				if (position + 4 > index.Length)
-				{
 					return false;
-				}
 
 				Int32 nameLength = BinaryPrimitives.ReadInt32LittleEndian(index.AsSpan((Int32)position));
 				if (nameLength < 0)
-				{
 					return false;
-				}
 
 				position += 4L + nameLength + fixedSize;
 				if (position > index.Length)
-				{
 					return false;
-				}
 			}
 
 			return position == index.Length;
@@ -93,15 +83,13 @@ namespace DatExplorerIII.Core
 			stream.ReadExactly(index);
 
 			Int32 count = BinaryPrimitives.ReadInt32LittleEndian(index);
-			List<ToeeRecord> records = new(Math.Max(count, 0));
+			List<ToeeRecord> records = [with(Math.Max(count, 0))];
 			Int32 position = 4;
 			while (records.Count < count && position + 4 <= index.Length)
 			{
 				Int32 nameLength = BinaryPrimitives.ReadInt32LittleEndian(index.AsSpan(position));
 				if (nameLength < 0 || (Int64)position + 4 + nameLength + ToeeEntryFixedSize > index.Length)
-				{
 					break;
-				}
 
 				position += 4;
 				String name = NameEncoding.GetString(index, position, nameLength).TrimEnd('\0');
@@ -121,9 +109,7 @@ namespace DatExplorerIII.Core
 			if (records.Count < count)
 			{
 				if (mode == DatOpenMode.Strict)
-				{
 					throw new DatException(DatErrorKind.InvalidTree, "The index of the DAT file is damaged.");
-				}
 
 				_issues.Add(new DatIssue(DatIssueKind.TruncatedTree, null, records.Count));
 			}
@@ -137,17 +123,13 @@ namespace DatExplorerIII.Core
 				{
 					String folder = part == null ? directory : directory + part + '\\';
 					if (folder.Length > 0)
-					{
 						RegisterFolder(folder);
-					}
 
 					continue;
 				}
 
 				if (part == null)
-				{
 					continue;
-				}
 
 				Boolean compressed = (record.Flags & ArcanumFlagCompressed) != 0;
 				Register(CreateEntry(directory + part, compressed, record.UnpackedSize, compressed ? record.PackedSize : record.UnpackedSize, record.Offset), true);
@@ -164,14 +146,12 @@ namespace DatExplorerIII.Core
 		/// <summary>The path of the folder that holds an entry (ending with a backslash; empty for the root), from the chain of the folders above it.</summary>
 		private static String ToeeDirectoryOf(List<ToeeRecord> records, Int32 parent)
 		{
-			List<String> parts = new();
+			List<String> parts = [];
 			for (Int32 depth = 0; parent >= 0 && parent < records.Count && depth < ToeeMaxDepth; depth++)
 			{
 				ToeeRecord folder = records[parent];
 				if (ToeePart(folder.Name) is { } part)
-				{
 					parts.Add(part);
-				}
 
 				parent = folder.Parent;
 			}

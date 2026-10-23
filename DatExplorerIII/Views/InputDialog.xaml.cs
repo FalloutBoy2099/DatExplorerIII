@@ -3,6 +3,7 @@ namespace DatExplorerIII.Views
 	using System;
 	using System.Windows;
 	using System.Windows.Controls;
+	using Services.Interface;
 
 	/// <summary>
 	/// Asks the user for a single line of text, with live validation.

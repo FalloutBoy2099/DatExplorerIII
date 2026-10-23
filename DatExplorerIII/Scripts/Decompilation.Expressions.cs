@@ -15,23 +15,17 @@ namespace DatExplorerIII.Scripts
 			ThrowIfCancelled();
 
 			if (node.Type == NodeType.OmittedArgument)
-			{
 				return "/* Omitted argument */";
-			}
 
 			Opcode op = node.Opcode.Operator;
 			UInt32 argument = node.Opcode.Argument;
 			if (op == Opcode.O_JMP)
 			{
 				if (node.Type == NodeType.Break)
-				{
 					return "break";
-				}
 
 				if (node.Type == NodeType.Continue)
-				{
 					return "continue";
-				}
 			}
 
 			switch (op)
@@ -92,9 +86,7 @@ namespace DatExplorerIII.Scripts
 					return GetSourceWithProcedureArguments(node, argumentCount, new UInt32[] { 2U, 3U });
 				case Opcode.O_SAYOPTION:
 					if (node.Arguments.Count > 1 && node.Arguments[1].Opcode.Operator == Opcode.O_INTOP)
-					{
 						return GetSourceWithProcedureArguments(node, argumentCount, new UInt32[] { 2U });
-					}
 
 					return "sayOption(" + GetSource(node.Arguments[0], false, argumentCount) + ", " + GetSource(node.Arguments[1], false, argumentCount) + ")";
 				case Opcode.O_ADDREGIONPROC:
@@ -124,9 +116,7 @@ namespace DatExplorerIII.Scripts
 		{
 			OpcodeAttributes attributes = node.Opcode.GetAttributes(_options);
 			if (attributes.ProcedureArguments.Length > 0)
-			{
 				return GetSourceWithProcedureArguments(node, argumentCount, attributes.ProcedureArguments);
-			}
 
 			if (node.Type == NodeType.ConditionalExpression)
 			{
@@ -174,14 +164,10 @@ namespace DatExplorerIII.Scripts
 			}
 
 			if (arguments.Count == 0)
-			{
 				return prefix;
-			}
 
 			if (node.Opcode.Operator == Opcode.O_IF || node.Opcode.Operator == Opcode.O_WHILE)
-			{
 				prefix += " ";
-			}
 
 			return prefix + "(" + String.Join(", ", arguments) + ")";
 		}
@@ -189,9 +175,7 @@ namespace DatExplorerIII.Scripts
 		private String GetInfixArgumentSource(Node node, Node argument, UInt32 argumentCount)
 		{
 			if (IsBitwiseOperator(node.Opcode.Operator))
-			{
 				return GetBitwiseArgumentSource(argument, argumentCount);
-			}
 
 			return GetSource(argument, false, argumentCount);
 		}
@@ -199,9 +183,7 @@ namespace DatExplorerIII.Scripts
 		private String GetBitwiseArgumentSource(Node argument, UInt32 argumentCount)
 		{
 			if (argument.Opcode.Operator == Opcode.O_INTOP)
-			{
 				return String.Format(CultureInfo.InvariantCulture, "0x{0:X8}", argument.Opcode.Argument);
-			}
 
 			if (argument.Opcode.Operator == Opcode.O_NEGATE &&
 				argument.Arguments.Count == 1 &&
@@ -246,9 +228,7 @@ namespace DatExplorerIII.Scripts
 		private String GetProcedureArgumentSource(Node node, UInt32 argumentCount)
 		{
 			if (node.Opcode.Operator == Opcode.O_INTOP)
-			{
 				return _namespace[_procedures[node.Opcode.Argument].NameOffset];
-			}
 
 			return GetSource(node, false, argumentCount);
 		}

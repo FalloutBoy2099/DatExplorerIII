@@ -18,17 +18,14 @@
 		<Description>Fallout 1/2 and Arcanum DAT archive explorer - by Kain</Description>
 		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
 		<AnalysisLevel>latest</AnalysisLevel>
-		<!-- The built-in Fluent theme (ThemeMode) is still flagged as experimental. -->
 		<NoWarn>$(NoWarn);WPF0001</NoWarn>
 		<AssemblyVersion>2026.10.16.10</AssemblyVersion>
 		<FileVersion>2026.10.16.10</FileVersion>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Resource Include="Resources\app.ico" />
-		<!-- The icon of the .dat files is inside the program, so that a single executable is enough. -->
-		<EmbeddedResource Include="Resources\dat.ico" LogicalName="DatExplorerIII.dat.ico" />
-		<EmbeddedResource Include="Resources\Fallout.pal" LogicalName="DatExplorerIII.Fallout.pal" />
+		<PackageReference Include="AvalonEdit" Version="6.3.1.120" />
+		<PackageReference Include="NLayer" Version="3.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -36,8 +33,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="AvalonEdit" Version="6.3.1.120" />
-	  <PackageReference Include="NLayer" Version="3.0.0" />
+		<Resource Include="Resources\app.ico" />
+		<EmbeddedResource Include="Resources\dat.ico" LogicalName="DatExplorerIII.dat.ico" />
+		<EmbeddedResource Include="Resources\Fallout.pal" LogicalName="DatExplorerIII.Fallout.pal" />
 	</ItemGroup>
 
 </Project>

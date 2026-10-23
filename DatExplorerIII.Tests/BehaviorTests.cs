@@ -11,7 +11,7 @@ namespace DatExplorerIII.Tests
 	using System.Windows.Media;
 	using System.Windows.Threading;
 	using DatExplorerIII.Infrastructure;
-	using DatExplorerIII.Models;
+	using DatExplorerIII.Models.Interface;
 	using DatExplorerIII.Views.Behaviors;
 
 	/// <summary>The attached behaviors of the main window, on real controls.</summary>
@@ -36,9 +36,7 @@ namespace DatExplorerIII.Tests
 			thread.Start();
 			thread.Join();
 			if (failure != null)
-			{
 				throw new InvalidOperationException("The behavior test failed.", failure);
-			}
 		}
 
 		/// <summary>Lets the layout and what it posts happen (the scroll bars tell their changes after a layout).</summary>
@@ -69,7 +67,7 @@ namespace DatExplorerIII.Tests
 		{
 			RunOnStaThread(() =>
 			{
-				List<IReadOnlyList<Object>> received = new();
+				List<IReadOnlyList<Object>> received = [];
 				ListBox list = new() { SelectionMode = SelectionMode.Extended, ItemsSource = new[] { "a", "b", "c" } };
 				SelectionBehavior.SetCommand(list, new RelayCommand(parameter => received.Add((IReadOnlyList<Object>)parameter!)));
 
@@ -92,7 +90,7 @@ namespace DatExplorerIII.Tests
 		{
 			RunOnStaThread(() =>
 			{
-				List<IReadOnlyList<Object>> received = new();
+				List<IReadOnlyList<Object>> received = [];
 				ComboBox box = new() { ItemsSource = new[] { "x", "y" } };
 				SelectionBehavior.SetCommand(box, new RelayCommand(parameter => received.Add((IReadOnlyList<Object>)parameter!)));
 
@@ -118,22 +116,20 @@ namespace DatExplorerIII.Tests
 				GridViewColumn withoutKey = new() { Header = "Other" };
 				view.Columns.Add(withoutKey);
 
-				List<Object?> received = new();
+				List<Object?> received = [];
 				ListView list = new() { View = view };
 				SortColumn.SetCommand(list, new RelayCommand(parameter => received.Add(parameter)));
 				Window window = Show(list);
 				try
 				{
-					List<GridViewColumnHeader> headers = new();
+					List<GridViewColumnHeader> headers = [];
 					void Collect(DependencyObject node)
 					{
 						for (Int32 i = 0; i < VisualTreeHelper.GetChildrenCount(node); i++)
 						{
 							DependencyObject child = VisualTreeHelper.GetChild(node, i);
 							if (child is GridViewColumnHeader { Role: GridViewColumnHeaderRole.Normal } header)
-							{
 								headers.Add(header);
-							}
 
 							Collect(child);
 						}
@@ -161,7 +157,7 @@ namespace DatExplorerIII.Tests
 		{
 			RunOnStaThread(() =>
 			{
-				List<Object?> received = new();
+				List<Object?> received = [];
 				ListBox list = new() { ItemsSource = new[] { "first", "second" } };
 				ItemActivation.SetCommand(list, new RelayCommand(parameter => received.Add(parameter)));
 				Window window = Show(list);
@@ -188,7 +184,7 @@ namespace DatExplorerIII.Tests
 		{
 			RunOnStaThread(() =>
 			{
-				List<Object?> received = new();
+				List<Object?> received = [];
 				TreeViewItem first = new() { Header = "first" };
 				TreeViewItem second = new() { Header = "second" };
 				TreeView tree = new();
@@ -324,14 +320,12 @@ namespace DatExplorerIII.Tests
 		private static List<T> FindAll<T>(DependencyObject root)
 			where T : DependencyObject
 		{
-			List<T> found = new();
+			List<T> found = [];
 			for (Int32 i = 0; i < VisualTreeHelper.GetChildrenCount(root); i++)
 			{
 				DependencyObject child = VisualTreeHelper.GetChild(root, i);
 				if (child is T match)
-				{
 					found.Add(match);
-				}
 
 				found.AddRange(FindAll<T>(child));
 			}

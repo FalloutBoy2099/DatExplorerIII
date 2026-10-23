@@ -4,7 +4,7 @@ namespace DatExplorerIII.Core
 	using System.Collections.Generic;
 	using System.Text;
 	using System.Text.RegularExpressions;
-	using Models;
+	using Models.Comparison;
 
 	/// <summary>How a line of the comparison of two texts is.</summary>
 	public enum DiffKind
@@ -72,16 +72,12 @@ namespace DatExplorerIII.Core
 			IReadOnlyList<String> leftKeys = LineSet.Create(left, options).Keys;
 			IReadOnlyList<String> rightKeys = LineSet.Create(right, options).Keys;
 			if (leftKeys.Count != rightKeys.Count)
-			{
 				return false;
-			}
 
 			for (Int32 index = 0; index < leftKeys.Count; index++)
 			{
 				if (!String.Equals(leftKeys[index], rightKeys[index], StringComparison.Ordinal))
-				{
 					return false;
-				}
 			}
 
 			return true;
@@ -90,13 +86,11 @@ namespace DatExplorerIII.Core
 		/// <summary>The rows that start a group of lines that differ: where "next difference" goes.</summary>
 		public static IReadOnlyList<Int32> GroupStarts(IReadOnlyList<DiffRow> rows)
 		{
-			List<Int32> starts = new();
+			List<Int32> starts = [];
 			for (Int32 index = 0; index < rows.Count; index++)
 			{
 				if (IsDifference(rows[index].Kind) && (index == 0 || !IsDifference(rows[index - 1].Kind)))
-				{
 					starts.Add(index);
-				}
 			}
 
 			return starts;
@@ -128,9 +122,7 @@ namespace DatExplorerIII.Core
 					{
 						Int32 close = line.IndexOf("*/", position, StringComparison.Ordinal);
 						if (close < 0)
-						{
 							break;
-						}
 
 						inBlock = false;
 						position = close + 2;
@@ -190,21 +182,17 @@ namespace DatExplorerIII.Core
 			public static LineSet Create(IReadOnlyList<String> lines, ComparisonOptions? options)
 			{
 				if (options == null || options.KeepsLinesAsWritten)
-				{
 					return new LineSet(lines, null);
-				}
 
 				IReadOnlyList<String> text = options.IgnoreComments ? StripComments(lines) : lines;
-				List<String> keys = new(lines.Count);
-				List<Int32> kept = new(lines.Count);
+				List<String> keys = [with(lines.Count)];
+				List<Int32> kept = [with(lines.Count)];
 				for (Int32 index = 0; index < lines.Count; index++)
 				{
 					Boolean blank = String.IsNullOrWhiteSpace(lines[index]);
 					Boolean commentOnly = options.IgnoreComments && !blank && String.IsNullOrWhiteSpace(text[index]);
 					if ((options.IgnoreBlankLines && blank) || commentOnly)
-					{
 						continue;
-					}
 
 					keys.Add(Normalize(text[index], options));
 					kept.Add(index);
@@ -222,9 +210,7 @@ namespace DatExplorerIII.Core
 					foreach (Char character in key)
 					{
 						if (!Char.IsWhiteSpace(character))
-						{
 							builder.Append(character);
-						}
 					}
 
 					key = builder.ToString();
@@ -250,7 +236,7 @@ namespace DatExplorerIII.Core
 				end++;
 			}
 
-			List<Pair> pairs = new(Math.Max(left.Count, right.Count));
+			List<Pair> pairs = [with(Math.Max(left.Count, right.Count))];
 			for (Int32 index = 0; index < start; index++)
 			{
 				pairs.Add(new Pair(DiffKind.Same, index, index));
@@ -281,7 +267,7 @@ namespace DatExplorerIII.Core
 		/// </summary>
 		private static List<Edit> SimpleEdits(Int32 leftCount, Int32 rightCount)
 		{
-			List<Edit> edits = new();
+			List<Edit> edits = [];
 			for (Int32 index = 0; index < leftCount; index++)
 			{
 				edits.Add(new Edit(EditKind.Delete));
@@ -304,7 +290,7 @@ namespace DatExplorerIII.Core
 			Int32 limit = Math.Min(n + m, MaxDifferences);
 			Int32 offset = limit + 1;
 			Int32[] v = new Int32[2 * limit + 3];
-			List<Int32[]> trace = new();
+			List<Int32[]> trace = [];
 
 			Boolean found = false;
 			for (Int32 d = 0; d <= limit && !found; d++)
@@ -334,12 +320,10 @@ namespace DatExplorerIII.Core
 			}
 
 			if (!found)
-			{
 				return null;
-			}
 
 			// From the end to the start: what the search did at each distance.
-			List<Edit> reversed = new();
+			List<Edit> reversed = [];
 			Int32 endX = n;
 			Int32 endY = m;
 			for (Int32 d = trace.Count - 1; d >= 0; d--)
@@ -359,9 +343,7 @@ namespace DatExplorerIII.Core
 				}
 
 				if (d > 0)
-				{
 					reversed.Add(new Edit(endX == previousX ? EditKind.Insert : EditKind.Delete));
-				}
 
 				endX = previousX;
 				endY = previousY;
@@ -430,7 +412,7 @@ namespace DatExplorerIII.Core
 		/// </summary>
 		private static List<DiffRow> BuildRows(IReadOnlyList<String> left, IReadOnlyList<String> right, List<Int32>? leftKept, List<Int32>? rightKept, List<Pair> pairs)
 		{
-			List<DiffRow> rows = new(pairs.Count);
+			List<DiffRow> rows = [with(pairs.Count)];
 			Int32 nextLeft = 0;
 			Int32 nextRight = 0;
 
@@ -448,14 +430,10 @@ namespace DatExplorerIII.Core
 					rightIndex < 0 ? String.Empty : right[rightIndex]));
 
 				if (leftIndex >= 0)
-				{
 					nextLeft = leftIndex + 1;
-				}
 
 				if (rightIndex >= 0)
-				{
 					nextRight = rightIndex + 1;
-				}
 			}
 
 			AddIgnored(rows, left, right, ref nextLeft, ref nextRight, left.Count, right.Count);

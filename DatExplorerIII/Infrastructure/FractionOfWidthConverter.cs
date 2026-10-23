@@ -14,9 +14,7 @@ namespace DatExplorerIII.Infrastructure
 		public Object Convert(Object[] values, Type targetType, Object parameter, CultureInfo culture)
 		{
 			if (values.Length < 3 || values[0] is not Double fraction || values[1] is not Double width || values[2] is not Double markWidth || Double.IsNaN(width) || Double.IsNaN(markWidth))
-			{
 				return new Thickness(0);
-			}
 
 			return new Thickness(Math.Max(0, (width - markWidth) * Math.Clamp(fraction, 0, 1)), 0, 0, 0);
 		}

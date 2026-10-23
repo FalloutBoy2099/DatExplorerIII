@@ -94,10 +94,12 @@ dotnet run --project DatExplorerIII
 
 | Folder | Content |
 | --- | --- |
-| `DatExplorerIII/Models` | Data and description objects: archive file (`DatEntry`), problems, results, formats, enumerations, settings, languages, dialog buttons... |
-| `DatExplorerIII/Formats` | Readers of the Fallout and Arcanum formats (`.art`, `.mes`, `.dlg`, `.mp3`): `.frm` and `.rix` images, `.pal` and `.act` palettes, `.mve` movies, `.gcd` characters, `.pro` prototypes, `.bio` biographies, `.acm` sounds (port of libacm, ISC license) and `.wav`. |
+| `DatExplorerIII/Models` | Data and description objects, by subject: `Archives` (archive file `DatEntry`, problems, results, formats), `Graphics` (pictures, palettes, fonts), `Audio` (sounds, lip synchronization), `Prototypes` (objects of the games), `GameFiles` (messages, dialogs, maps, characters, decoded texts), `Comparison`, `Interface` (settings, languages, dialog buttons). |
+| `DatExplorerIII/Formats` | Readers of the Fallout and Arcanum formats, by subject: `Graphics` (`.frm`, `.rix`, `.art`, `.msk` pictures, `.pal` and `.act` palettes, fonts), `Audio` (`.acm` sounds, port of libacm, ISC license, `.wav`, `.mp3`, `.lip`), `Movies` (`.mve`), `Prototypes` (`.pro` of Fallout and Arcanum), `GameFiles` (`.mes`, `.dlg`, `.gam`, `.sve`, `.bio`, `.gcd`, `.map`, check of the `.msg`). |
 | `DatExplorerIII/Core` | Reading (strict or tolerant), verification, repair, editing and writing of the DAT archives. |
-| `DatExplorerIII/ViewModels`, `Views`, `Services`, `Infrastructure` | WPF interface (MVVM without any external library). |
+| `DatExplorerIII/ScrLib` | Reader of the scripts of Arcanum (`.scr`). |
+| `DatExplorerIII/Services` | What the view models use, by subject: `Syntax` (colors of the texts), `Checks` (`.msg`, `.lst`, images of the ending), `ArcanumScripts` (`.scr` as text), `Texts` (encodings, comparison of texts), `Media` (pictures, palette, sound), `Interface` (dialogs, thread of the interface, translations, theme), `Platform` (settings, recent files, single instance, file association, temporary files). |
+| `DatExplorerIII/ViewModels`, `Views`, `Infrastructure` | WPF interface (MVVM without any external library). |
 | `DatExplorerIII/Resources` | Icons and texts (`Strings.<language>.xaml`). |
 | `DatExplorerIII.Tests` | xUnit tests: format readers and text decoding, core (Fallout 1 and 2 round trip, quick save, LZSS, safety of the paths), damaged archives (recovery, verification, fuzzing), logic of the interface and completeness of the translations. |
 

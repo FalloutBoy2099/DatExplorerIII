@@ -11,7 +11,7 @@ namespace DatExplorerIII.Tests
 	using System.Windows.Media;
 	using System.Windows.Media.Imaging;
 	using DatExplorerIII.Infrastructure;
-	using DatExplorerIII.Models;
+	using DatExplorerIII.Models.Graphics;
 	using DatExplorerIII.Views.Behaviors;
 
 	/// <summary>The view models know nothing of WPF (they could be used by another kind of interface), and the views draw what they hold.</summary>
@@ -24,15 +24,13 @@ namespace DatExplorerIII.Tests
 			Regex forbidden = new("using System\\.Windows(\\.(?!Input;)[A-Za-z.]+)?;|Application\\.Current|Dispatcher|BitmapSource|WriteableBitmap|\\bGeometry\\b|DependencyObject|Visibility\\b|\\bBrush\\b", RegexOptions.CultureInvariant);
 
 			String folder = Path.Combine(SourceFiles.ProjectFolder, "ViewModels");
-			List<String> offences = new();
+			List<String> offences = [];
 			foreach (String path in Directory.EnumerateFiles(folder, "*.cs"))
 			{
 				foreach ((String line, Int32 number) in File.ReadLines(path).Select((line, index) => (line, index + 1)))
 				{
 					if (forbidden.IsMatch(line) && !line.TrimStart().StartsWith("//", StringComparison.Ordinal))
-					{
 						offences.Add(Path.GetFileName(path) + ":" + number + " " + line.Trim());
-					}
 				}
 			}
 
@@ -58,9 +56,7 @@ namespace DatExplorerIII.Tests
 			thread.Start();
 			thread.Join();
 			if (failure != null)
-			{
 				throw new InvalidOperationException("The test failed.", failure);
-			}
 		}
 
 		[Fact]

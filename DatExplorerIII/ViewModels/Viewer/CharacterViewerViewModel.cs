@@ -5,8 +5,9 @@ namespace DatExplorerIII.ViewModels.Viewer
 	using System.Globalization;
 	using System.Linq;
 	using Infrastructure;
-	using Models;
-	using Services;
+	using Models.GameFiles;
+	using Models.Prototypes;
+	using Services.Interface;
 
 	/// <summary>A line of the sheet of a character: what it is, and its value.</summary>
 	public sealed record CharacterRow(String Label, String Value);
@@ -52,9 +53,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 		public void RefreshLanguage()
 		{
 			if (_build != null)
-			{
 				Sections = _build();
-			}
 		}
 
 		internal static String Number(Int32 value) => value.ToString("N0", CultureInfo.CurrentCulture);
@@ -75,7 +74,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 		/// <summary>The resistances: a line for each kind of damage, then radiation and poison.</summary>
 		internal static IReadOnlyList<CharacterRow> ResistanceRows(Func<Int32, Int32> stat)
 		{
-			List<CharacterRow> resistances = new();
+			List<CharacterRow> resistances = [];
 			for (Int32 type = 0; type < 7; type++)
 			{
 				resistances.Add(new CharacterRow(Loc.Get("Str.Damage" + type), ResistanceText(stat((Int32)CharacterStat.ThresholdNormal + type), stat((Int32)CharacterStat.ResistanceNormal + type))));
@@ -96,7 +95,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 		{
 			Int32 Stat(Int32 index) => character.GetStat((CharacterStat)index);
 
-			List<CharacterSection> sections = new();
+			List<CharacterSection> sections = [];
 
 			Boolean female = Stat((Int32)CharacterStat.Gender) == 1;
 			sections.Add(new CharacterSection(Loc.Get("Str.GcdSectionCharacter"),
@@ -125,9 +124,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 				.ToList();
 
 			if (rows.Count == 0)
-			{
 				rows.Add(new CharacterRow(Loc.Get("Str.GcdNone"), String.Empty));
-			}
 
 			return rows;
 		}

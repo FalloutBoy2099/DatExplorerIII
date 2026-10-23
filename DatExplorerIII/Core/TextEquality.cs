@@ -1,7 +1,7 @@
 namespace DatExplorerIII.Core
 {
 	using System;
-	using Models;
+	using Models.Archives;
 
 	/// <summary>A version of a file that is being compared: its name, the format of the archive it is in, and its content.</summary>
 	public sealed record ComparedFile(String Name, DatFormat Format, Byte[] Data);

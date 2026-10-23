@@ -2,7 +2,9 @@ namespace DatExplorerIII.Tests
 {
 	using System;
 	using System.Linq;
-	using DatExplorerIII.Services;
+	using DatExplorerIII.Services.Platform;
+	using DatExplorerIII.Services.Syntax;
+	using DatExplorerIII.Models.Interface;
 
 	/// <summary>The coloring of Lua scripts.</summary>
 	public sealed class LuaSyntaxTests
@@ -45,8 +47,8 @@ namespace DatExplorerIII.Tests
 		[Fact]
 		public void LuaFiles_AreTextFilesOfTheViewer_AndNotBinary()
 		{
-			Assert.True(FileViewers.TryGetKind("main.LUA", out DatExplorerIII.Models.FileViewerKind kind));
-			Assert.Equal(DatExplorerIII.Models.FileViewerKind.Text, kind);
+			Assert.True(FileViewers.TryGetKind("main.LUA", out DatExplorerIII.Models.Interface.FileViewerKind kind));
+			Assert.Equal(DatExplorerIII.Models.Interface.FileViewerKind.Text, kind);
 			Assert.True(FileViewers.IsPlainText("main.lua"));
 		}
 	}

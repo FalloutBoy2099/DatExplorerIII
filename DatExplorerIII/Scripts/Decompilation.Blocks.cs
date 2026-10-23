@@ -12,9 +12,7 @@ namespace DatExplorerIII.Scripts
 		private void SetBlockBorders(List<Node> nodes)
 		{
 			if (nodes.Count == 0)
-			{
 				return;
-			}
 
 			UInt32 offset;
 			if (nodes[0].Opcode.Operator == Opcode.O_PUSH_BASE)
@@ -43,9 +41,7 @@ namespace DatExplorerIII.Scripts
 					Node node = nodes[index].Arguments[0];
 					UInt32 loopOffset = nodes[index].Arguments[1].GetTopOffset();
 					if (node.Opcode.Operator != Opcode.O_INTOP)
-					{
 						throw new ScriptFormatException("Error: Invalid opcode for jump-address");
-					}
 
 					nodes.Insert(index + 1, new Node(NodeType.BeginOfBlock) { Offset = nodes[index].Offset });
 					UInt32 endOffset = node.Opcode.Argument;
@@ -91,9 +87,7 @@ namespace DatExplorerIII.Scripts
 					nodes.Insert(nodeIndex, new Node(NodeType.EndOfBlock) { Offset = endBlockOffset });
 					node = nodes[nodeIndex - 1];
 					if (node.Opcode.Operator != Opcode.O_JMP || node.Arguments[0].Opcode.Operator != Opcode.O_INTOP)
-					{
 						throw new ScriptFormatException("Error: Invalid tail of 'while' statement");
-					}
 
 					if (isForLoop)
 					{
@@ -115,9 +109,7 @@ namespace DatExplorerIII.Scripts
 					{
 						List<Node> args = nodes[index].Arguments;
 						if (args[2].Opcode.GetAttributes(_options).Type != OpcodeAttributeType.ExpressionStatement || args[3].Opcode.GetAttributes(_options).Type != OpcodeAttributeType.ExpressionStatement)
-						{
 							throw new ScriptFormatException("Error: Conditional expression left in stack.");
-						}
 
 						_messages.Add("Warning: Conditional expression left in stack. Restoring as IF.");
 						nodes[index].Type = NodeType.Normal;
@@ -129,9 +121,7 @@ namespace DatExplorerIII.Scripts
 
 					Node node = nodes[index].Arguments[0];
 					if (node.Opcode.Operator != Opcode.O_INTOP)
-					{
 						throw new ScriptFormatException("Error: Invalid opcode for jump-address");
-					}
 
 					nodes.Insert(index + 1, new Node(NodeType.BeginOfBlock) { Offset = nodes[index + 1].Offset });
 					UInt32 jumpOffset = node.Opcode.Argument;
@@ -148,9 +138,7 @@ namespace DatExplorerIII.Scripts
 					if (node.Opcode.Operator == Opcode.O_JMP && node.Type != NodeType.Break && node.Type != NodeType.Continue)
 					{
 						if (node.Arguments[0].Opcode.Operator != Opcode.O_INTOP)
-						{
 							throw new ScriptFormatException("Error: Invalid opcode for jump-address");
-						}
 
 						jumpOffset = node.Arguments[0].Opcode.Argument;
 						if (jumpOffset > node.Offset)

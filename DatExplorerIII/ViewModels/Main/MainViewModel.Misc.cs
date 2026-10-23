@@ -4,17 +4,17 @@ namespace DatExplorerIII.ViewModels.Main
 	using System.IO;
 	using System.Threading;
 	using System.Threading.Tasks;
-	using Models;
-	using Services;
+	using Models.Archives;
+	using Models.Interface;
+	using Services.Interface;
+	using Services.Platform;
 
 	public sealed partial class MainViewModel
 	{
 		private void ChangeLanguage(String code)
 		{
 			if (code == Loc.Language)
-			{
 				return;
-			}
 
 			Loc.SetLanguage(code);
 			_settings.Data.Language = Loc.Language;
@@ -31,9 +31,7 @@ namespace DatExplorerIII.ViewModels.Main
 		private void Associate()
 		{
 			if (!_dialogs.Confirm(Title, Loc.Get("Str.AskAssociate")))
-			{
 				return;
-			}
 
 			try
 			{
@@ -48,17 +46,13 @@ namespace DatExplorerIII.ViewModels.Main
 
 			// Windows keeps the program the user chose in Explorer over the one registered here.
 			if (FileAssociationService.IsOverriddenByUserChoice && _dialogs.Confirm(Title, Loc.Get("Str.AssociateOtherChoice"), DialogIcon.Information))
-			{
 				FileAssociationService.OpenDefaultAppsSettings();
-			}
 		}
 
 		private void AssociatePatches()
 		{
 			if (!_dialogs.Confirm(Title, Loc.Get("Str.AskAssociatePatches")))
-			{
 				return;
-			}
 
 			try
 			{
@@ -72,9 +66,7 @@ namespace DatExplorerIII.ViewModels.Main
 			}
 
 			if (FileAssociationService.ArePatchesOverriddenByUserChoice && _dialogs.Confirm(Title, Loc.Get("Str.AssociatePatchesOtherChoice"), DialogIcon.Information))
-			{
 				FileAssociationService.OpenDefaultAppsSettings();
-			}
 		}
 
 		/// <summary>
@@ -84,9 +76,7 @@ namespace DatExplorerIII.ViewModels.Main
 		{
 			Boolean completed = await Busy.RunAsync(title, canCancel, work);
 			if (Busy.WasCancelled)
-			{
 				StatusText = Loc.Get("Str.Cancelled");
-			}
 
 			return completed;
 		}

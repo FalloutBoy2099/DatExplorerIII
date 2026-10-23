@@ -5,8 +5,8 @@ namespace DatExplorerIII.Tests
 	using System.Windows;
 	using System.Windows.Controls;
 	using System.Windows.Controls.Primitives;
-	using DatExplorerIII.Models;
-	using DatExplorerIII.Services;
+	using DatExplorerIII.Models.Interface;
+	using DatExplorerIII.Services.Interface;
 	using DatExplorerIII.ViewModels;
 	using DatExplorerIII.Views;
 
@@ -35,9 +35,7 @@ namespace DatExplorerIII.Tests
 			thread.Start();
 			thread.Join();
 			if (failure != null)
-			{
 				throw new InvalidOperationException("The XAML failed.", failure);
-			}
 		}
 
 		private static ResourceDictionary LoadScrollBars()

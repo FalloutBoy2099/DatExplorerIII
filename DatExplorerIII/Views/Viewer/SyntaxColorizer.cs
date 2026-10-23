@@ -6,7 +6,7 @@ namespace DatExplorerIII.Views.Viewer
 	using System.Windows.Media;
 	using ICSharpCode.AvalonEdit.Document;
 	using ICSharpCode.AvalonEdit.Rendering;
-	using Services;
+	using Services.Syntax;
 
 	/// <summary>
 	/// Gives the colors of a text (a message file, a script) to the lines the editor draws. Only the lines that can be seen are
@@ -17,7 +17,7 @@ namespace DatExplorerIII.Views.Viewer
 	{
 		private readonly IReadOnlyList<SyntaxSpan> _spans;
 		private readonly FrameworkElement _resources;
-		private readonly Dictionary<SyntaxKind, Look?> _looks = new();
+		private readonly Dictionary<SyntaxKind, Look?> _looks = [];
 
 		/// <param name="spans">The parts of the text, in order, one after the other.</param>
 		/// <param name="resources">Where the brushes of the theme are looked up.</param>
@@ -64,39 +64,29 @@ namespace DatExplorerIII.Views.Viewer
 				Int32 start = Math.Max(span.Start, lineStart);
 				Int32 end = Math.Min(span.Start + span.Length, lineEnd);
 				if (end > start)
-				{
 					yield return (start, end, span.Kind);
-				}
 			}
 		}
 
 		protected override void ColorizeLine(DocumentLine line)
 		{
 			if (line.Length == 0)
-			{
 				return;
-			}
 
 			foreach ((Int32 start, Int32 end, SyntaxKind kind) in PartsOf(_spans, line.Offset, line.EndOffset))
 			{
 				if (LookOf(kind) is { } look)
-				{
 					ChangeLinePart(start, end, element => Apply(element, look));
-				}
 			}
 		}
 
 		private static void Apply(VisualLineElement element, Look look)
 		{
 			if (look.Foreground != null)
-			{
 				element.TextRunProperties.SetForegroundBrush(look.Foreground);
-			}
 
 			if (look.Background != null)
-			{
 				element.TextRunProperties.SetBackgroundBrush(look.Background);
-			}
 
 			if (look.SemiBold)
 			{
@@ -105,9 +95,7 @@ namespace DatExplorerIII.Views.Viewer
 			}
 
 			if (look.Underline)
-			{
 				element.TextRunProperties.SetTextDecorations(TextDecorations.Underline);
-			}
 		}
 
 		/// <summary>How a kind is drawn; null for the kinds that have the color of the text.</summary>
@@ -142,9 +130,7 @@ namespace DatExplorerIII.Views.Viewer
 			};
 
 			if (brush == null)
-			{
 				return null;
-			}
 
 			// What does not fit is marked on its background too, so that spaces past the end of a line show.
 			Brush? background = kind == SyntaxKind.Overflow ? _resources.TryFindResource("SystemFillColorCriticalBackgroundBrush") as Brush : null;

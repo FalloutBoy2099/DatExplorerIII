@@ -19,7 +19,7 @@ namespace DatExplorerIII.Tests
 		/// <summary>The keys the source files name: in the XAML, and the quoted ones of the code (some are only the beginning of a key).</summary>
 		private static List<String> NamedKeys()
 		{
-			List<String> names = new();
+			List<String> names = [];
 			foreach (String path in SourceFiles.Files(".xaml").Where(path => !Path.GetFileName(path).StartsWith("Strings.", StringComparison.Ordinal)))
 			{
 				names.AddRange(Regex.Matches(File.ReadAllText(path), "Str\\.[A-Za-z0-9_]+").Select(match => match.Value));
@@ -50,7 +50,7 @@ namespace DatExplorerIII.Tests
 		public void EveryTextTheProgramNames_Exists()
 		{
 			HashSet<String> defined = DefinedKeys().ToHashSet();
-			List<String> missing = new();
+			List<String> missing = [];
 			foreach (String path in SourceFiles.Files(".xaml").Where(path => !Path.GetFileName(path).StartsWith("Strings.", StringComparison.Ordinal)))
 			{
 				missing.AddRange(Regex.Matches(File.ReadAllText(path), "Str\\.[A-Za-z0-9_]+").Select(match => match.Value).Where(key => !defined.Contains(key)));

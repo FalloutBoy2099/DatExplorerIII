@@ -51,9 +51,7 @@ namespace DatExplorerIII.Scripts
 			{
 				UInt32 nameOffset = _namespace.GetOffsetByIndex(index);
 				if (index == 0 && _namespace[nameOffset] == "..............")
-				{
 					continue;
-				}
 
 				String definition;
 				DefinitionOutputType currentOutput;
@@ -80,9 +78,7 @@ namespace DatExplorerIII.Scripts
 
 						definition = prefix + "procedure " + _namespace[nameOffset] + CreateProcedureArguments(procedure.ArgumentCount) + ";";
 						if ((procedure.Type & ObjectAttributes.NotImplemented) != 0)
-						{
 							definition += " /* Prodedure defined, but not implemented */";
-						}
 					}
 					else
 					{
@@ -104,9 +100,7 @@ namespace DatExplorerIII.Scripts
 
 						definition = prefix + "variable " + _namespace[nameOffset];
 						if ((definitionObject.Attributes & ObjectAttributes.Import) == 0)
-						{
 							definition = CreateVariableDefinition(definition, new ScriptOpcode((Opcode)(definitionObject.Attributes & 0xFFFF), definitionObject.Data), false);
-						}
 
 						definition += ";";
 					}
@@ -118,9 +112,7 @@ namespace DatExplorerIII.Scripts
 				}
 
 				if (currentOutput != lastOutput && lastOutput != DefinitionOutputType.Nothing)
-				{
 					output.AppendLine();
-				}
 
 				lastOutput = currentOutput;
 				output.AppendLine(definition);
@@ -135,9 +127,7 @@ namespace DatExplorerIII.Scripts
 			for (UInt32 index = 0; index < _procedures.Count; index++)
 			{
 				if (index == 0 && _namespace[_procedures[index].NameOffset] == "..............")
-				{
 					continue;
-				}
 
 				if (_procedures.GetProcedureSize(index) == 0)
 				{
@@ -198,16 +188,12 @@ namespace DatExplorerIII.Scripts
 					{
 						Opcode op = node.Opcode.Operator;
 						if ((node.Opcode.GetAttributes(_options).Type == OpcodeAttributeType.Expression) && op != Opcode.O_STRINGOP && op != Opcode.O_FLOATOP && op != Opcode.O_INTOP)
-						{
 							_messages.Add(String.Format(CultureInfo.InvariantCulture, "Warning: Result of expression is left in stack. (Opcode 0x{0:X4} at 0x{1:X8})", (UInt16)op, node.Offset));
-						}
 
 						if (op == Opcode.O_STRINGOP || op == Opcode.O_FLOATOP || op == Opcode.O_INTOP)
 						{
 							if (!localVariable)
-							{
 								_messages.Add("Warning: Free value found. Converted to definition of local variable");
-							}
 
 							output.AppendLine(GetIndentString(indentLevel) + String.Format(CultureInfo.InvariantCulture, "variable LVar{0} := {1};", localVariableIndex, GetSource(node, false, procedure.ArgumentCount)));
 							localVariableIndex++;

@@ -5,7 +5,7 @@ namespace DatExplorerIII.Views.Behaviors
 	using System.Windows.Controls;
 	using System.Windows.Media;
 	using System.Windows.Media.Imaging;
-	using Models;
+	using Models.Graphics;
 
 	/// <summary>
 	/// Draws a <see cref="PixelImage"/> in an image control. The bitmap is kept and written again when the picture has the same size
@@ -37,9 +37,7 @@ namespace DatExplorerIII.Views.Behaviors
 		private static void OnImageChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
 		{
 			if (sender is not Image control)
-			{
 				return;
-			}
 
 			if (control.GetValue(FollowerProperty) is Follower previous)
 			{

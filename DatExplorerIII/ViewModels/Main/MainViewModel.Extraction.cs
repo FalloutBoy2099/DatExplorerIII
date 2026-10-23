@@ -8,8 +8,10 @@ namespace DatExplorerIII.ViewModels.Main
 	using System.Linq;
 	using System.Threading.Tasks;
 	using Core;
-	using Models;
-	using Services;
+	using Models.Archives;
+	using Models.Interface;
+	using Services.Interface;
+	using Services.Platform;
 
 	public sealed partial class MainViewModel
 	{
@@ -23,9 +25,7 @@ namespace DatExplorerIII.ViewModels.Main
 		{
 			DatDocument? document = CurrentDocument;
 			if (document == null)
-			{
 				return;
-			}
 
 			await ExtractAsync(document, CollectEntries(document, SelectedItems), String.Empty);
 		}
@@ -33,22 +33,18 @@ namespace DatExplorerIII.ViewModels.Main
 		private async Task ExtractSelectedFolderAsync(Object? parameter)
 		{
 			if (SelectedFolder is { IsRoot: false } folder)
-			{
 				await ExtractAsync(folder.Document, folder.Document.Archive.GetEntriesUnder(folder.Path), String.Empty);
-			}
 		}
 
 		private async Task ExtractAllAsync(Object? parameter)
 		{
 			if (CurrentDocument is { } document)
-			{
 				await ExtractAsync(document, document.Archive.Entries.ToList(), String.Empty);
-			}
 		}
 
 		private List<DatEntry> CollectEntries(DatDocument document, IEnumerable<ListEntry> items)
 		{
-			List<DatEntry> entries = new();
+			List<DatEntry> entries = [];
 			foreach (ListEntry item in items)
 			{
 				if (item.Entry != null)
@@ -83,18 +79,14 @@ namespace DatExplorerIII.ViewModels.Main
 
 			String? mode = _dialogs.Choose(Title, Loc.Get("Str.ExtractModeQuestion"), DialogIcon.Question, modes);
 			if (mode is not ("tree" or "flat"))
-			{
 				return;
-			}
 
 			flat = mode == "flat";
 			_settings.Data.ExtractFlat = flat;
 
 			String? destination = _dialogs.PickFolder(Loc.Get("Str.SelectDestination"), _settings.Data.LastExtractFolder);
 			if (destination == null)
-			{
 				return;
-			}
 
 			_settings.Data.LastExtractFolder = destination;
 
@@ -102,9 +94,7 @@ namespace DatExplorerIII.ViewModels.Main
 			Dictionary<DatEntry, String>? flatNames = flat ? DatArchive.GetFlatNames(entries) : null;
 			List<DatEntry>? selected = ResolveOverwrites(entries, destination, stripPrefix, flatNames);
 			if (selected == null)
-			{
 				return;
-			}
 
 			DatExtractResult? result = null;
 			Boolean completed = await RunBusyAsync(
@@ -124,7 +114,7 @@ namespace DatExplorerIII.ViewModels.Main
 		/// </summary>
 		private List<DatEntry>? ResolveOverwrites(IReadOnlyList<DatEntry> entries, String destination, String stripPrefix, IReadOnlyDictionary<DatEntry, String>? flatNames)
 		{
-			List<DatEntry> selected = new(entries.Count);
+			List<DatEntry> selected = [with(entries.Count)];
 			ConflictResolver resolver = new(_dialogs, Title);
 
 			foreach (DatEntry entry in entries)
@@ -163,15 +153,11 @@ namespace DatExplorerIII.ViewModels.Main
 		private void ReportFailures(String title, IReadOnlyList<String> failures)
 		{
 			if (failures.Count == 0)
-			{
 				return;
-			}
 
 			String list = String.Join(Environment.NewLine, failures.Take(MaxListedItems));
 			if (failures.Count > MaxListedItems)
-			{
 				list += Environment.NewLine + Loc.Format("Str.AndMore", failures.Count - MaxListedItems);
-			}
 
 			_dialogs.ShowMessage(Title, title + Environment.NewLine + Environment.NewLine + list, DialogIcon.Warning);
 		}
@@ -179,9 +165,7 @@ namespace DatExplorerIII.ViewModels.Main
 		internal async Task OpenItemAsync(ListEntry? item)
 		{
 			if (item == null)
-			{
 				return;
-			}
 
 			if (item.Folder != null)
 			{
@@ -191,14 +175,10 @@ namespace DatExplorerIII.ViewModels.Main
 
 			// A folder always opens; a file opens only when the user wants a double click (or Enter) to do something.
 			if (_settings.Data.DoubleClickDisabled)
-			{
 				return;
-			}
 
 			if (await OpenMessageProblemsInsteadAsync(item))
-			{
 				return;
-			}
 
 			if (_settings.Data.DoubleClickOpensViewer && FileViewers.IsViewable(item.Name))
 			{
@@ -213,15 +193,11 @@ namespace DatExplorerIII.ViewModels.Main
 		private async Task OpenExternalAsync(ListEntry? item)
 		{
 			if (item?.Entry is not { } entry)
-			{
 				return;
-			}
 
 			DatDocument? document = CurrentDocument;
 			if (document == null)
-			{
 				return;
-			}
 
 			if (FilePolicy.IsDangerous(entry.Name))
 			{
@@ -253,9 +229,7 @@ namespace DatExplorerIII.ViewModels.Main
 				}
 
 				if (!completed)
-				{
 					return;
-				}
 
 				if (result == null || result.Failures.Count > 0)
 				{
@@ -275,9 +249,7 @@ namespace DatExplorerIII.ViewModels.Main
 			try
 			{
 				if (File.Exists(file))
-				{
 					Process.Start(new ProcessStartInfo(file) { UseShellExecute = true });
-				}
 			}
 			catch (Exception exception) when (exception is Win32Exception or InvalidOperationException)
 			{

@@ -30,15 +30,11 @@ namespace DatExplorerIII.Views.Behaviors
 		{
 			// The first value comes from the binding when the window loads: nobody asked for anything yet.
 			if (e.OldValue == null || sender is not UIElement element)
-			{
 				return;
-			}
 
 			element.Focus();
 			if (element is TextBox box)
-			{
 				box.SelectAll();
-			}
 		}
 	}
 }

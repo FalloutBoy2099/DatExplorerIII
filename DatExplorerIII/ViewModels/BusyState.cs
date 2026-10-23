@@ -7,8 +7,8 @@ namespace DatExplorerIII.ViewModels
 	using System.Windows.Input;
 	using Core;
 	using Infrastructure;
-	using Models;
-	using Services;
+	using Models.Archives;
+	using Services.Interface;
 
 	/// <summary>
 	/// A long running operation: the progress shown over the window and the way to run work behind it.

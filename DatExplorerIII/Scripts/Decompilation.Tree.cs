@@ -27,9 +27,7 @@ namespace DatExplorerIII.Scripts
 					Int32 nameNodeIndex = NextNodeIndex(nodes, (Int32)index, -1);
 					Opcode nameOperator = nodes[nameNodeIndex].Opcode.Operator;
 					if (nameOperator != Opcode.O_STRINGOP && nameOperator != Opcode.O_INTOP)
-					{
 						throw new ScriptFormatException("Error: Invalid reference to external variable");
-					}
 
 					SetExternalVariable(nodes[nameNodeIndex].Opcode.Argument);
 				}
@@ -37,9 +35,7 @@ namespace DatExplorerIII.Scripts
 				{
 					Int32 countNodeIndex = NextNodeIndex(nodes, (Int32)index, -2);
 					if (nodes[countNodeIndex].Opcode.Operator != Opcode.O_INTOP)
-					{
 						throw new ScriptFormatException("Error: Invalid opcode for procedure's number of arguments");
-					}
 
 					argumentCount = nodes[countNodeIndex].Opcode.Argument + 2;
 				}
@@ -47,9 +43,7 @@ namespace DatExplorerIII.Scripts
 				{
 					Int32 countNodeIndex = NextNodeIndex(nodes, (Int32)index, -1);
 					if (nodes[countNodeIndex].Opcode.Operator != Opcode.O_INTOP)
-					{
 						throw new ScriptFormatException("Error: Invalid opcode for addRegion number of arguments");
-					}
 
 					argumentCount = nodes[countNodeIndex].Opcode.Argument + 1;
 				}
@@ -138,9 +132,7 @@ namespace DatExplorerIII.Scripts
 		private void BuildTree(List<Node> nodes)
 		{
 			if (nodes.Count > 0)
-			{
 				BuildTreeBranch(nodes, 0, nodes[nodes.Count - 1].Offset + ScriptOpcode.OperatorSize, false);
-			}
 		}
 
 		/// <summary>
@@ -152,9 +144,7 @@ namespace DatExplorerIII.Scripts
 			Int32 nodeIndex;
 			Node node = source[nodeIndex = NextNodeIndex(source, startIndex - 1, 1)];
 			if (node.Opcode.Operator != Opcode.O_JMP || node.Arguments[0].Opcode.Operator != Opcode.O_INTOP)
-			{
 				throw new ScriptFormatException("Error: Invalid startup of condition");
-			}
 
 			UInt32 jumpOffset = node.Arguments[0].Opcode.Argument;
 			do
@@ -170,19 +160,13 @@ namespace DatExplorerIII.Scripts
 			}
 
 			if (!RemoveSequenceOfNodes(destination, 0, 2, ConditionStart))
-			{
 				throw new ScriptFormatException("Error: Invalid startup of condition");
-			}
 
 			if (!RemoveSequenceOfNodes(destination, destination.Count - 2, 2, ConditionEnd))
-			{
 				throw new ScriptFormatException("Error: Invalid cleanup of condition");
-			}
 
 			if (destination.Count != 1 || !destination[0].IsExpression(_options))
-			{
 				throw new ScriptFormatException("Error: Invalid condition. Only one expression allowed");
-			}
 
 			source.RemoveRange(startIndex, nodeIndex - startIndex);
 		}

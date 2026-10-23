@@ -17,9 +17,7 @@ namespace DatExplorerIII.Views.Behaviors
 			while (current != null)
 			{
 				if (current is T match)
-				{
 					return match;
-				}
 
 				current = Parent(current);
 			}
@@ -34,9 +32,7 @@ namespace DatExplorerIII.Views.Behaviors
 			while (current != null)
 			{
 				if (current is TreeViewItem or ListBoxItem)
-				{
 					return (FrameworkElement)current;
-				}
 
 				current = Parent(current);
 			}
@@ -47,16 +43,14 @@ namespace DatExplorerIII.Views.Behaviors
 		/// <summary>Every scroll viewer under <paramref name="root"/>, in the order of the tree.</summary>
 		public static List<ScrollViewer> ScrollViewersOf(DependencyObject root)
 		{
-			List<ScrollViewer> found = new();
+			List<ScrollViewer> found = [];
 			void Walk(DependencyObject node)
 			{
 				for (Int32 index = 0; index < VisualTreeHelper.GetChildrenCount(node); index++)
 				{
 					DependencyObject child = VisualTreeHelper.GetChild(node, index);
 					if (child is ScrollViewer viewer)
-					{
 						found.Add(viewer);
-					}
 
 					Walk(child);
 				}

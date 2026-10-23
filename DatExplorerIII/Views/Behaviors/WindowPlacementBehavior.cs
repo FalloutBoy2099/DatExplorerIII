@@ -4,7 +4,7 @@ namespace DatExplorerIII.Views.Behaviors
 	using System.ComponentModel;
 	using System.Windows;
 	using Infrastructure;
-	using Models;
+	using Models.Interface;
 
 	/// <summary>
 	/// Puts a window where it was when the program ended last time, and keeps where it is when it closes. What is kept, and where,
@@ -31,9 +31,7 @@ namespace DatExplorerIII.Views.Behaviors
 		private static void OnStoreChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
 		{
 			if (sender is not Window window)
-			{
 				return;
-			}
 
 			window.Closing -= OnClosing;
 			if (e.NewValue is IWindowPlacementStore store)
@@ -80,17 +78,13 @@ namespace DatExplorerIII.Views.Behaviors
 			}
 
 			if (placement.IsMaximized)
-			{
 				window.WindowState = WindowState.Maximized;
-			}
 		}
 
 		private static void OnClosing(Object? sender, CancelEventArgs e)
 		{
 			if (e.Cancel || sender is not Window window || GetStore(window) is not { } store)
-			{
 				return;
-			}
 
 			Rect bounds = window.WindowState == WindowState.Normal ? new Rect(window.Left, window.Top, window.Width, window.Height) : window.RestoreBounds;
 			store.SavePlacement(new WindowPlacement(bounds.Left, bounds.Top, bounds.Width, bounds.Height, window.WindowState == WindowState.Maximized));

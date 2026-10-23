@@ -4,7 +4,7 @@ namespace DatExplorerIII.Core
 	using System.Collections.Generic;
 	using System.IO;
 	using System.IO.Compression;
-	using Models;
+	using Models.Archives;
 
 	/// <summary>
 	/// ZIP files, browsed like a DAT archive: the folders and the files of the ZIP are those of the archive, and the data is read
@@ -21,9 +21,7 @@ namespace DatExplorerIII.Core
 		private static Boolean IsZipFile(FileStream stream, Int64 length)
 		{
 			if (length < 4)
-			{
 				return false;
-			}
 
 			Byte[] header = new Byte[4];
 			stream.Position = 0;
@@ -50,7 +48,7 @@ namespace DatExplorerIII.Core
 		private void ReadZip(FileStream stream, Int64 length)
 		{
 			_zip = new ZipArchive(stream, ZipArchiveMode.Read, leaveOpen: true);
-			_zipEntries = new Dictionary<DatEntry, ZipArchiveEntry>();
+			_zipEntries = [];
 			_archiveEnd = length;
 			_dataLimit = Int64.MaxValue;
 
@@ -80,22 +78,16 @@ namespace DatExplorerIII.Core
 		private Byte[] ReadZipData(DatEntry entry)
 		{
 			if (entry.IsDamaged)
-			{
 				throw new DatException(DatErrorKind.OutsideArchive, $"The file '{entry.FullPath}' is damaged.", entry.FullPath);
-			}
 
 			lock (_streamLock)
 			{
 				if (_zipEntries == null || !_zipEntries.TryGetValue(entry, out ZipArchiveEntry? zipEntry))
-				{
 					throw new DatException(DatErrorKind.NotOnDisk, "The archive is not stored on disk.");
-				}
 
 				// A deflate stream cannot shrink more than about 1032 to 1: a larger announced size is a lie (and would fill the memory).
 				if (entry.IsCompressed && entry.UnpackedSize > ((Int64)entry.PackedSize * MaxZlibRatio) + 1024)
-				{
 					throw new DatException(DatErrorKind.CorruptData, $"The announced size of '{entry.FullPath}' is impossible.", entry.FullPath);
-				}
 
 				try
 				{
@@ -109,15 +101,11 @@ namespace DatExplorerIII.Core
 					{
 						result.Write(buffer, 0, read);
 						if (result.Length > entry.UnpackedSize)
-						{
 							break;
-						}
 					}
 
 					if (result.Length != entry.UnpackedSize)
-					{
 						throw new InvalidDataException("The size of the file is not the one announced.");
-					}
 
 					return result.ToArray();
 				}

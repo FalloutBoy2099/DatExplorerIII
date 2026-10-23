@@ -6,7 +6,7 @@ namespace DatExplorerIII.Tests
 	using System.Linq;
 	using System.Text;
 	using DatExplorerIII.Core;
-	using DatExplorerIII.Models;
+	using DatExplorerIII.Models.Archives;
 
 	/// <summary>The archives of Temple of Elemental Evil: the footer of Arcanum, and an index that is a tree of folders.</summary>
 	public sealed class ToeeArchiveTests : IDisposable

@@ -36,9 +36,7 @@ namespace DatExplorerIII.Views
 			{
 				Rect area = SystemParameters.WorkArea;
 				if (Top + ActualHeight > area.Bottom)
-				{
 					Top = Math.Max(area.Top, area.Bottom - ActualHeight);
-				}
 			};
 		}
 

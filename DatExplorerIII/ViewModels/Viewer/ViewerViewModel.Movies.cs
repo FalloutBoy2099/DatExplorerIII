@@ -7,9 +7,10 @@ namespace DatExplorerIII.ViewModels.Viewer
 	using System.Threading;
 	using System.Threading.Tasks;
 	using Core;
-	using Formats;
-	using Models;
-	using Services;
+	using Formats.GameFiles;
+	using Models.Archives;
+	using Models.GameFiles;
+	using Services.Interface;
 
 	/// <summary>The movies: their subtitles.</summary>
 	public sealed partial class ViewerViewModel
@@ -31,7 +32,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 				_ => "english",
 			};
 
-			List<(DatArchive Archive, DatEntry Entry, Int32 Rank)> found = new();
+			List<(DatArchive Archive, DatEntry Entry, Int32 Rank)> found = [];
 			try
 			{
 				foreach (DatArchive candidate in GameArchives(archive))
@@ -49,9 +50,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 				}
 
 				if (found.Count == 0)
-				{
 					return null;
-				}
 
 				(DatArchive source, DatEntry chosen, _) = found.OrderBy(item => item.Rank).First();
 				return (SveReader.Read(source.ReadData(chosen)), chosen.FullPath);

@@ -8,10 +8,12 @@ namespace DatExplorerIII.ViewModels.Viewer
 	using System.Threading;
 	using System.Threading.Tasks;
 	using System.Windows.Input;
-	using Formats;
+	using Formats.Movies;
 	using Infrastructure;
-	using Models;
-	using Services;
+	using Models.GameFiles;
+	using Models.Graphics;
+	using Services.Interface;
+	using Services.Media;
 
 	/// <summary>
 	/// A movie shown in the viewer: the picture, a button to play or pause it with its sound, a bar to move in it, and its
@@ -83,9 +85,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 			set
 			{
 				if (SetProperty(ref _showSubtitles, value))
-				{
 					UpdateSubtitle();
-				}
 			}
 		}
 
@@ -96,9 +96,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 			private set
 			{
 				if (SetProperty(ref _subtitle, value))
-				{
 					OnPropertyChanged(nameof(HasSubtitle));
-				}
 			}
 		}
 
@@ -115,9 +113,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 			{
 				Int32 frame = (Int32)Math.Round(value);
 				if (_movie != null && frame != _shown)
-				{
 					SeekTo(frame);
-				}
 			}
 		}
 
@@ -146,9 +142,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 				movie.FramesPerSecond.ToString("0.#", CultureInfo.CurrentCulture),
 				FormatDuration(movie.Duration));
 			if (subtitles != null)
-			{
 				Info += " · " + Loc.Format("Str.ViewerVideoSubtitles", subtitles.Entries.Count, subtitlesName ?? String.Empty);
-			}
 
 			Warning = movie.IsIncomplete ? Loc.Get("Str.ViewerVideoIncomplete") : movie.Audio == null ? Loc.Get("Str.ViewerVideoSilent") : String.Empty;
 			UpdateSubtitle();
@@ -229,9 +223,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 		private void ShowFrame(Int32 frame)
 		{
 			if (_reader == null)
-			{
 				return;
-			}
 
 			_reader.SeekTo(frame);
 			if (_reader.ReadFrame(_pixels))
@@ -258,9 +250,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 			foreach (SveEntry entry in _subtitles.Entries)
 			{
 				if (entry.Frame > _shown)
-				{
 					break;
-				}
 
 				current = entry;
 			}
@@ -295,14 +285,10 @@ namespace DatExplorerIII.ViewModels.Viewer
 		private void Play()
 		{
 			if (_movie == null || _reader == null || _isPlaying)
-			{
 				return;
-			}
 
 			if (_shown >= _movie.FrameCount - 1)
-			{
 				ShowFrame(0);
-			}
 
 			Warning = _movie.IsIncomplete ? Loc.Get("Str.ViewerVideoIncomplete") : String.Empty;
 			_clockStart = _movie.FramePeriod * _shown;
@@ -337,15 +323,11 @@ namespace DatExplorerIII.ViewModels.Viewer
 		private void OnTick()
 		{
 			if (_reader == null || _movie == null)
-			{
 				return;
-			}
 
 			Int32 target = (Int32)((_clockStart + _clock.Elapsed).Ticks / _movie.FramePeriod.Ticks);
 			if (target <= _shown)
-			{
 				return;
-			}
 
 			if (target >= _movie.FrameCount)
 			{

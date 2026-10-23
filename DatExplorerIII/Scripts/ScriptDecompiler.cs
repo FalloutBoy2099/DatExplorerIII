@@ -30,9 +30,7 @@ namespace DatExplorerIII.Scripts
 			ScriptDecompilerOptions actual = options ?? new ScriptDecompilerOptions();
 			using CancellationTokenSource limit = CancellationTokenSource.CreateLinkedTokenSource(cancellation);
 			if (actual.Timeout > TimeSpan.Zero)
-			{
 				limit.CancelAfter(actual.Timeout);
-			}
 
 			CancellationToken token = limit.Token;
 			DecompiledScript? script = null;
@@ -61,9 +59,7 @@ namespace DatExplorerIII.Scripts
 			}
 
 			if (failure != null)
-			{
 				ExceptionDispatchInfo.Capture(failure).Throw();
-			}
 
 			return script!;
 		}

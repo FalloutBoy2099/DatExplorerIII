@@ -45,45 +45,33 @@ namespace DatExplorerIII.Views.Behaviors
 		private static void OnSelectedItemCommandChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
 		{
 			if (sender is not TreeView tree)
-			{
 				return;
-			}
 
 			tree.SelectedItemChanged -= OnSelectedItemChanged;
 			if (e.NewValue != null)
-			{
 				tree.SelectedItemChanged += OnSelectedItemChanged;
-			}
 		}
 
 		private static void OnSelectedItemChanged(Object sender, RoutedPropertyChangedEventArgs<Object> e)
 		{
 			if (GetSelectedItemCommand((DependencyObject)sender) is { } command && command.CanExecute(e.NewValue))
-			{
 				command.Execute(e.NewValue);
-			}
 		}
 
 		private static void OnSelectOnRightClickChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
 		{
 			if (sender is not UIElement element)
-			{
 				return;
-			}
 
 			element.PreviewMouseRightButtonDown -= OnRightButtonDown;
 			if (e.NewValue is true)
-			{
 				element.PreviewMouseRightButtonDown += OnRightButtonDown;
-			}
 		}
 
 		private static void OnRightButtonDown(Object sender, MouseButtonEventArgs e)
 		{
 			if (VisualTree.FindAncestor<TreeViewItem>(e.OriginalSource) is { } item)
-			{
 				item.IsSelected = true;
-			}
 		}
 	}
 }

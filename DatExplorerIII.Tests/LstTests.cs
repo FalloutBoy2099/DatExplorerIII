@@ -3,7 +3,7 @@ namespace DatExplorerIII.Tests
 	using System;
 	using System.Linq;
 	using System.Text;
-	using DatExplorerIII.Services;
+	using DatExplorerIII.Services.Syntax;
 	using DatExplorerIII.ViewModels;
 	using DatExplorerIII.ViewModels.Viewer;
 

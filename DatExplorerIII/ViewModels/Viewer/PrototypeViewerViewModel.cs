@@ -4,8 +4,8 @@ namespace DatExplorerIII.ViewModels.Viewer
 	using System.Collections.Generic;
 	using System.Linq;
 	using Infrastructure;
-	using Models;
-	using Services;
+	using Models.Prototypes;
+	using Services.Interface;
 	using static CharacterViewerViewModel;
 
 	/// <summary>
@@ -66,12 +66,12 @@ namespace DatExplorerIII.ViewModels.Viewer
 		/// </summary>
 		internal static IReadOnlyList<CharacterSection> Build(ArcanumProto prototype)
 		{
-			List<CharacterRow> general = new()
-			{
+			List<CharacterRow> general =
+			[
 				new CharacterRow(Loc.Get("Str.ProType"), Loc.Get("Str.ArcProType" + (Int32)prototype.Type)),
 				Row("Str.ArcProNumber", prototype.Number.ToString(System.Globalization.CultureInfo.InvariantCulture)),
 				Row("Str.ArcProVersion", "0x" + prototype.Version.ToString("X2", System.Globalization.CultureInfo.InvariantCulture)),
-			};
+			];
 
 			if (prototype.Note != null)
 			{
@@ -84,11 +84,9 @@ namespace DatExplorerIII.ViewModels.Viewer
 				.Select(property => new CharacterRow(property.Name, property.Value))
 				.ToList();
 
-			List<CharacterSection> sections = new() { new CharacterSection(Loc.Get("Str.ProSectionGeneral"), general) };
+			List<CharacterSection> sections = [new CharacterSection(Loc.Get("Str.ProSectionGeneral"), general)];
 			if (fields.Count > 0)
-			{
 				sections.Add(new CharacterSection(Loc.Get("Str.ArcProFields"), fields));
-			}
 
 			return sections;
 		}
@@ -113,8 +111,8 @@ namespace DatExplorerIII.ViewModels.Viewer
 
 		internal static IReadOnlyList<CharacterSection> Build(ProtoFile prototype)
 		{
-			List<CharacterRow> general = new()
-			{
+			List<CharacterRow> general =
+			[
 				new CharacterRow(Loc.Get("Str.ProType"), Loc.Get("Str.ProType" + (Int32)prototype.Type)),
 				Row("Str.ProId", prototype.Id),
 				Row("Str.ProMessage", prototype.MessageId),
@@ -122,9 +120,9 @@ namespace DatExplorerIII.ViewModels.Viewer
 				Row("Str.ProLightDistance", prototype.LightDistance),
 				Row("Str.ProLightIntensity", prototype.LightIntensity),
 				Row("Str.ProFlags", Hex(prototype.Flags)),
-			};
+			];
 
-			List<CharacterSection> sections = new() { new CharacterSection(Loc.Get("Str.ProSectionGeneral"), general) };
+			List<CharacterSection> sections = [new CharacterSection(Loc.Get("Str.ProSectionGeneral"), general)];
 
 			switch (prototype)
 			{
@@ -162,11 +160,11 @@ namespace DatExplorerIII.ViewModels.Viewer
 
 		private static IReadOnlyList<CharacterRow> SceneryRows(SceneryProto scenery)
 		{
-			List<CharacterRow> rows = new()
-			{
+			List<CharacterRow> rows =
+			[
 				new CharacterRow(Loc.Get("Str.ProMaterial"), Named("Str.ProMaterial", scenery.Material, 8)),
 				Row("Str.ProSoundCode", scenery.SoundId.ToString()),
-			};
+			];
 
 			if (scenery.Door is { } door)
 			{
@@ -187,9 +185,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 			}
 
 			if (scenery.LadderDestination is { } ladder)
-			{
 				rows.Add(Row("Str.ProDestinationTile", Hex(ladder)));
-			}
 
 			return rows;
 		}
@@ -206,7 +202,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 			general.Add(Row("Str.ProInventoryPicture", Identifier(item.InventoryFid)));
 			general.Add(Row("Str.ProSoundCode", item.SoundId.ToString()));
 
-			List<CharacterRow> rows = new();
+			List<CharacterRow> rows = [];
 			if (item.Armor is { } armor)
 			{
 				rows.Add(new CharacterRow(Loc.Get("Str.Stat9"), Number(armor.ArmorClass)));
@@ -227,9 +223,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 			}
 
 			if (item.Drug is { } drug)
-			{
 				rows.AddRange(DrugRows(drug));
-			}
 
 			if (item.Weapon is { } weapon)
 			{
@@ -266,9 +260,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 			}
 
 			if (item.Key is { } key)
-			{
 				rows.Add(Row("Str.ProKeyCode", Identifier(key.KeyCode)));
-			}
 
 			sections.Add(new CharacterSection(Loc.Get("Str.ProItem" + (Int32)item.ItemType), rows));
 		}
@@ -315,9 +307,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 				.Select(skill => new CharacterRow(Loc.Get("Str.Skill" + skill.index), Number(skill.points)))
 				.ToList();
 			if (skills.Count > 0)
-			{
 				sections.Add(new CharacterSection(Loc.Get("Str.ProSectionSkills"), skills));
-			}
 		}
 	}
 }

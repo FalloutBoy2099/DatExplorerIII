@@ -45,9 +45,7 @@ namespace DatExplorerIII.Views.Behaviors
 		private static void OnSourceChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
 		{
 			if (sender is not UIElement element)
-			{
 				return;
-			}
 
 			element.PreviewMouseLeftButtonDown -= OnMouseDown;
 			element.PreviewMouseMove -= OnMouseMove;
@@ -82,15 +80,11 @@ namespace DatExplorerIII.Views.Behaviors
 			UIElement element = (UIElement)sender;
 			DragState state = StateOf(element);
 			if (e.LeftButton != MouseButtonState.Pressed || !state.Candidate || !IsDragStarted(state.Origin, e.GetPosition(null)))
-			{
 				return;
-			}
 
 			state.Candidate = false;
 			if (GetSource(element) is not { } source || VisualTree.ItemAt(e.OriginalSource) is not { } item)
-			{
 				return;
-			}
 
 			// Extracting the files can take a while.
 			IReadOnlyList<String>? paths;
@@ -105,9 +99,7 @@ namespace DatExplorerIII.Views.Behaviors
 			}
 
 			if (paths == null || paths.Count == 0)
-			{
 				return;
-			}
 
 			DataObject data = new(DataFormats.FileDrop, paths.ToArray());
 			data.SetData(InternalFormat, true);

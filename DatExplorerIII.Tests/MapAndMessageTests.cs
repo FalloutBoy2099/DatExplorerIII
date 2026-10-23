@@ -8,9 +8,10 @@ namespace DatExplorerIII.Tests
 	using System.Text;
 	using System.Threading.Tasks;
 	using DatExplorerIII.Core;
-	using DatExplorerIII.Formats;
-	using DatExplorerIII.Models;
-	using DatExplorerIII.Services;
+	using DatExplorerIII.Formats.GameFiles;
+	using DatExplorerIII.Models.Archives;
+	using DatExplorerIII.Models.GameFiles;
+	using DatExplorerIII.Services.Syntax;
 	using DatExplorerIII.ViewModels;
 	using DatExplorerIII.ViewModels.Viewer;
 	using DatExplorerIII.Views;
@@ -38,7 +39,7 @@ namespace DatExplorerIII.Tests
 		/// <summary>Writes big endian 32 bit words.</summary>
 		private sealed class Words
 		{
-			private readonly List<Byte> _bytes = new();
+			private readonly List<Byte> _bytes = [];
 
 			public Words Add(params Int64[] values)
 			{
@@ -138,9 +139,7 @@ namespace DatExplorerIII.Tests
 			AddObject(words, (5L << 24) | 16, 21718, 0, 3, 28707, 0, 1);
 			AddObject(words, (3L << 24) | 30, 20000, 0);
 			if (withItem)
-			{
 				AddObject(words, (0L << 24) | 5, 20001, 0);
-			}
 
 			// The two other elevations hold nothing.
 			words.Add(0);
@@ -248,9 +247,7 @@ namespace DatExplorerIII.Tests
 				}
 
 				if (MapReader.IsMap(data))
-				{
 					MapReader.Read(data);
-				}
 			}
 		}
 
@@ -482,9 +479,7 @@ namespace DatExplorerIII.Tests
 			viewer.PropertyChanged += (_, args) =>
 			{
 				if (args.PropertyName == nameof(TextViewerViewModel.Options))
-				{
 					viewer.SelectedEncoding = null!;
-				}
 			};
 
 			viewer.RefreshLanguage();
@@ -504,9 +499,7 @@ namespace DatExplorerIII.Tests
 			viewer.PropertyChanged += (_, args) =>
 			{
 				if (args.PropertyName == nameof(AudioViewerViewModel.ChannelChoices))
-				{
 					viewer.SelectedChannels = null!;
-				}
 			};
 
 			viewer.RefreshLanguage();
@@ -544,7 +537,7 @@ namespace DatExplorerIII.Tests
 		public void TheColorsOfALine_OfALongText_AreFoundWithoutGoingThroughTheText()
 		{
 			// Ten thousand lines of three parts: the parts of a line in the middle are those of that line only.
-			List<SyntaxSpan> spans = new();
+			List<SyntaxSpan> spans = [];
 			for (Int32 line = 0; line < 10000; line++)
 			{
 				Int32 start = line * 12;

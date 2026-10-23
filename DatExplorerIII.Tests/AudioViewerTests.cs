@@ -4,8 +4,8 @@ namespace DatExplorerIII.Tests
 	using System.Buffers.Binary;
 	using System.Collections.Generic;
 	using System.Threading.Tasks;
-	using DatExplorerIII.Formats;
-	using DatExplorerIII.Services;
+	using DatExplorerIII.Formats.Audio;
+	using DatExplorerIII.Services.Media;
 	using DatExplorerIII.ViewModels;
 	using DatExplorerIII.ViewModels.Viewer;
 
@@ -15,7 +15,7 @@ namespace DatExplorerIII.Tests
 		/// <summary>A sound card that records what it is given.</summary>
 		private sealed class FakePlayer : ISoundPlayer
 		{
-			public List<Byte[]> Played { get; } = new();
+			public List<Byte[]> Played { get; } = [];
 
 			public Int32 Stops { get; private set; }
 
@@ -24,8 +24,7 @@ namespace DatExplorerIII.Tests
 			public void Stop() => Stops++;
 
 			public void Dispose()
-			{
-			}
+			{ }
 		}
 
 		/// <summary>A clock that only moves when a test says so.</summary>
@@ -268,7 +267,7 @@ namespace DatExplorerIII.Tests
 		public async Task TheMarkOnTheShape_FollowsThePosition()
 		{
 			(AudioViewerViewModel viewer, _, _, _) = await CreateAsync();
-			List<String?> changes = new();
+			List<String?> changes = [];
 			viewer.PropertyChanged += (_, args) => changes.Add(args.PropertyName);
 			Assert.Equal(0, viewer.PlayedFraction);
 

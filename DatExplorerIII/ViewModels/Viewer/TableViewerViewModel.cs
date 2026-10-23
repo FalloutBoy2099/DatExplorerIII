@@ -5,8 +5,8 @@ namespace DatExplorerIII.ViewModels.Viewer
 	using System.Data;
 	using System.Globalization;
 	using Infrastructure;
-	using Models;
-	using Services;
+	using Models.GameFiles;
+	using Services.Interface;
 
 	/// <summary>
 	/// The content of a message file (.mes) or of a dialog (.dlg) shown as a table: a line for each message, that can be
@@ -63,9 +63,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 			set
 			{
 				if (SetProperty(ref _showLineComments, value))
-				{
 					RefreshComments();
-				}
 			}
 		}
 
@@ -92,9 +90,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 		private void RefreshComments()
 		{
 			if (HasComments)
-			{
 				Build();
-			}
 		}
 
 		/// <summary>The lines of the table.</summary>
@@ -122,9 +118,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 		public String GetHeader(String column)
 		{
 			if (column == Text2Column)
-			{
 				return Loc.Get(_dialog != null ? "Str.TableText2Dialog" : "Str.TableText");
-			}
 
 			return HeaderKeys.TryGetValue(column, out String? key) ? Loc.Get(key) : column;
 		}
@@ -178,18 +172,14 @@ namespace DatExplorerIII.ViewModels.Viewer
 		public void RefreshLanguage()
 		{
 			if (_messages != null || _dialog != null || _variables != null || _subtitles != null)
-			{
 				Build();
-			}
 		}
 
 		/// <summary>The mark of the lines that are comments: a column of the table only when the comments between the lines are shown.</summary>
 		private void AddIsCommentColumn(DataTable table)
 		{
 			if (_showBlockComments)
-			{
 				table.Columns.Add(IsCommentColumn, typeof(Boolean));
-			}
 		}
 
 		/// <summary>The cells of a line of an entry, with the mark that says it is not a comment when the table has that column.</summary>
@@ -246,9 +236,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 			{
 				table.Columns.Add(TextColumn, typeof(String));
 				if (_showLineComments)
-				{
 					table.Columns.Add(CommentColumn, typeof(String));
-				}
 
 				AddIsCommentColumn(table);
 				AddRows(table, _messages.Entries.Count, _messages.Comments, index =>
@@ -300,9 +288,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 				table.Columns.Add(GotoColumn, typeof(String));
 				table.Columns.Add(EffectColumn, typeof(String));
 				if (_showLineComments)
-				{
 					table.Columns.Add(CommentColumn, typeof(String));
-				}
 
 				AddIsCommentColumn(table);
 

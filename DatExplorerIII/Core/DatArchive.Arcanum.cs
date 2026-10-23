@@ -5,7 +5,7 @@ namespace DatExplorerIII.Core
 	using System.Collections.Generic;
 	using System.IO;
 	using System.Linq;
-	using Models;
+	using Models.Archives;
 
 	/// <summary>
 	/// The DAT archives of Arcanum (Troika): the data of the files, then an index, then a footer. All numbers are little endian.
@@ -45,9 +45,7 @@ namespace DatExplorerIII.Core
 		{
 			footer = default;
 			if (length < ArcanumTailSize)
-			{
 				return false;
-			}
 
 			Byte[] tail = new Byte[ArcanumTailSize];
 			stream.Position = length - ArcanumTailSize;
@@ -55,9 +53,7 @@ namespace DatExplorerIII.Core
 
 			UInt32 magic = BinaryPrimitives.ReadUInt32LittleEndian(tail);
 			if (magic != ArcanumGuidMagic && magic != ArcanumPlainMagic)
-			{
 				return false;
-			}
 
 			Boolean hasGuid = magic == ArcanumGuidMagic;
 			Int64 footerSize = hasGuid ? ArcanumGuidSize + ArcanumTailSize : ArcanumTailSize;
@@ -66,9 +62,7 @@ namespace DatExplorerIII.Core
 
 			// The length counts the entry count (4 bytes) and the footer; the names are part of the entries.
 			if (length < footerSize || indexSize < footerSize + 4 || indexSize > length || nameTableSize > indexSize)
-			{
 				return false;
-			}
 
 			Byte[] guid = new Byte[ArcanumGuidSize];
 			if (hasGuid)
@@ -129,9 +123,7 @@ namespace DatExplorerIII.Core
 			if (count < 0 || parsed < count)
 			{
 				if (mode == DatOpenMode.Strict)
-				{
 					throw new DatException(DatErrorKind.InvalidTree, "The index of the DAT file is damaged.");
-				}
 
 				_issues.Add(new DatIssue(DatIssueKind.TruncatedTree, null, parsed));
 			}
@@ -143,15 +135,11 @@ namespace DatExplorerIII.Core
 			entry = null;
 			folder = null;
 			if (position + 4 > index.Length)
-			{
 				return false;
-			}
 
 			Int32 nameLength = BinaryPrimitives.ReadInt32LittleEndian(index.AsSpan(position));
 			if (nameLength <= 0 || (Int64)position + 4 + nameLength + 20 > index.Length)
-			{
 				return false;
-			}
 
 			position += 4;
 			String path = NameEncoding.GetString(index, position, nameLength).TrimEnd('\0');
@@ -222,9 +210,7 @@ namespace DatExplorerIII.Core
 
 			Int64 archiveSize = output.Position + index.Length + ArcanumGuidSize + ArcanumTailSize;
 			if (archiveSize > UInt32.MaxValue)
-			{
 				throw new DatException(DatErrorKind.ArchiveTooLarge, "The archive would exceed 4 GB.");
-			}
 
 			index.Position = 0;
 			index.CopyTo(output);

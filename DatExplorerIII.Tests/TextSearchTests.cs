@@ -13,11 +13,11 @@ namespace DatExplorerIII.Tests
 		{
 			public Queue<String?> Values { get; } = new();
 
-			public List<Func<String, String?>?> Validators { get; } = new();
+			public List<Func<String, String?>?> Validators { get; } = [];
 
-			public List<String> Labels { get; } = new();
+			public List<String> Labels { get; } = [];
 
-			public List<String> Informed { get; } = new();
+			public List<String> Informed { get; } = [];
 
 			public String? Ask(String title, String label, String initial, Func<String, String?>? validate)
 			{
@@ -177,7 +177,7 @@ namespace DatExplorerIII.Tests
 		{
 			Answers answers = new();
 			TextViewerViewModel viewer = Viewer("{1}{}{a}\r\n", ".txt", answers);
-			List<String?> changes = new();
+			List<String?> changes = [];
 			viewer.PropertyChanged += (_, args) => changes.Add(args.PropertyName);
 
 			Assert.False(viewer.IsMessageFile);

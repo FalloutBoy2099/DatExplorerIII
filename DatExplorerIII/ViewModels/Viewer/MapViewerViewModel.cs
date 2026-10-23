@@ -5,8 +5,8 @@ namespace DatExplorerIII.ViewModels.Viewer
 	using System.Globalization;
 	using System.Linq;
 	using Infrastructure;
-	using Models;
-	using Services;
+	using Models.GameFiles;
+	using Services.Interface;
 	using static CharacterViewerViewModel;
 
 	/// <summary>
@@ -47,9 +47,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 		public void RefreshLanguage()
 		{
 			if (_map != null)
-			{
 				Sections = Build(_map);
-			}
 		}
 
 		/// <summary>The place of a hexagon on the map: its column and its row.</summary>
@@ -63,7 +61,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 
 		internal static IReadOnlyList<CharacterSection> Build(MapFile map)
 		{
-			List<CharacterSection> sections = new() { BuildGeneral(map) };
+			List<CharacterSection> sections = [BuildGeneral(map)];
 
 			foreach (MapElevation elevation in map.Elevations)
 			{
@@ -71,14 +69,10 @@ namespace DatExplorerIII.ViewModels.Viewer
 			}
 
 			if (map.Scripts.Count > 0)
-			{
 				sections.Add(BuildScripts(map.Scripts));
-			}
 
 			if (map.Transitions.Count > 0)
-			{
 				sections.Add(BuildTransitions(map.Transitions));
-			}
 
 			return sections;
 		}
@@ -86,8 +80,8 @@ namespace DatExplorerIII.ViewModels.Viewer
 		private static CharacterSection BuildGeneral(MapFile map)
 		{
 			MapHeader header = map.Header;
-			List<CharacterRow> rows = new()
-			{
+			List<CharacterRow> rows =
+			[
 				Row("Str.MapName", header.Name),
 				Row("Str.MapFormat", $"Fallout {(header.Version == 19 ? 1 : 2)} ({header.Version})"),
 				Row("Str.MapNumber", header.DisplayName != null ? $"{header.MapNumber} - {header.DisplayName}" : header.MapNumber.ToString(CultureInfo.InvariantCulture)),
@@ -98,23 +92,21 @@ namespace DatExplorerIII.ViewModels.Viewer
 				Row("Str.MapObjects", map.TotalObjects),
 				Row("Str.MapGlobalVariables", map.GlobalVariableCount),
 				Row("Str.MapLocalVariables", map.LocalVariableCount),
-			};
+			];
 
 			if (map.Note != null)
-			{
 				rows.Add(new CharacterRow(Loc.Format("Str.MapIncomplete", map.Note), String.Empty));
-			}
 
 			return new CharacterSection(Loc.Get("Str.ProSectionGeneral"), rows);
 		}
 
 		private static CharacterSection BuildElevation(MapElevation elevation)
 		{
-			List<CharacterRow> rows = new()
-			{
+			List<CharacterRow> rows =
+			[
 				Row("Str.MapFloorTiles", elevation.FloorTiles),
 				Row("Str.MapRoofTiles", elevation.RoofTiles),
-			};
+			];
 
 			if (elevation.ObjectsByType is { Count: 6 } counts)
 			{
@@ -135,7 +127,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 		/// </summary>
 		private static CharacterSection BuildScripts(IReadOnlyList<MapScriptEntry> scripts)
 		{
-			List<CharacterRow> rows = new();
+			List<CharacterRow> rows = [];
 			foreach (IGrouping<Int32, MapScriptEntry> type in scripts.GroupBy(script => script.Type).OrderBy(group => group.Key))
 			{
 				String typeName = Loc.Get("Str.MapScriptType" + type.Key);
@@ -172,7 +164,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 		/// <summary>The places that lead somewhere else, grouped by what they lead to (an exit is often many squares wide).</summary>
 		private static CharacterSection BuildTransitions(IReadOnlyList<MapTransition> transitions)
 		{
-			List<CharacterRow> rows = new();
+			List<CharacterRow> rows = [];
 			IEnumerable<IGrouping<(MapTransitionKind Kind, Int32 Map, Int32 Tile, Int32 Elevation, Int32 Source), MapTransition>> groups = transitions
 				.GroupBy(transition => (transition.Kind, transition.DestinationMap, transition.DestinationTile, transition.DestinationElevation, transition.Elevation));
 

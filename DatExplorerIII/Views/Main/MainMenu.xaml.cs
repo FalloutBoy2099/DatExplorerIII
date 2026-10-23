@@ -4,7 +4,7 @@ namespace DatExplorerIII.Views.Main
 	using System.Collections.Generic;
 	using System.Windows;
 	using System.Windows.Controls;
-	using Services;
+	using Services.Platform;
 	using ViewModels.Main;
 
 	/// <summary>The menu of the main window. The recent files are added to the File menu each time it opens.</summary>
@@ -27,31 +27,25 @@ namespace DatExplorerIII.Views.Main
 		{
 			// The event also comes from the submenus of the menu.
 			if (!ReferenceEquals(e.OriginalSource, FileMenu))
-			{
 				return;
-			}
 
 			for (Int32 i = FileMenu.Items.Count - 1; i >= 0; i--)
 			{
 				if (FileMenu.Items[i] is FrameworkElement { Tag: RecentTag })
-				{
 					FileMenu.Items.RemoveAt(i);
-				}
 			}
 
 			IReadOnlyList<String> files = ViewModel.RecentFiles;
 			if (files.Count == 0)
-			{
 				return;
-			}
 
 			// The line that clears the list comes first, and a separator sets it apart from the files.
-			List<Control> lines = new()
-			{
+			List<Control> lines =
+			[
 				new Separator { Tag = RecentTag },
 				new MenuItem { Header = (String)FindResource("Str.ClearRecent"), Command = ViewModel.ClearRecentCommand, Tag = RecentTag },
 				new Separator { Tag = RecentTag },
-			};
+			];
 			for (Int32 i = 0; i < files.Count; i++)
 			{
 				// The digit is the access key of the line (1 to 9, and 0 for the tenth); an underscore of the path is not one.

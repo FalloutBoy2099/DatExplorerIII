@@ -6,7 +6,8 @@ namespace DatExplorerIII.ViewModels
 	using System.Windows.Input;
 	using Core;
 	using Infrastructure;
-	using Services;
+	using Services.Interface;
+	using Services.Texts;
 
 	/// <summary>
 	/// The differences between the two versions of a file, as the two texts side by side with what differs marked, and the
@@ -42,9 +43,7 @@ namespace DatExplorerIII.ViewModels
 			private set
 			{
 				if (SetProperty(ref _rows, value))
-				{
 					OnPropertyChanged(nameof(HasRows));
-				}
 			}
 		}
 
@@ -124,9 +123,7 @@ namespace DatExplorerIII.ViewModels
 		{
 			List<String> parts = [Loc.Format("Str.CompareDiffCount", _starts.Count)];
 			if (!_exact)
-			{
 				parts.Add(Loc.Get("Str.CompareDiffTooDifferent"));
-			}
 
 			parts.AddRange(_notes.Select(note => Loc.Format(note.Key, note.Args)));
 			return String.Join(" - ", parts);
@@ -149,9 +146,7 @@ namespace DatExplorerIII.ViewModels
 		private void Go(Boolean forward)
 		{
 			if (_starts.Count == 0)
-			{
 				return;
-			}
 
 			Int32 current = _selectedRow == null ? -1 : _list.IndexOf(_selectedRow);
 			Int32 target = forward

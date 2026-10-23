@@ -8,9 +8,13 @@ namespace DatExplorerIII.Tests
 	using System.Threading;
 	using System.Threading.Tasks;
 	using DatExplorerIII.Core;
-	using DatExplorerIII.Models;
+	using DatExplorerIII.Models.Archives;
+	using DatExplorerIII.Models.Comparison;
+	using DatExplorerIII.Models.Interface;
 	using DatExplorerIII.Scripts;
-	using DatExplorerIII.Services;
+	using DatExplorerIII.Services.Platform;
+	using DatExplorerIII.Services.Syntax;
+	using DatExplorerIII.Services.Texts;
 	using DatExplorerIII.ViewModels;
 	using DatExplorerIII.ViewModels.Viewer;
 
@@ -22,7 +26,7 @@ namespace DatExplorerIII.Tests
 			"8002c00100000012800dc0010000008480048010801a8020801a8021801a8022801a8023802480258026000000020000000600000000000000000000000000000096000000000000001800000000000000000000000000000096000000000000001a00102e2e2e2e2e2e2e2e2e2e2e2e2e2e00000006737461727400ffffffffffffffff"
 			+ "802cc001000000008003c001000000968004802bc001000000b880c7c001000000068033802fc00100000021c0010000000080e4c00100000000800d8019802a8029800c801c802a8029801c");
 
-		private readonly List<String> _folders = new();
+		private readonly List<String> _folders = [];
 
 		public void Dispose()
 		{
@@ -33,8 +37,7 @@ namespace DatExplorerIII.Tests
 					Directory.Delete(folder, true);
 				}
 				catch (IOException)
-				{
-				}
+				{ }
 			}
 		}
 
@@ -114,8 +117,7 @@ namespace DatExplorerIII.Tests
 					ScriptDecompiler.Decompile(data);
 				}
 				catch (ScriptFormatException)
-				{
-				}
+				{ }
 			}
 		}
 

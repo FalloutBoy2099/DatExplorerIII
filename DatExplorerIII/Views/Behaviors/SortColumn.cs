@@ -47,28 +47,20 @@ namespace DatExplorerIII.Views.Behaviors
 		private static void OnCommandChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
 		{
 			if (sender is not UIElement element)
-			{
 				return;
-			}
 
 			element.RemoveHandler(ButtonBase.ClickEvent, (RoutedEventHandler)OnHeaderClick);
 			if (e.NewValue != null)
-			{
 				element.AddHandler(ButtonBase.ClickEvent, (RoutedEventHandler)OnHeaderClick);
-			}
 		}
 
 		private static void OnHeaderClick(Object sender, RoutedEventArgs e)
 		{
 			if (e.OriginalSource is not GridViewColumnHeader { Column: { } column } || GetKey(column) is not { } key)
-			{
 				return;
-			}
 
 			if (GetCommand((DependencyObject)sender) is { } command && command.CanExecute(key))
-			{
 				command.Execute(key);
-			}
 		}
 	}
 }

@@ -2,7 +2,7 @@ namespace DatExplorerIII.Core
 {
 	using System;
 	using System.Diagnostics;
-	using Models;
+	using Models.Archives;
 
 	/// <summary>
 	/// Forwards progress notifications at a rate the user interface can follow.
@@ -25,9 +25,7 @@ namespace DatExplorerIII.Core
 		public void Report(String name, Int32 current)
 		{
 			if (_progress == null)
-			{
 				return;
-			}
 
 			Int64 now = Stopwatch.GetTimestamp();
 			if (current >= _total || now - _lastReport >= IntervalTicks)

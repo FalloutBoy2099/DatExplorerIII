@@ -1,7 +1,7 @@
 namespace DatExplorerIII.Infrastructure
 {
 	using System;
-	using Models;
+	using Models.Interface;
 
 	/// <summary>Where a window keeps its size and its position between two runs of the program, and what the user wants kept.</summary>
 	public interface IWindowPlacementStore

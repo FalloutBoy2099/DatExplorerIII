@@ -6,9 +6,8 @@ namespace DatExplorerIII.Tests
 	using System.IO;
 	using System.Linq;
 	using System.Text;
-	using DatExplorerIII.Formats;
-	using DatExplorerIII.Models;
-	using DatExplorerIII.Services;
+	using DatExplorerIII.Formats.GameFiles;
+	using DatExplorerIII.Models.GameFiles;
 
 	/// <summary>The checks of the message files (.msg): what is critical, what is high, what is medium.</summary>
 	public sealed class MsgValidatorTests

@@ -42,9 +42,7 @@ namespace DatExplorerIII.Views.Behaviors
 		private static void OnIsEnabledChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
 		{
 			if (sender is not ScrollViewer viewer)
-			{
 				return;
-			}
 
 			viewer.PreviewMouseRightButtonDown -= OnMouseDown;
 			viewer.PreviewMouseMove -= OnMouseMove;
@@ -66,9 +64,7 @@ namespace DatExplorerIII.Views.Behaviors
 
 			// Nothing to move when the picture fits.
 			if (viewer.ScrollableWidth <= 0 && viewer.ScrollableHeight <= 0)
-			{
 				return;
-			}
 
 			viewer.SetValue(StartPointProperty, e.GetPosition(viewer));
 			viewer.SetValue(StartOffsetProperty, new Vector(viewer.HorizontalOffset, viewer.VerticalOffset));
@@ -81,9 +77,7 @@ namespace DatExplorerIII.Views.Behaviors
 		{
 			ScrollViewer viewer = (ScrollViewer)sender;
 			if (viewer.GetValue(StartPointProperty) is not Point start || e.RightButton != MouseButtonState.Pressed)
-			{
 				return;
-			}
 
 			Point now = e.GetPosition(viewer);
 			Vector offset = (Vector)viewer.GetValue(StartOffsetProperty);

@@ -23,30 +23,22 @@ namespace DatExplorerIII.Scripts
 			_order.Clear();
 			UInt32 length = reader.ReadUInt32();
 			if (length == 0xFFFFFFFF)
-			{
 				return;
-			}
 
 			UInt32 totalRead = 0;
 			while (totalRead < length)
 			{
 				UInt16 stringLength = reader.ReadUInt16();
 				if (stringLength < 2 || (stringLength & 1) != 0)
-				{
 					throw new ScriptFormatException("Error: Invalid length of string");
-				}
 
 				Byte[] bytes = reader.ReadBytes(stringLength);
 				if (bytes[stringLength - 1] != 0 && bytes[stringLength - 2] != 0)
-				{
 					throw new ScriptFormatException("Error: Invalid end of string in namespace");
-				}
 
 				Int32 zeroIndex = Array.IndexOf(bytes, (Byte)0);
 				if (zeroIndex < 0)
-				{
 					zeroIndex = bytes.Length;
-				}
 
 				String value = Encoding.Latin1.GetString(bytes, 0, zeroIndex);
 				value = EscapeNamespaceString(value);
@@ -58,9 +50,7 @@ namespace DatExplorerIII.Scripts
 
 			UInt32 terminator = reader.ReadUInt32();
 			if (terminator != 0xFFFFFFFF)
-			{
 				throw new ScriptFormatException("Error: Invalid terminator of namespace");
-			}
 		}
 
 		public String GetStringByIndex(Int32 index)

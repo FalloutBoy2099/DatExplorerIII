@@ -15,8 +15,7 @@ namespace DatExplorerIII.Infrastructure
 
 		public AsyncRelayCommand(Func<Task> execute, Func<Boolean>? canExecute = null)
 			: this(_ => execute(), canExecute == null ? null : _ => canExecute())
-		{
-		}
+		{ }
 
 		public AsyncRelayCommand(Func<Object?, Task> execute, Func<Object?, Boolean>? canExecute = null)
 		{

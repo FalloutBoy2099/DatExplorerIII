@@ -5,7 +5,7 @@ namespace DatExplorerIII.Core
 	using System.IO;
 	using System.Linq;
 	using System.Text;
-	using Models;
+	using Models.Archives;
 
 	/// <summary>
 	/// A Fallout 1, Fallout 2 or Arcanum DAT archive: reading, editing, verifying, repairing and saving.
@@ -18,14 +18,14 @@ namespace DatExplorerIII.Core
 		/// <summary>DAT files store single byte characters.</summary>
 		internal static readonly Encoding NameEncoding = Encoding.Latin1;
 
-		private readonly List<DatEntry> _entries = new();
-		private readonly Dictionary<String, DatEntry> _byKey = new(StringComparer.Ordinal);
-		private readonly Dictionary<String, List<DatEntry>> _byDirectory = new(StringComparer.Ordinal);
+		private readonly List<DatEntry> _entries = [];
+		private readonly Dictionary<String, DatEntry> _byKey = [with(StringComparer.Ordinal)];
+		private readonly Dictionary<String, List<DatEntry>> _byDirectory = [with(StringComparer.Ordinal)];
 
 		/// <summary>Lower case folder path to original case folder path. Includes empty folders.</summary>
-		private readonly Dictionary<String, String> _folders = new(StringComparer.Ordinal);
+		private readonly Dictionary<String, String> _folders = [with(StringComparer.Ordinal)];
 
-		private readonly List<DatIssue> _issues = new();
+		private readonly List<DatIssue> _issues = [];
 		private readonly Object _streamLock = new();
 
 		private FileStream? _stream;
@@ -93,34 +93,22 @@ namespace DatExplorerIII.Core
 			{
 				DatPendingChanges changes = DatPendingChanges.None;
 				if (_sourceFolder != null && _folderPristine)
-				{
 					return changes;
-				}
 
 				if (!HasBackingFile)
-				{
 					changes |= DatPendingChanges.Created;
-				}
 
 				if (_newCount > 0)
-				{
 					changes |= DatPendingChanges.Added;
-				}
 
 				if (_deletedStored)
-				{
 					changes |= DatPendingChanges.Deleted;
-				}
 
 				if (_renamed)
-				{
 					changes |= DatPendingChanges.Renamed;
-				}
 
 				if (_repairPending)
-				{
 					changes |= DatPendingChanges.Repaired;
-				}
 
 				return changes;
 			}
@@ -161,9 +149,7 @@ namespace DatExplorerIII.Core
 		public IReadOnlyList<DatEntry> GetEntries(String directory)
 		{
 			if (_byDirectory.TryGetValue(NormalizeDirectory(directory).ToLowerInvariant(), out List<DatEntry>? list))
-			{
 				return list;
-			}
 
 			return Array.Empty<DatEntry>();
 		}
@@ -184,9 +170,7 @@ namespace DatExplorerIII.Core
 		{
 			System.IO.FileInfo info = new(sourceFile);
 			if (!info.Exists)
-			{
 				throw new DatException(DatErrorKind.FileNotFound, $"The file '{sourceFile}' does not exist.", sourceFile);
-			}
 
 			String normalizedDirectory = NormalizeDirectory(directory);
 			ValidateDirectory(normalizedDirectory);
@@ -200,9 +184,7 @@ namespace DatExplorerIII.Core
 		private DatEntry AddFile(System.IO.FileInfo info, String normalizedDirectory, String fileName)
 		{
 			if (info.Length > Int32.MaxValue)
-			{
 				throw new DatException(DatErrorKind.FileTooLarge, $"The file '{info.FullName}' is too large for a DAT archive.", info.FullName);
-			}
 
 			Touch();
 			ValidateName(fileName);
@@ -214,9 +196,7 @@ namespace DatExplorerIII.Core
 			};
 
 			if (_byKey.ContainsKey(entry.Key))
-			{
 				throw new DatException(DatErrorKind.AlreadyExists, $"The file '{entry.FullPath}' already exists.", entry.FullPath);
-			}
 
 			Register(entry);
 			_newCount++;
@@ -234,11 +214,9 @@ namespace DatExplorerIII.Core
 
 		public void Remove(IEnumerable<DatEntry> entries)
 		{
-			HashSet<DatEntry> removed = new(entries);
+			HashSet<DatEntry> removed = [with(entries)];
 			if (removed.Count == 0)
-			{
 				return;
-			}
 
 			Touch();
 
@@ -248,7 +226,7 @@ namespace DatExplorerIII.Core
 			{
 				if (_byDirectory.TryGetValue(group.Key, out List<DatEntry>? list))
 				{
-					HashSet<DatEntry> inDirectory = new(group);
+					HashSet<DatEntry> inDirectory = [with(group)];
 					list.RemoveAll(inDirectory.Contains);
 				}
 			}
@@ -256,9 +234,7 @@ namespace DatExplorerIII.Core
 			foreach (DatEntry entry in removed)
 			{
 				if (_byKey.TryGetValue(entry.Key, out DatEntry? indexed) && indexed == entry)
-				{
 					_byKey.Remove(entry.Key);
-				}
 
 				if (entry.IsNew)
 				{
@@ -277,9 +253,7 @@ namespace DatExplorerIII.Core
 			String normalized = NormalizeDirectory(directory);
 			String key = normalized.ToLowerInvariant();
 			if (key.Length == 0)
-			{
 				return;
-			}
 
 			Remove(GetEntriesUnder(normalized));
 
@@ -297,22 +271,16 @@ namespace DatExplorerIII.Core
 
 			String newKey = (entry.Directory + newName).ToLowerInvariant();
 			if (newKey != entry.Key && _byKey.ContainsKey(newKey))
-			{
 				throw new DatException(DatErrorKind.AlreadyExists, $"The file '{entry.Directory + newName}' already exists.", entry.Directory + newName);
-			}
 
 			if (_byKey.TryGetValue(entry.Key, out DatEntry? indexed) && indexed == entry)
-			{
 				_byKey.Remove(entry.Key);
-			}
 
 			entry.SetLocation(entry.Directory, newName);
 			_byKey[entry.Key] = entry;
 
 			if (!entry.IsNew)
-			{
 				_renamed = true;
-			}
 		}
 
 		/// <summary>
@@ -336,9 +304,7 @@ namespace DatExplorerIII.Core
 			List<DatEntry> entries = _entries.Where(entry => entry.DirectoryKey.StartsWith(key, StringComparison.Ordinal) && (Lower(entry.Directory) != entry.Directory || entry.Name.ToLowerInvariant() != entry.Name)).ToList();
 			Int32 count = folders.Count + entries.Count;
 			if (!apply || count == 0)
-			{
 				return count;
-			}
 
 			Touch();
 			foreach (KeyValuePair<String, String> pair in folders)
@@ -350,9 +316,7 @@ namespace DatExplorerIII.Core
 			{
 				entry.SetLocation(Lower(entry.Directory), entry.Name.ToLowerInvariant());
 				if (!entry.IsNew)
-				{
 					_renamed = true;
-				}
 			}
 
 			RebuildIndexes();
@@ -364,9 +328,7 @@ namespace DatExplorerIII.Core
 		{
 			String oldPath = NormalizeDirectory(directory);
 			if (oldPath.Length == 0)
-			{
 				throw new DatException(DatErrorKind.RootFolderRename, "The root folder cannot be renamed.");
-			}
 
 			ValidateName(newName);
 			Touch();
@@ -377,9 +339,7 @@ namespace DatExplorerIII.Core
 			String newKey = newPath.ToLowerInvariant();
 
 			if (newKey != oldKey && _folders.ContainsKey(newKey))
-			{
 				throw new DatException(DatErrorKind.FolderAlreadyExists, $"The folder '{newPath}' already exists.", newPath);
-			}
 
 			List<KeyValuePair<String, String>> oldFolders = _folders.Where(pair => pair.Key.StartsWith(oldKey, StringComparison.Ordinal)).ToList();
 
@@ -387,9 +347,7 @@ namespace DatExplorerIII.Core
 			{
 				entry.SetLocation(newPath + entry.Directory.Substring(oldPath.Length), entry.Name);
 				if (!entry.IsNew)
-				{
 					_renamed = true;
-				}
 			}
 
 			foreach (KeyValuePair<String, String> pair in oldFolders)
@@ -456,27 +414,19 @@ namespace DatExplorerIII.Core
 		public static void ValidateName(String name)
 		{
 			if (String.IsNullOrWhiteSpace(name) || name.Length > MaxNameLength)
-			{
 				throw new DatException(DatErrorKind.NameInvalid, "The name is empty or too long.", name);
-			}
 
 			if (name.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 || name != name.Trim() || name.EndsWith('.'))
-			{
 				throw new DatException(DatErrorKind.NameCharacters, $"The name '{name}' contains invalid characters.", name);
-			}
 
 			if (name.Any(character => character > 0xFF))
-			{
 				throw new DatException(DatErrorKind.NameNotStorable, $"The name '{name}' contains characters that a DAT archive cannot store.", name);
-			}
 		}
 
 		private static void ValidateDirectory(String directory)
 		{
 			if (directory.Length > MaxNameLength)
-			{
 				throw new DatException(DatErrorKind.PathTooLong, $"The folder path '{directory}' is too long.", directory);
-			}
 
 			foreach (String segment in directory.Split('\\', StringSplitOptions.RemoveEmptyEntries))
 			{
@@ -493,9 +443,7 @@ namespace DatExplorerIII.Core
 		{
 			_entries.Add(entry);
 			if (!_byKey.TryAdd(entry.Key, entry) && fromDisk)
-			{
 				_issues.Add(new DatIssue(DatIssueKind.DuplicateEntry, entry.FullPath));
-			}
 
 			IndexDirectory(entry);
 			RegisterFolder(entry.Directory);
@@ -506,7 +454,7 @@ namespace DatExplorerIII.Core
 			String key = entry.DirectoryKey;
 			if (!_byDirectory.TryGetValue(key, out List<DatEntry>? list))
 			{
-				list = new List<DatEntry>();
+				list = [];
 				_byDirectory.Add(key, list);
 			}
 

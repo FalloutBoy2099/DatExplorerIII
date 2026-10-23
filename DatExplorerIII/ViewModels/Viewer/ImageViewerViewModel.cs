@@ -6,8 +6,10 @@ namespace DatExplorerIII.ViewModels.Viewer
 	using System.Linq;
 	using System.Windows.Input;
 	using Infrastructure;
-	using Models;
-	using Services;
+	using Models.Graphics;
+	using Services.Checks;
+	using Services.Interface;
+	using Services.Media;
 
 	/// <summary>A palette the user can show a picture with.</summary>
 	public sealed record PaletteChoice(String Display, Palette Palette)
@@ -27,7 +29,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 	/// </summary>
 	public sealed class ImageViewerViewModel : ObservableObject, IDisposable
 	{
-		private readonly Dictionary<(Int32 Direction, Int32 Frame, Int32 Palette), PixelImage> _cache = new();
+		private readonly Dictionary<(Int32 Direction, Int32 Frame, Int32 Palette), PixelImage> _cache = [];
 		private readonly IUiTimer _timer;
 
 		private FrmImage? _animation;
@@ -84,9 +86,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 		private void StepDirection(Int32 step)
 		{
 			if (DirectionCount > 1)
-			{
 				SelectedDirection = (((_direction + step) % DirectionCount) + DirectionCount) % DirectionCount;
-			}
 		}
 
 		/// <summary>How many notches of the wheel make one step of magnification (1 to 3): the program gives the choice of the user (3 when it gives none).</summary>
@@ -103,9 +103,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 		{
 			// A turn the other way starts again.
 			if (_wheelRemainder != 0 && Math.Sign(_wheelRemainder) != Math.Sign(delta))
-			{
 				_wheelRemainder = 0;
-			}
 
 			_wheelRemainder += delta;
 			Int32 needed = Math.Clamp(WheelNotchesSource?.Invoke() ?? 3, 1, 3) * WheelNotch;
@@ -182,9 +180,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 			set
 			{
 				if (SetProperty(ref _selectedPalette, value))
-				{
 					RenderCurrent();
-				}
 			}
 		}
 
@@ -329,9 +325,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 				if (SetProperty(ref _showEndingText, value))
 				{
 					if (value && IsEndingUsable)
-					{
 						PickEndingText();
-					}
 
 					OnEndingTextChanged();
 				}
@@ -358,9 +352,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 			_ending = ending;
 			_endingTextSource = endingText;
 			if (_showEndingText && IsEndingUsable)
-			{
 				PickEndingText();
-			}
 
 			OnEndingTextChanged();
 			_animation = image;
@@ -456,9 +448,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 		{
 			// The list is the same object until the picture changes: a box that gets a new list forgets its selection.
 			if (_directions.Count != DirectionCount)
-			{
 				_directions = Enumerable.Range(1, DirectionCount).ToList();
-			}
 			OnPropertyChanged(nameof(PaletteChoices));
 			OnPropertyChanged(nameof(HasPaletteChoices));
 			OnPropertyChanged(nameof(SelectedPalette));
@@ -476,9 +466,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 		private void RenderCurrent()
 		{
 			if (_animation == null || _selectedPalette == null)
-			{
 				return;
-			}
 
 			Int32 paletteIndex = _paletteChoices.ToList().IndexOf(_selectedPalette);
 			(Int32, Int32, Int32) key = (_direction, _frame, paletteIndex);
@@ -497,15 +485,11 @@ namespace DatExplorerIII.ViewModels.Viewer
 		private void NextFrame(Boolean wrap, Int32 step = 1)
 		{
 			if (!IsAnimated)
-			{
 				return;
-			}
 
 			Int32 next = _frame + step;
 			if (wrap || next < 0 || next >= FrameCount)
-			{
 				next = ((next % FrameCount) + FrameCount) % FrameCount;
-			}
 
 			CurrentFrame = next;
 		}

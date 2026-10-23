@@ -2,7 +2,7 @@ namespace DatExplorerIII.Core
 {
 	using System;
 	using System.Collections.Generic;
-	using Models;
+	using Models.Archives;
 
 	/// <summary>
 	/// Raised when a DAT archive is invalid or an operation on it cannot be completed.

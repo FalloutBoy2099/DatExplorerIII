@@ -4,7 +4,7 @@ namespace DatExplorerIII.ViewModels
 	using System.Collections.ObjectModel;
 	using Core;
 	using Infrastructure;
-	using Models;
+	using Models.Archives;
 
 	/// <summary>
 	/// A folder of the tree. The root node of a tree is the DAT archive itself.
@@ -29,9 +29,7 @@ namespace DatExplorerIII.ViewModels
 				document.PropertyChanged += (_, e) =>
 				{
 					if (e.PropertyName == nameof(DatDocument.HasIssues))
-					{
 						OnPropertyChanged(nameof(HasIssues));
-					}
 				};
 			}
 		}
@@ -40,7 +38,7 @@ namespace DatExplorerIII.ViewModels
 
 		public FolderNode? Parent { get; }
 
-		public ObservableCollection<FolderNode> Children { get; } = new();
+		public ObservableCollection<FolderNode> Children { get; } = [];
 
 		public Boolean IsRoot => Parent == null;
 
@@ -69,9 +67,7 @@ namespace DatExplorerIII.ViewModels
 			set
 			{
 				if (SetProperty(ref _name, value))
-				{
 					OnPropertyChanged(nameof(DisplayName));
-				}
 			}
 		}
 
@@ -80,9 +76,7 @@ namespace DatExplorerIII.ViewModels
 			get
 			{
 				if (!IsRoot)
-				{
 					return _name;
-				}
 
 				String version = Document.Archive.IsFolderBacked ? "DIR" : Document.Archive.Format switch
 				{

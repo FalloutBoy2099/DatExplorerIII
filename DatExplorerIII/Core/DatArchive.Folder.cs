@@ -4,7 +4,7 @@ namespace DatExplorerIII.Core
 	using System.Collections.Generic;
 	using System.IO;
 	using System.Linq;
-	using Models;
+	using Models.Archives;
 
 	public sealed partial class DatArchive
 	{
@@ -14,7 +14,7 @@ namespace DatExplorerIII.Core
 		/// <summary>True while nothing was changed in an archive made from a folder (opening it is not a change to save).</summary>
 		private Boolean _folderPristine;
 
-		private readonly List<String> _skippedFiles = new();
+		private readonly List<String> _skippedFiles = [];
 
 		/// <summary>
 		/// True for an archive made from a folder: its files are read from the folder, and it can only be saved under another name
@@ -36,15 +36,11 @@ namespace DatExplorerIII.Core
 		public static DatArchive OpenFolder(String folderPath, DatFormat format = DatFormat.Fallout2, Boolean showHidden = true)
 		{
 			if (String.IsNullOrWhiteSpace(folderPath))
-			{
 				throw new DatException(DatErrorKind.InvalidFileName, "The folder name is empty.");
-			}
 
 			String full = Path.TrimEndingDirectorySeparator(Path.GetFullPath(folderPath));
 			if (!Directory.Exists(full))
-			{
 				throw new DatException(DatErrorKind.FileNotFound, $"The folder '{full}' does not exist.", full);
-			}
 
 			DatArchive archive = new(full, format) { _sourceFolder = full };
 			archive.AddFolderContent(full, String.Empty, showHidden);
@@ -88,9 +84,7 @@ namespace DatExplorerIII.Core
 
 				// A hidden folder is left out, not skipped: the user chose not to see it.
 				if (!showHidden && (name.StartsWith('.') || (folderInfo.Attributes & FileAttributes.Hidden) != 0))
-				{
 					continue;
-				}
 
 				// A link to a folder could lead back to where it is: it is not followed.
 				if ((folderInfo.Attributes & FileAttributes.ReparsePoint) != 0)

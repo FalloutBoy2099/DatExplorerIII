@@ -5,8 +5,9 @@ namespace DatExplorerIII.ViewModels.Main
 	using System.Linq;
 	using System.Threading.Tasks;
 	using Core;
-	using Models;
-	using Services;
+	using Models.Archives;
+	using Services.Interface;
+	using Services.Platform;
 	using ViewModels.Viewer;
 
 	public sealed partial class MainViewModel
@@ -126,9 +127,7 @@ namespace DatExplorerIII.ViewModels.Main
 		{
 			_settings.Data.DoubleClickDisabled = mode == "None";
 			if (mode != "None")
-			{
 				_settings.Data.DoubleClickOpensViewer = mode == "Viewer";
-			}
 
 			OnPropertyChanged(nameof(DoubleClickOpensViewer));
 			NotifyDoubleClick();
@@ -146,9 +145,7 @@ namespace DatExplorerIII.ViewModels.Main
 		private void UpdatePreview()
 		{
 			if (!IsPreviewVisible || Busy.IsBusy)
-			{
 				return;
-			}
 
 			if (CurrentDocument is { } document && SelectedItems is [{ Entry: { } entry }])
 			{
@@ -163,18 +160,14 @@ namespace DatExplorerIII.ViewModels.Main
 		private async Task ViewSelectedItemAsync(Object? parameter)
 		{
 			if (SelectedViewableEntry is { } entry)
-			{
 				await ViewEntryAsync(entry);
-			}
 		}
 
 		/// <summary>Shows a file in a window of its own.</summary>
 		private async Task ViewEntryAsync(DatEntry entry)
 		{
 			if (CurrentDocument is not { } document)
-			{
 				return;
-			}
 
 			ViewerViewModel viewer = CreateViewer();
 			_dialogs.ShowViewer(viewer);

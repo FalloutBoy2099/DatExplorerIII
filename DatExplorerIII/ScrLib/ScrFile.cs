@@ -1,4 +1,4 @@
-namespace ScrLib
+namespace DatExplorerIII.ScrLib
 {
 	using System;
 	using System.Collections.Generic;

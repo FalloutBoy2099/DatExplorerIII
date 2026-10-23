@@ -19,8 +19,7 @@ namespace DatExplorerIII.Infrastructure
 
 		public RelayCommand(Action execute, Func<Boolean>? canExecute = null)
 			: this(_ => execute(), canExecute == null ? null : _ => canExecute())
-		{
-		}
+		{ }
 
 		public event EventHandler? CanExecuteChanged
 		{

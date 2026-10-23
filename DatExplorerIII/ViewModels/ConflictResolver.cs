@@ -1,8 +1,9 @@
 namespace DatExplorerIII.ViewModels
 {
 	using System;
-	using Models;
-	using Services;
+	using Models.Archives;
+	using Models.Interface;
+	using Services.Interface;
 
 	/// <summary>
 	/// Asks what to do when a file already exists, and remembers the answer when the user says "to all".
@@ -23,9 +24,7 @@ namespace DatExplorerIII.ViewModels
 		public ConflictDecision Resolve(String message)
 		{
 			if (_always is { } remembered)
-			{
 				return remembered;
-			}
 
 			DialogButton[] buttons =
 			[

@@ -5,8 +5,8 @@ namespace DatExplorerIII.ViewModels.Main
 	using System.Linq;
 	using System.Windows.Input;
 	using Infrastructure;
-	using Models;
-	using Services;
+	using Models.Interface;
+	using Services.Platform;
 
 	/// <summary>What the keyboard and the mouse ask for, as commands: the shortcuts and the drag and drop of files.</summary>
 	public sealed partial class MainViewModel
@@ -94,9 +94,7 @@ namespace DatExplorerIII.ViewModels.Main
 		{
 			ListEntry? found = FindInFolder(forward);
 			if (found != null)
-			{
 				RevealRequested?.Invoke(found);
-			}
 		}
 	}
 }

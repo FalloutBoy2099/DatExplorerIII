@@ -10,9 +10,16 @@ namespace DatExplorerIII.Tests
 	using System.Windows.Media;
 	using System.Windows.Media.Imaging;
 	using DatExplorerIII.Core;
-	using DatExplorerIII.Formats;
-	using DatExplorerIII.Models;
-	using DatExplorerIII.Services;
+	using DatExplorerIII.Formats.Audio;
+	using DatExplorerIII.Formats.GameFiles;
+	using DatExplorerIII.Formats.Graphics;
+	using DatExplorerIII.Models.Archives;
+	using DatExplorerIII.Models.Audio;
+	using DatExplorerIII.Models.GameFiles;
+	using DatExplorerIII.Models.Graphics;
+	using DatExplorerIII.Models.Interface;
+	using DatExplorerIII.Services.Media;
+	using DatExplorerIII.Services.Platform;
 	using DatExplorerIII.ViewModels;
 	using DatExplorerIII.ViewModels.Viewer;
 
@@ -176,7 +183,7 @@ namespace DatExplorerIII.Tests
 				stream.Write(palette);
 			}
 
-			List<(Int32 Width, Int32 Height, Byte[] Data)> pictures = new();
+			List<(Int32 Width, Int32 Height, Byte[] Data)> pictures = [];
 			for (Int32 r = 0; r < rotations; r++)
 			{
 				for (Int32 f = 0; f < frames; f++)

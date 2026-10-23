@@ -27,23 +27,17 @@ namespace DatExplorerIII.Views.Behaviors
 		private static void OnEnabledChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
 		{
 			if (sender is not Selector selector)
-			{
 				return;
-			}
 
 			selector.SelectionChanged -= OnSelectionChanged;
 			if (e.NewValue is true)
-			{
 				selector.SelectionChanged += OnSelectionChanged;
-			}
 		}
 
 		private static void OnSelectionChanged(Object sender, SelectionChangedEventArgs e)
 		{
 			if (!ReferenceEquals(e.OriginalSource, sender) || ((Selector)sender).SelectedItem is not { } item)
-			{
 				return;
-			}
 
 			switch (sender)
 			{

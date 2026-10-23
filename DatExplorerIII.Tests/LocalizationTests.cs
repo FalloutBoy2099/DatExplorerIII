@@ -6,8 +6,8 @@ namespace DatExplorerIII.Tests
 	using System.Linq;
 	using System.Text.RegularExpressions;
 	using System.Xml.Linq;
-	using DatExplorerIII.Models;
-	using DatExplorerIII.Services;
+	using DatExplorerIII.Models.Interface;
+	using DatExplorerIII.Services.Interface;
 
 	public sealed class LocalizationTests
 	{

@@ -9,8 +9,12 @@ namespace DatExplorerIII.ViewModels
 	using System.Windows.Input;
 	using Core;
 	using Infrastructure;
-	using Models;
-	using Services;
+	using Models.Archives;
+	using Models.Comparison;
+	using Models.Interface;
+	using Services.Interface;
+	using Services.Platform;
+	using Services.Texts;
 
 	/// <summary>
 	/// The comparison mode: two archives (files or folders) side by side in the main window, the files that are identical,
@@ -184,9 +188,7 @@ namespace DatExplorerIII.ViewModels
 
 			ComparisonSources? sources = _dialogs.PickComparisonSources(defaultLeft, defaultRight, ComparisonSuggestions());
 			if (sources == null)
-			{
 				return;
-			}
 
 			_settings.Data.CompareLastLeft = sources.Left;
 			_settings.Data.CompareLastRight = sources.Right;
@@ -195,9 +197,7 @@ namespace DatExplorerIII.ViewModels
 			DatDocument? left = await OpenForComparisonAsync(sources.Left);
 			DatDocument? right = left == null ? null : await OpenForComparisonAsync(sources.Right);
 			if (left == null || right == null)
-			{
 				return;
-			}
 
 			await RunComparisonAsync(left, right);
 		}
@@ -217,9 +217,7 @@ namespace DatExplorerIII.ViewModels
 		internal async Task CompareAgainAsync()
 		{
 			if (_comparison is { } comparison)
-			{
 				await RunComparisonAsync(comparison.Left, comparison.Right);
-			}
 		}
 
 		/// <summary>The document of an archive that is open; the archive is opened first when it is not.</summary>
@@ -229,9 +227,7 @@ namespace DatExplorerIII.ViewModels
 			FolderNode? FindRoot() => _host.Roots.FirstOrDefault(root => String.Equals(root.Document.FilePath, full, StringComparison.OrdinalIgnoreCase));
 
 			if (FindRoot() == null)
-			{
 				await _host.OpenArchiveAsync(full);
-			}
 
 			return FindRoot()?.Document;
 		}
@@ -247,9 +243,7 @@ namespace DatExplorerIII.ViewModels
 			});
 
 			if (!done || items == null)
-			{
 				return;
-			}
 
 			_comparison?.Dispose();
 			ComparisonViewModel comparison = new(left, right, items, _host.OpenArchives, _uiThread, options);
@@ -285,9 +279,7 @@ namespace DatExplorerIII.ViewModels
 		{
 			ComparisonViewModel? comparison = _comparison;
 			if (comparison == null)
-			{
 				return;
-			}
 
 			DatDocument source = toRight ? comparison.Left : comparison.Right;
 			DatDocument target = toRight ? comparison.Right : comparison.Left;
@@ -306,20 +298,16 @@ namespace DatExplorerIII.ViewModels
 			{
 				String question = move ? Loc.Format("Str.CompareConfirmMove", rows.Count) : String.Empty;
 				if (replaced > 0)
-				{
 					question += (question.Length > 0 ? Environment.NewLine + Environment.NewLine : String.Empty) + Loc.Format("Str.CompareConfirmReplace", replaced);
-				}
 
 				if (!_dialogs.Confirm(_host.Title, question + Environment.NewLine + Environment.NewLine + Loc.Get("Str.CompareContinue"), DialogIcon.Warning))
-				{
 					return;
-				}
 			}
 
 			// A file that is the same on both sides is not copied again; a move of it only takes it away from the source.
 			String folder = _temp.Create("compare");
-			Dictionary<ComparisonRow, String?> prepared = new();
-			List<String> failures = new();
+			Dictionary<ComparisonRow, String?> prepared = [];
+			List<String> failures = [];
 
 			Boolean read = await _host.RunBusyAsync(Loc.Get(move ? "Str.CompareMoving" : "Str.CompareCopying"), true, (progress, token) => Task.Run(() =>
 			{
@@ -350,9 +338,7 @@ namespace DatExplorerIII.ViewModels
 			}, token));
 
 			if (!read)
-			{
 				return;
-			}
 
 			Int32 done = 0;
 			foreach ((ComparisonRow row, String? temporary) in prepared)
@@ -363,17 +349,13 @@ namespace DatExplorerIII.ViewModels
 					if (temporary != null)
 					{
 						if (TargetOf(row) is { } existing)
-						{
 							target.Archive.Remove([existing]);
-						}
 
 						target.Archive.AddFile(temporary, sourceEntry.Directory, sourceEntry.Name);
 					}
 
 					if (move)
-					{
 						source.Archive.Remove([sourceEntry]);
-					}
 
 					done++;
 				}
@@ -399,9 +381,7 @@ namespace DatExplorerIII.ViewModels
 			{
 				List<String> lines = failures.Take(MaxListedItems).ToList();
 				if (failures.Count > MaxListedItems)
-				{
 					lines.Add(Loc.Format("Str.AndMore", failures.Count - MaxListedItems));
-				}
 
 				_dialogs.ShowMessage(_host.Title, Loc.Get("Str.CompareTransferFailures") + Environment.NewLine + Environment.NewLine + String.Join(Environment.NewLine, lines), DialogIcon.Warning);
 			}
@@ -412,9 +392,7 @@ namespace DatExplorerIII.ViewModels
 		{
 			ComparisonViewModel? comparison = _comparison;
 			if (comparison == null)
-			{
 				return;
-			}
 
 			DatDocument document = left ? comparison.Left : comparison.Right;
 			await _host.SaveDocumentAsync(document, false);

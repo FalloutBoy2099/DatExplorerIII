@@ -7,9 +7,13 @@ namespace DatExplorerIII.ViewModels.Viewer
 	using System.Threading;
 	using System.Threading.Tasks;
 	using Core;
-	using Formats;
-	using Models;
-	using Services;
+	using Formats.Graphics;
+	using Models.Archives;
+	using Models.Graphics;
+	using Models.Interface;
+	using Services.Checks;
+	using Services.Interface;
+	using Services.Media;
 
 	/// <summary>The pictures: the palettes a sprite can be shown with, and what says if a picture can be an image of the ending.</summary>
 	public sealed partial class ViewerViewModel
@@ -86,7 +90,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 			else
 			{
 				FrmImage animation = FrmReader.Read(data);
-				IReadOnlyList<PaletteChoice> shownPalettes = palettes.Count > 0 ? palettes : new List<PaletteChoice> { new(Loc.Get("Str.PaletteBuiltIn"), DefaultPalette.Palette), new(Loc.Get("Str.PaletteGray"), Palette.Grayscale()) };
+				IReadOnlyList<PaletteChoice> shownPalettes = palettes.Count > 0 ? palettes : [new(Loc.Get("Str.PaletteBuiltIn"), DefaultPalette.Palette), new(Loc.Get("Str.PaletteGray"), Palette.Grayscale())];
 
 				// A picture with a palette of its own may be an image of the ending: say so, and give the text to try on it.
 				EndingImageCheck? ending = null;
@@ -130,7 +134,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 		/// </summary>
 		private static List<PaletteChoice> ReadPalettes(DatArchive archive, DatEntry picture)
 		{
-			List<PaletteChoice> choices = new();
+			List<PaletteChoice> choices = [];
 			List<DatEntry> files = archive.Entries
 				.Where(entry => IsPaletteFile(entry.Name) && !entry.IsDamaged)
 				.OrderBy(entry => entry.Directory.Length)
@@ -180,11 +184,9 @@ namespace DatExplorerIII.ViewModels.Viewer
 
 			// The first choice is the one used: the palette of the picture, else color.pal of the archive, else the built-in one.
 			PaletteChoice preferred = own ?? choices.FirstOrDefault(choice => choice.Display.Equals("color.pal", StringComparison.OrdinalIgnoreCase)) ?? builtIn;
-			List<PaletteChoice> result = new() { new PaletteChoice(Loc.Format("Str.PaletteAuto", preferred.Display), preferred.Palette) };
+			List<PaletteChoice> result = [new PaletteChoice(Loc.Format("Str.PaletteAuto", preferred.Display), preferred.Palette)];
 			if (!ReferenceEquals(preferred, builtIn))
-			{
 				result.Add(builtIn);
-			}
 
 			result.Add(grayscale);
 			result.AddRange(choices);

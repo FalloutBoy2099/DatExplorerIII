@@ -2,15 +2,15 @@ namespace DatExplorerIII.Tests
 {
 	using System;
 	using System.Collections.Generic;
-	using DatExplorerIII.Services;
+	using DatExplorerIII.Services.Interface;
 
 	/// <summary>A user interface thread for tests: actions run at once, timers tick when a test says so, so that view models are tested without a dispatcher.</summary>
 	public sealed class ManualUiThread : IUiThread
 	{
-		public List<ManualTimer> Created { get; } = new();
+		public List<ManualTimer> Created { get; } = [];
 
 		/// <summary>What the view models put on the clipboard.</summary>
-		public List<String> Clipboard { get; } = new();
+		public List<String> Clipboard { get; } = [];
 
 		public void SetClipboardText(String text)
 		{
@@ -52,9 +52,7 @@ namespace DatExplorerIII.Tests
 		public void Raise()
 		{
 			if (IsRunning)
-			{
 				Tick?.Invoke(this, EventArgs.Empty);
-			}
 		}
 	}
 }

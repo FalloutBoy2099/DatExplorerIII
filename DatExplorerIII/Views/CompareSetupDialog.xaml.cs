@@ -8,8 +8,8 @@ namespace DatExplorerIII.Views
 	using System.Windows.Controls;
 	using System.Windows.Controls.Primitives;
 	using Microsoft.Win32;
-	using Models;
-	using Services;
+	using Models.Comparison;
+	using Services.Interface;
 
 	/// <summary>
 	/// Asks which two archives to compare: for each side a DAT file or a folder (a folder is opened like a DAT). Each side has a
@@ -45,14 +45,10 @@ namespace DatExplorerIII.Views
 		internal static String Describe(String path)
 		{
 			if (path.Length == 0)
-			{
 				return String.Empty;
-			}
 
 			if (Directory.Exists(path))
-			{
 				return Loc.Get("Str.CompareKindFolder");
-			}
 
 			if (File.Exists(path))
 			{
@@ -72,9 +68,7 @@ namespace DatExplorerIII.Views
 		private void Validate()
 		{
 			if (ErrorText == null || OkButton == null || LeftInfo == null || RightInfo == null)
-			{
 				return;
-			}
 
 			ComparisonSources sources = Sources;
 			LeftInfo.Text = Describe(sources.Left);
@@ -127,18 +121,14 @@ namespace DatExplorerIII.Views
 			};
 
 			if (dialog.ShowDialog(this) == true)
-			{
 				box.Text = dialog.FileName;
-			}
 		}
 
 		private void ChooseFolder(ComboBox box)
 		{
 			OpenFolderDialog dialog = new() { Title = Loc.Get("Str.CompareChooseFolder") };
 			if (dialog.ShowDialog(this) == true)
-			{
 				box.Text = dialog.FolderName;
-			}
 		}
 
 		private void OnLeftFile(Object sender, RoutedEventArgs e) => ChooseFile(LeftBox);
@@ -169,9 +159,7 @@ namespace DatExplorerIII.Views
 		private static void DropPath(ComboBox box, DragEventArgs e)
 		{
 			if (e.Data.GetData(DataFormats.FileDrop) is String[] { Length: > 0 } paths)
-			{
 				box.Text = paths[0];
-			}
 
 			e.Handled = true;
 		}

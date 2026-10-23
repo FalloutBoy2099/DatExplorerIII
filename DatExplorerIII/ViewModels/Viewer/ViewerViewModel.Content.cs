@@ -7,9 +7,16 @@ namespace DatExplorerIII.ViewModels.Viewer
 	using System.Threading;
 	using System.Threading.Tasks;
 	using Core;
-	using Formats;
-	using Models;
-	using Services;
+	using Formats.Audio;
+	using Formats.GameFiles;
+	using Formats.Movies;
+	using Formats.Prototypes;
+	using Models.Archives;
+	using Models.Audio;
+	using Models.GameFiles;
+	using Models.Interface;
+	using Services.Checks;
+	using Services.Texts;
 	using Scripts;
 
 	/// <summary>The content of a file: what is made of each kind of file to show it.</summary>

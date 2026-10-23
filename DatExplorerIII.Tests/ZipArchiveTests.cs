@@ -6,8 +6,8 @@ namespace DatExplorerIII.Tests
 	using System.Linq;
 	using System.Text;
 	using DatExplorerIII.Core;
-	using DatExplorerIII.Models;
-	using DatExplorerIII.Services;
+	using DatExplorerIII.Models.Archives;
+	using DatExplorerIII.Services.Platform;
 
 	/// <summary>ZIP files browsed like an archive.</summary>
 	public sealed class ZipArchiveTests : IDisposable

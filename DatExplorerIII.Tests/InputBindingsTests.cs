@@ -6,7 +6,7 @@ namespace DatExplorerIII.Tests
 	using System.Linq;
 	using System.Text.RegularExpressions;
 	using System.Windows.Input;
-	using DatExplorerIII.Models;
+	using DatExplorerIII.Models.Interface;
 	using DatExplorerIII.ViewModels;
 	using DatExplorerIII.ViewModels.Main;
 
@@ -49,9 +49,7 @@ namespace DatExplorerIII.Tests
 			{
 				PropertyInfo? property = type.GetProperty(name);
 				if (property == null)
-				{
 					return null;
-				}
 
 				type = property.PropertyType;
 			}

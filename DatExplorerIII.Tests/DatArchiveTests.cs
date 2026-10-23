@@ -6,7 +6,7 @@ namespace DatExplorerIII.Tests
 	using System.Linq;
 	using System.Text;
 	using DatExplorerIII.Core;
-	using DatExplorerIII.Models;
+	using DatExplorerIII.Models.Archives;
 
 	public sealed class DatArchiveTests : IDisposable
 	{

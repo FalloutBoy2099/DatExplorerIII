@@ -8,7 +8,7 @@ namespace DatExplorerIII.Core
 	using System.Linq;
 	using System.Runtime.ExceptionServices;
 	using System.Threading.Tasks;
-	using Models;
+	using Models.Archives;
 
 	public sealed partial class DatArchive
 	{
@@ -17,7 +17,7 @@ namespace DatExplorerIII.Core
 
 		private sealed class SavePlan
 		{
-			public Dictionary<DatEntry, Placement> Placements { get; } = new();
+			public Dictionary<DatEntry, Placement> Placements { get; } = [];
 
 			public Int32 TreeSize { get; set; }
 		}
@@ -36,14 +36,10 @@ namespace DatExplorerIII.Core
 		{
 			DatPendingChanges changes = PendingChanges;
 			if (changes == DatPendingChanges.None)
-			{
 				return;
-			}
 
 			if (_sourceFolder != null)
-			{
 				throw new InvalidOperationException("An archive made from a folder is saved with SaveAs.");
-			}
 
 			PrepareToSave();
 
@@ -69,20 +65,14 @@ namespace DatExplorerIII.Core
 		{
 			String target = Path.GetFullPath(path);
 			if (Directory.Exists(target))
-			{
 				throw new DatException(DatErrorKind.Io, $"'{target}' is a folder.", $"'{target}' is a folder.");
-			}
 
 			DatFormat newFormat = format ?? Format;
 			if (newFormat != Format && _entries.Any(entry => !entry.IsNew))
-			{
 				throw new InvalidOperationException("The format of an archive that holds stored files cannot change.");
-			}
 
 			if (_entries.Any(entry => entry.IsDamaged))
-			{
 				throw new DatException(DatErrorKind.DamagedEntriesPresent, "The damaged files must be removed before the archive is saved.");
-			}
 
 			String previousPath = FilePath;
 			DatFormat previousFormat = Format;
@@ -110,9 +100,7 @@ namespace DatExplorerIII.Core
 				lock (_streamLock)
 				{
 					if (_stream == null && File.Exists(FilePath))
-					{
 						ReopenStream();
-					}
 				}
 
 				throw;
@@ -122,14 +110,10 @@ namespace DatExplorerIII.Core
 		private void PrepareToSave()
 		{
 			if (_entries.Any(entry => entry.IsDamaged))
-			{
 				throw new DatException(DatErrorKind.DamagedEntriesPresent, "The damaged files must be removed before the archive is saved.");
-			}
 
 			if (IsReadOnly)
-			{
 				throw new DatException(DatErrorKind.ReadOnlyFormat, "This kind of archive cannot be saved yet.");
-			}
 
 			ValidateForSaving();
 
@@ -188,9 +172,7 @@ namespace DatExplorerIII.Core
 				};
 
 				if (tooLong)
-				{
 					throw new DatException(DatErrorKind.PathTooLong, $"The path '{entry.FullPath}' is too long.", entry.FullPath);
-				}
 			}
 		}
 
@@ -287,9 +269,7 @@ namespace DatExplorerIII.Core
 		private void ReopenStream()
 		{
 			if (File.Exists(FilePath))
-			{
 				_stream = OpenStream(FilePath);
-			}
 		}
 
 		private static void TryDelete(String path)
@@ -354,9 +334,7 @@ namespace DatExplorerIII.Core
 		{
 			Int64 position = output.Position;
 			if (position > UInt32.MaxValue)
-			{
 				throw new DatException(DatErrorKind.ArchiveTooLarge, "The archive would exceed 4 GB.");
-			}
 
 			if (!entry.IsNew)
 			{
@@ -377,14 +355,12 @@ namespace DatExplorerIII.Core
 
 		private static List<DatEntry> TakeBatch(List<DatEntry> ordered, Int32 start)
 		{
-			List<DatEntry> batch = new();
+			List<DatEntry> batch = [];
 			Int64 bytes = 0;
 			for (Int32 index = start; index < ordered.Count && ordered[index].IsNew && batch.Count < MaxBatchFiles; index++)
 			{
 				if (batch.Count > 0 && bytes + ordered[index].UnpackedSize > MaxBatchBytes)
-				{
 					break;
-				}
 
 				batch.Add(ordered[index]);
 				bytes += ordered[index].UnpackedSize;
@@ -417,9 +393,7 @@ namespace DatExplorerIII.Core
 			{
 				Byte[] compressed = DeflateZlib(data);
 				if (compressed.Length < data.Length)
-				{
 					return new Prepared(compressed, data.Length, compressed.Length, true);
-				}
 			}
 
 			// Fallout 1 compression is not supported: the data is stored as is, without packed size.
@@ -430,9 +404,7 @@ namespace DatExplorerIII.Core
 		{
 			Int64 position = output.Position;
 			if (position > UInt32.MaxValue)
-			{
 				throw new DatException(DatErrorKind.ArchiveTooLarge, "The archive would exceed 4 GB.");
-			}
 
 			output.Write(prepared.Bytes);
 			return new Placement((UInt32)position, prepared.UnpackedSize, prepared.PackedSize, prepared.IsCompressed);
@@ -522,9 +494,7 @@ namespace DatExplorerIII.Core
 
 			Int64 archiveSize = output.Position + tree.Length + Fallout2FooterSize;
 			if (archiveSize > UInt32.MaxValue)
-			{
 				throw new DatException(DatErrorKind.ArchiveTooLarge, "The archive would exceed 4 GB.");
-			}
 
 			tree.Position = 0;
 			tree.CopyTo(output);
@@ -547,18 +517,16 @@ namespace DatExplorerIII.Core
 		/// </summary>
 		private SavePlan WriteFallout1(FileStream output, IProgress<DatProgress>? progress)
 		{
-			SortedDictionary<String, List<DatEntry>> directories = new(StringComparer.Ordinal);
+			SortedDictionary<String, List<DatEntry>> directories = [with(StringComparer.Ordinal)];
 			foreach (DatEntry entry in _entries)
 			{
 				String directory = ToUpperAscii(entry.Directory.TrimEnd('\\'));
 				if (directory.Length == 0)
-				{
 					directory = ".";
-				}
 
 				if (!directories.TryGetValue(directory, out List<DatEntry>? list))
 				{
-					list = new List<DatEntry>();
+					list = [];
 					directories.Add(directory, list);
 				}
 

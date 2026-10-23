@@ -3,7 +3,7 @@ namespace DatExplorerIII.Views
 	using System;
 	using System.Collections.Generic;
 	using System.Windows;
-	using Models;
+	using Models.Archives;
 	using ViewModels;
 
 	/// <summary>

@@ -93,17 +93,13 @@ namespace DatExplorerIII.Views
 
 				GridSplitter splitter = new();
 				if (Application.Current?.TryFindResource(sideBySide ? "BlockSplitterStyle" : "BlockSplitterRowStyle") is Style style)
-				{
 					splitter.Style = style;
-				}
 
 				Place(splitter, sideBySide, index++);
 			}
 
 			if (Second != null)
-			{
 				Place(Second, sideBySide, index);
-			}
 		}
 
 		private void AddDefinition(Boolean sideBySide, GridLength size, Double minimum = MinimumSize)

@@ -31,9 +31,7 @@ namespace DatExplorerIII.Tests
 			thread.Start();
 			thread.Join();
 			if (failure != null)
-			{
 				throw new InvalidOperationException("The control failed.", failure);
-			}
 		}
 
 		[Fact]

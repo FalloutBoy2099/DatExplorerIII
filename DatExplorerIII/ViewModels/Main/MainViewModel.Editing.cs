@@ -5,8 +5,9 @@ namespace DatExplorerIII.ViewModels.Main
 	using System.Globalization;
 	using System.Linq;
 	using Core;
-	using Models;
-	using Services;
+	using Models.Archives;
+	using Models.Interface;
+	using Services.Interface;
 
 	public sealed partial class MainViewModel
 	{
@@ -14,9 +15,7 @@ namespace DatExplorerIII.ViewModels.Main
 		{
 			FolderNode? parent = SelectedFolder;
 			if (parent == null)
-			{
 				return;
-			}
 
 			Int32 number = 0;
 			String suggestion;
@@ -29,9 +28,7 @@ namespace DatExplorerIII.ViewModels.Main
 
 			String? name = _dialogs.Prompt(Loc.Get("Str.NewFolder"), Loc.Get("Str.FolderNamePrompt"), suggestion, text => ValidateName(parent, text, null, null));
 			if (name == null)
-			{
 				return;
-			}
 
 			DatDocument document = parent.Document;
 			document.Archive.AddFolder(parent.Path + name);
@@ -40,9 +37,7 @@ namespace DatExplorerIII.ViewModels.Main
 			parent.IsExpanded = true;
 			FolderNode? created = document.FindNode(parent.Path + name);
 			if (created != null)
-			{
 				SelectFolder(created);
-			}
 		}
 
 		private void RenameSelectedItem()
@@ -50,15 +45,11 @@ namespace DatExplorerIII.ViewModels.Main
 			FolderNode? folder = SelectedFolder;
 			ListEntry? item = SelectedItems.FirstOrDefault();
 			if (folder == null || item == null || SelectedItems.Count != 1)
-			{
 				return;
-			}
 
 			String? name = _dialogs.Prompt(Loc.Get("Str.Rename"), Loc.Get("Str.NewNamePrompt"), item.Name, text => ValidateName(folder, text, item.Entry, item.Folder));
 			if (name == null || name == item.Name)
-			{
 				return;
-			}
 
 			DatDocument document = folder.Document;
 			try
@@ -87,16 +78,12 @@ namespace DatExplorerIII.ViewModels.Main
 		{
 			FolderNode? folder = SelectedFolder;
 			if (folder == null || folder.IsRoot || folder.Parent == null)
-			{
 				return;
-			}
 
 			FolderNode parent = folder.Parent;
 			String? name = _dialogs.Prompt(Loc.Get("Str.Rename"), Loc.Get("Str.NewNamePrompt"), folder.Name, text => ValidateName(parent, text, null, folder));
 			if (name == null || name == folder.Name)
-			{
 				return;
-			}
 
 			try
 			{
@@ -114,9 +101,7 @@ namespace DatExplorerIII.ViewModels.Main
 		{
 			FolderNode? folder = SelectedFolder;
 			if (folder == null)
-			{
 				return;
-			}
 
 			DatDocument document = folder.Document;
 			String directory = folder.IsRoot ? String.Empty : folder.Path;
@@ -129,9 +114,7 @@ namespace DatExplorerIII.ViewModels.Main
 
 			String scope = folder.IsRoot ? Loc.Get("Str.LowercaseScopeAll") : Loc.Format("Str.LowercaseScopeFolder", folder.Path.TrimEnd('\\'));
 			if (!_dialogs.Confirm(Title, Loc.Format("Str.LowercaseConfirm", scope, count.ToString("N0", CultureInfo.CurrentCulture)), DialogIcon.Question))
-			{
 				return;
-			}
 
 			try
 			{
@@ -150,9 +133,7 @@ namespace DatExplorerIII.ViewModels.Main
 		{
 			ListEntry? item = Items.FirstOrDefault(match);
 			if (item != null)
-			{
 				RevealRequested?.Invoke(item);
-			}
 		}
 
 		/// <summary>Returns why a name cannot be used in a folder, or null when it can.</summary>
@@ -168,14 +149,10 @@ namespace DatExplorerIII.ViewModels.Main
 			}
 
 			if (folder.Children.Any(child => child != ignoredFolder && String.Equals(child.Name, name, StringComparison.OrdinalIgnoreCase)))
-			{
 				return Loc.Get("Str.FolderExists");
-			}
 
 			if (folder.Document.Archive.GetEntries(folder.Path).Any(entry => entry != ignoredEntry && String.Equals(entry.Name, name, StringComparison.OrdinalIgnoreCase)))
-			{
 				return Loc.Get("Str.FileExists");
-			}
 
 			return null;
 		}
@@ -184,14 +161,10 @@ namespace DatExplorerIII.ViewModels.Main
 		{
 			FolderNode? folder = SelectedFolder;
 			if (folder == null || SelectedItems.Count == 0)
-			{
 				return;
-			}
 
 			if (!_dialogs.Confirm(Title, Loc.Get("Str.ConfirmDelete"), DialogIcon.Warning))
-			{
 				return;
-			}
 
 			DatArchive archive = folder.Document.Archive;
 			List<ListEntry> items = SelectedItems.ToList();
@@ -211,14 +184,10 @@ namespace DatExplorerIII.ViewModels.Main
 		{
 			FolderNode? folder = SelectedFolder;
 			if (folder == null || folder.Parent == null)
-			{
 				return;
-			}
 
 			if (!_dialogs.Confirm(Title, Loc.Get("Str.ConfirmDelete"), DialogIcon.Warning))
-			{
 				return;
-			}
 
 			DatDocument document = folder.Document;
 			FolderNode parent = folder.Parent;

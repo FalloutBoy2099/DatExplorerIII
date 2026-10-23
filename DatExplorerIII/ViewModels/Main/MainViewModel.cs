@@ -8,8 +8,10 @@ namespace DatExplorerIII.ViewModels.Main
 	using System.Threading.Tasks;
 	using System.Windows.Input;
 	using Infrastructure;
-	using Models;
-	using Services;
+	using Models.Archives;
+	using Models.Interface;
+	using Services.Interface;
+	using Services.Platform;
 	using ViewModels.Viewer;
 
 	/// <summary>
@@ -212,7 +214,7 @@ namespace DatExplorerIII.ViewModels.Main
 		/// <summary>The progress of the long operation that is running, if any.</summary>
 		public BusyState Busy { get; }
 
-		public ObservableCollection<FolderNode> Roots { get; } = new();
+		public ObservableCollection<FolderNode> Roots { get; } = [];
 
 		public FolderNode? SelectedFolder
 		{
@@ -267,9 +269,7 @@ namespace DatExplorerIII.ViewModels.Main
 			set
 			{
 				if (SetProperty(ref _searchText, value))
-				{
 					SearchNotFound = false;
-				}
 			}
 		}
 
@@ -335,9 +335,7 @@ namespace DatExplorerIII.ViewModels.Main
 				_settings.Save();
 
 				if (!FileAssociationService.IsAssociated)
-				{
 					Associate();
-				}
 			}
 		}
 

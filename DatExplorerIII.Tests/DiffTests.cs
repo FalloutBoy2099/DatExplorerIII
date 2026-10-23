@@ -7,9 +7,12 @@ namespace DatExplorerIII.Tests
 	using System.Text;
 	using System.Threading.Tasks;
 	using DatExplorerIII.Core;
-	using DatExplorerIII.Formats;
-	using DatExplorerIII.Models;
-	using DatExplorerIII.Services;
+	using DatExplorerIII.Models.Archives;
+	using DatExplorerIII.Models.Comparison;
+	using DatExplorerIII.Models.Interface;
+	using DatExplorerIII.Services.Interface;
+	using DatExplorerIII.Services.Platform;
+	using DatExplorerIII.Services.Texts;
 	using DatExplorerIII.ViewModels;
 	using DatExplorerIII.ViewModels.Main;
 	using DatExplorerIII.ViewModels.Viewer;
@@ -18,7 +21,7 @@ namespace DatExplorerIII.Tests
 	public sealed class DiffTests : IDisposable
 	{
 		private readonly String _root = Path.Combine(Path.GetTempPath(), "DatExplorerIII.Tests", Path.GetRandomFileName());
-		private readonly List<MainViewModel> _viewModels = new();
+		private readonly List<MainViewModel> _viewModels = [];
 
 		public DiffTests()
 		{
@@ -222,12 +225,10 @@ namespace DatExplorerIII.Tests
 			public Boolean Confirm(String title, String message, DialogIcon icon = DialogIcon.Question) => true;
 
 			public void ShowMessage(String title, String message, DialogIcon icon)
-			{
-			}
+			{ }
 
 			public void ShowError(String message)
-			{
-			}
+			{ }
 
 			public String? Prompt(String title, String label, String initialValue, Func<String, String?>? validate) => null;
 
@@ -244,25 +245,22 @@ namespace DatExplorerIII.Tests
 			public String? PickFolder(String title, String? initialFolder) => null;
 
 			public void ShowSearchResults(String title, IReadOnlyList<DatEntry> results, Action<DatEntry> goTo)
-			{
-			}
+			{ }
 
 			public void ShowViewer(ViewerViewModel viewer)
-			{
-			}
+			{ }
 
 			public Func<SettingsDialogViewModel, Boolean>? SettingsScript { get; set; }
 
 			public Boolean ShowSettings(SettingsDialogViewModel settings) => SettingsScript?.Invoke(settings) ?? false;
 
 			/// <summary>The problems of message files that were shown.</summary>
-			public List<MsgIssuesViewModel> ShownIssues { get; } = new();
+			public List<MsgIssuesViewModel> ShownIssues { get; } = [];
 
 			public void ShowMessageIssues(MsgIssuesViewModel issues) => ShownIssues.Add(issues);
 
 			public void ShowAbout()
-			{
-			}
+			{ }
 		}
 
 		private String Folder(String name, params (String Path, Byte[] Content)[] files)

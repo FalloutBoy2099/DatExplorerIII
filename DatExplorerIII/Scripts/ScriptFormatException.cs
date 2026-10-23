@@ -7,13 +7,11 @@ namespace DatExplorerIII.Scripts
 	{
 		public ScriptFormatException(String message)
 			: base(message)
-		{
-		}
+		{ }
 
 		public ScriptFormatException(String message, Exception innerException)
 			: base(message, innerException)
-		{
-		}
+		{ }
 
 		/// <summary>True when the work was given up because it took too long (the script may be fine, only huge or strange).</summary>
 		public Boolean TimedOut { get; init; }

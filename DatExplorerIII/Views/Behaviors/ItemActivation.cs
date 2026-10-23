@@ -30,28 +30,20 @@ namespace DatExplorerIII.Views.Behaviors
 		private static void OnCommandChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
 		{
 			if (sender is not Control control)
-			{
 				return;
-			}
 
 			control.MouseDoubleClick -= OnDoubleClick;
 			if (e.NewValue != null)
-			{
 				control.MouseDoubleClick += OnDoubleClick;
-			}
 		}
 
 		private static void OnDoubleClick(Object sender, MouseButtonEventArgs e)
 		{
 			if (VisualTree.ItemAt(e.OriginalSource) is not { } item || GetCommand((DependencyObject)sender) is not { } command)
-			{
 				return;
-			}
 
 			if (command.CanExecute(item.DataContext))
-			{
 				command.Execute(item.DataContext);
-			}
 		}
 	}
 }

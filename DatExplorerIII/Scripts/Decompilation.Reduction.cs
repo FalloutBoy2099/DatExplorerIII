@@ -20,9 +20,7 @@ namespace DatExplorerIII.Scripts
 			for (Int32 index = 0; index < _procedureBodies.Count; index++)
 			{
 				if ((_procedures[(UInt32)index].Type & ObjectAttributes.Conditional) != 0)
-				{
 					ExtractAndReduceCondition(_procedureBodies[index], _conditions[index], 0);
-				}
 
 				for (Int32 nodeIndex = 0; nodeIndex < _procedureBodies[index].Count; nodeIndex++)
 				{
@@ -31,9 +29,7 @@ namespace DatExplorerIII.Scripts
 					{
 						Node node = _procedureBodies[index][nodeIndex].Arguments[0];
 						if (node.Opcode.Operator != Opcode.O_INTOP)
-						{
 							throw new ScriptFormatException("Error: Invalid opcode for start address of condition");
-						}
 
 						UInt32 conditionStartAddress = node.Opcode.Argument;
 						do
@@ -63,9 +59,7 @@ namespace DatExplorerIII.Scripts
 		{
 			Int32 result = currentIndex + step;
 			if (result < 0 || result >= nodes.Count)
-			{
 				throw new ScriptFormatException("Error: Index of node out of range");
-			}
 
 			return result;
 		}
@@ -77,22 +71,16 @@ namespace DatExplorerIII.Scripts
 		private static Boolean RemoveSequenceOfNodes(List<Node> nodes, Int32 startIndex, Int32 removeCount, Opcode[] sequence)
 		{
 			if (startIndex < 0 || startIndex + sequence.Length > nodes.Count)
-			{
 				return false;
-			}
 
 			for (Int32 index = 0; index < sequence.Length; index++)
 			{
 				if (nodes[startIndex + index].Opcode.Operator != sequence[index])
-				{
 					return false;
-				}
 			}
 
 			if (removeCount > 0)
-			{
 				nodes.RemoveRange(startIndex, removeCount);
-			}
 
 			return true;
 		}
@@ -120,9 +108,7 @@ namespace DatExplorerIII.Scripts
 				{
 					Opcode[] tail = (_procedures[(UInt32)procedureIndex].Type & ObjectAttributes.Critical) != 0 ? TailOfCriticalProcedure : TailOfProcedure;
 					if (!RemoveSequenceOfNodes(body, body.Count - tail.Length, tail.Length, tail))
-					{
 						throw new ScriptFormatException("Error: Invalid tail of procedure's body");
-					}
 				}
 
 				for (Int32 nodeIndex = 0; nodeIndex < body.Count; nodeIndex++)
@@ -138,9 +124,7 @@ namespace DatExplorerIII.Scripts
 									: RemoveSequenceOfNodes(body, nodeIndex, 0, ShortCircuitOr) ? Opcode.O_OR_ELSE : (Opcode)0;
 
 								if (actualOperator == 0)
-								{
 									throw new ScriptFormatException("Error: Unknown sequence of opcodes");
-								}
 
 								UInt32 skipOffset = body[nodeIndex + 1].Opcode.Argument;
 								Int32 insertIndex = nodeIndex - 1;
@@ -165,9 +149,7 @@ namespace DatExplorerIII.Scripts
 							if (!RemoveSequenceOfNodes(body, nodeIndex, sequence.Length - 1, sequence))
 							{
 								if (!RemoveSequenceOfNodes(body, nodeIndex - 1, 2, StoreReturnAddress))
-								{
 									throw new ScriptFormatException("Error: Unknown sequence of opcodes");
-								}
 							}
 
 							nodeIndex--;

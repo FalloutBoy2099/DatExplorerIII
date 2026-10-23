@@ -59,9 +59,7 @@ namespace DatExplorerIII.Views
 			}
 
 			if (_itemSize.IsEmpty)
-			{
 				_itemSize = MeasureFirstItem(generator, children);
-			}
 
 			Double width = Double.IsInfinity(availableSize.Width) ? _itemSize.Width * count : availableSize.Width;
 			_perRow = Math.Max(1, (Int32)(width / _itemSize.Width));
@@ -118,9 +116,7 @@ namespace DatExplorerIII.Views
 		protected override void BringIndexIntoView(Int32 index)
 		{
 			if (_itemSize.IsEmpty || index < 0)
-			{
 				return;
-			}
 
 			ScrollToShow(Rect.Offset(ItemRect(index), 0, _offset.Y));
 		}
@@ -149,40 +145,31 @@ namespace DatExplorerIII.Views
 		public void MouseWheelDown() => SetVerticalOffset(_offset.Y + (LineDistance * SystemParameters.WheelScrollLines));
 
 		public void LineLeft()
-		{
-		}
+		{ }
 
 		public void LineRight()
-		{
-		}
+		{ }
 
 		public void PageLeft()
-		{
-		}
+		{ }
 
 		public void PageRight()
-		{
-		}
+		{ }
 
 		public void MouseWheelLeft()
-		{
-		}
+		{ }
 
 		public void MouseWheelRight()
-		{
-		}
+		{ }
 
 		public void SetHorizontalOffset(Double offset)
-		{
-		}
+		{ }
 
 		public void SetVerticalOffset(Double offset)
 		{
 			Double clamped = Math.Max(0, Math.Min(offset, _extent.Height - _viewport.Height));
 			if (Double.IsNaN(clamped) || clamped == _offset.Y)
-			{
 				return;
-			}
 
 			_offset.Y = clamped;
 			ScrollOwner?.InvalidateScrollInfo();

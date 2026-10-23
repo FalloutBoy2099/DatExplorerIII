@@ -7,10 +7,12 @@ namespace DatExplorerIII.ViewModels.Viewer
 	using System.IO;
 	using System.Threading.Tasks;
 	using System.Windows.Input;
-	using Formats;
+	using Formats.Audio;
 	using Infrastructure;
-	using Models;
-	using Services;
+	using Models.Audio;
+	using Services.Interface;
+	using Services.Media;
+	using Services.Platform;
 
 	/// <summary>The number of channels to decode a sound with; 0 follows the header of the file.</summary>
 	public sealed record ChannelChoice(String Display, Int32 Channels)
@@ -87,14 +89,10 @@ namespace DatExplorerIII.ViewModels.Viewer
 			set
 			{
 				if (_refreshingLanguage || value is null)
-				{
 					return;
-				}
 
 				if (SetProperty(ref _selectedChannels, value) && IsAcm && _source.Length > 0)
-				{
 					_ = DecodeAsync();
-				}
 			}
 		}
 
@@ -161,15 +159,11 @@ namespace DatExplorerIII.ViewModels.Viewer
 			set
 			{
 				if (_clip == null)
-				{
 					return;
-				}
 
 				TimeSpan target = TimeSpan.FromMilliseconds(Math.Clamp(value, 0, Maximum));
 				if (target == _position)
-				{
 					return;
-				}
 
 				SetPosition(target);
 				if (_isPlaying && !_isSeeking)
@@ -177,9 +171,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 					// Going to the end ends the sound; anywhere else it goes on from there.
 					StopPlayback();
 					if (target < _clip.Duration - EndMargin)
-					{
 						Play();
-					}
 				}
 			}
 		}
@@ -297,9 +289,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 			{
 				AudioClip clip = await Task.Run(() => Decode(source, extension, channels));
 				if (generation != _generation)
-				{
 					return;
-				}
 
 				_clip = clip;
 				SetPosition(TimeSpan.Zero);
@@ -316,9 +306,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 			{
 				// A damaged sound: the decoders do not all say so in the same way.
 				if (exception is not InvalidDataException)
-				{
 					ErrorLog.Write(exception);
-				}
 
 				if (generation == _generation)
 				{
@@ -378,14 +366,10 @@ namespace DatExplorerIII.ViewModels.Viewer
 		private void Play()
 		{
 			if (_clip == null || _isPlaying)
-			{
 				return;
-			}
 
 			if (_position >= _clip.Duration - EndMargin)
-			{
 				SetPosition(TimeSpan.Zero);
-			}
 
 			Byte[]? slice = WavWriter.Slice(_clip.WavData, _position);
 			TimeSpan start = slice == null ? TimeSpan.Zero : _position;
@@ -410,9 +394,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 		private void Pause()
 		{
 			if (_isPlaying && _clip != null)
-			{
 				SetPosition(TimeSpan.FromTicks(Math.Min((_clockStart + _time.GetElapsedTime(_clockTimestamp)).Ticks, _clip.Duration.Ticks)));
-			}
 
 			StopPlayback();
 		}
@@ -428,9 +410,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 		private void OnTick()
 		{
 			if (_clip == null || !_isPlaying)
-			{
 				return;
-			}
 
 			TimeSpan reached = _clockStart + _time.GetElapsedTime(_clockTimestamp);
 			if (reached >= _clip.Duration)
@@ -438,9 +418,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 				StopPlayback();
 				SetPosition(TimeSpan.Zero);
 				if (_isLooping)
-				{
 					Play();
-				}
 
 				return;
 			}

@@ -7,8 +7,10 @@ namespace DatExplorerIII.ViewModels.Main
 	using System.Threading;
 	using System.Threading.Tasks;
 	using Core;
-	using Models;
-	using Services;
+	using Models.Archives;
+	using Models.Interface;
+	using Services.Interface;
+	using Services.Platform;
 
 	public sealed partial class MainViewModel
 	{
@@ -88,9 +90,7 @@ namespace DatExplorerIII.ViewModels.Main
 			});
 
 			if (!ran || archive == null)
-			{
 				return;
-			}
 
 			DatDocument document = new(archive);
 			AddDocument(document);
@@ -106,9 +106,7 @@ namespace DatExplorerIII.ViewModels.Main
 			StatusText = Loc.Format("Str.OpenedFolderSkipped", name, archive.Count, archive.SkippedFiles.Count);
 			List<String> lines = archive.SkippedFiles.Take(MaxListedItems).ToList();
 			if (archive.SkippedFiles.Count > MaxListedItems)
-			{
 				lines.Add(Loc.Format("Str.AndMore", archive.SkippedFiles.Count - MaxListedItems));
-			}
 
 			_dialogs.ShowMessage(Title, Loc.Get("Str.FolderSkippedNote") + Environment.NewLine + Environment.NewLine + String.Join(Environment.NewLine, lines), DialogIcon.Warning);
 		}
@@ -146,14 +144,10 @@ namespace DatExplorerIII.ViewModels.Main
 			});
 
 			if (ran && archive == null && damage != null)
-			{
 				archive = await RecoverAsync(fullPath, damage);
-			}
 
 			if (archive == null)
-			{
 				return;
-			}
 
 			DatDocument document = new(archive);
 			AddDocument(document);
@@ -164,7 +158,7 @@ namespace DatExplorerIII.ViewModels.Main
 		/// <summary>Puts a file that was opened at the top of the recent files.</summary>
 		private void RememberRecent(String fullPath)
 		{
-			Services.RecentFiles.Add(_settings.Data.RecentFiles, fullPath);
+			Services.Platform.RecentFiles.Add(_settings.Data.RecentFiles, fullPath);
 			_settings.Save();
 			OnPropertyChanged(nameof(RecentFiles));
 		}
@@ -180,14 +174,12 @@ namespace DatExplorerIII.ViewModels.Main
 		private async Task OpenRecentAsync(Object? parameter)
 		{
 			if (parameter is not String path)
-			{
 				return;
-			}
 
 			if (!File.Exists(path) && !Directory.Exists(path))
 			{
 				// A file that was moved or deleted does not stay in the list.
-				Services.RecentFiles.Remove(_settings.Data.RecentFiles, path);
+				Services.Platform.RecentFiles.Remove(_settings.Data.RecentFiles, path);
 				_settings.Save();
 				OnPropertyChanged(nameof(RecentFiles));
 				_dialogs.ShowMessage(Title, Loc.Format("Str.RecentMissing", path), DialogIcon.Warning);
@@ -204,9 +196,7 @@ namespace DatExplorerIII.ViewModels.Main
 		{
 			String question = ErrorText.Describe(damage) + Environment.NewLine + Environment.NewLine + Loc.Get("Str.OfferRecovery");
 			if (!_dialogs.Confirm(Title, question, DialogIcon.Warning))
-			{
 				return null;
-			}
 
 			DatArchive? recovered = null;
 			Boolean ran = await RunBusyAsync(Loc.Get("Str.Recovering"), false, async (_, _) =>
@@ -249,9 +239,7 @@ namespace DatExplorerIII.ViewModels.Main
 		{
 			List<String> lines = archive.Issues.Take(MaxListedItems).Select(issue => ErrorText.Describe(issue)).ToList();
 			if (archive.Issues.Count > MaxListedItems)
-			{
 				lines.Add(Loc.Format("Str.AndMore", archive.Issues.Count - MaxListedItems));
-			}
 
 			return String.Join(Environment.NewLine, lines);
 		}
@@ -260,9 +248,7 @@ namespace DatExplorerIII.ViewModels.Main
 		{
 			String? path = _dialogs.PickNewDatFile(format, _settings.Data.LastDatFolder);
 			if (path == null)
-			{
 				return;
-			}
 
 			path = Path.GetFullPath(path);
 			_settings.Data.LastDatFolder = Path.GetDirectoryName(path);
@@ -287,14 +273,10 @@ namespace DatExplorerIII.ViewModels.Main
 		private void CloseAllDocuments()
 		{
 			if (Roots.Count == 0)
-			{
 				return;
-			}
 
 			if (Roots.Any(root => root.Document.ShouldSave) && !_dialogs.Confirm(Title, Loc.Get("Str.QuitUnsaved"), DialogIcon.Warning))
-			{
 				return;
-			}
 
 			List<FolderNode> roots = Roots.ToList();
 			SelectedFolder = null;
@@ -310,9 +292,7 @@ namespace DatExplorerIII.ViewModels.Main
 		private Boolean CanMoveCurrentDocument(Int32 step)
 		{
 			if (!CanBrowse() || CurrentDocument == null)
-			{
 				return false;
-			}
 
 			Int32 target = Roots.IndexOf(CurrentDocument.Root) + step;
 			return target >= 0 && target < Roots.Count;
@@ -322,9 +302,7 @@ namespace DatExplorerIII.ViewModels.Main
 		private void MoveCurrentDocument(Int32 step)
 		{
 			if (!CanMoveCurrentDocument(step) || CurrentDocument is not { } document)
-			{
 				return;
-			}
 
 			FolderNode? selected = SelectedFolder;
 			Int32 index = Roots.IndexOf(document.Root);
@@ -333,23 +311,17 @@ namespace DatExplorerIII.ViewModels.Main
 			SelectedFolder = null;
 			Roots.Move(index, index + step);
 			if (selected != null)
-			{
 				SelectFolder(selected);
-			}
 		}
 
 		private void CloseCurrentDocument()
 		{
 			DatDocument? document = CurrentDocument;
 			if (document == null)
-			{
 				return;
-			}
 
 			if (document.ShouldSave && !_dialogs.Confirm(Title, Loc.Format("Str.ConfirmCloseUnsaved", Path.GetFileName(document.FilePath)), DialogIcon.Warning))
-			{
 				return;
-			}
 
 			Int32 index = Roots.IndexOf(document.Root);
 			SelectedFolder = null;
@@ -357,9 +329,7 @@ namespace DatExplorerIII.ViewModels.Main
 			document.Archive.Dispose();
 
 			if (Roots.Count > 0)
-			{
 				SelectFolder(Roots[Math.Min(index, Roots.Count - 1)]);
-			}
 
 			StatusText = Loc.Get("Str.Ready");
 		}

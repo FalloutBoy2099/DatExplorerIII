@@ -26,7 +26,7 @@ namespace DatExplorerIII.Views.Behaviors
 			new PropertyMetadata(false));
 
 		/// <summary>The scroll bars that were moved by the program to follow the other part (not by the user), and where it put them.</summary>
-		private static readonly ConditionalWeakTable<ScrollViewer, Followed> FollowedBars = new();
+		private static readonly ConditionalWeakTable<ScrollViewer, Followed> FollowedBars = [];
 
 		public static UIElement? GetPartner(DependencyObject element)
 		{
@@ -51,49 +51,37 @@ namespace DatExplorerIII.Views.Behaviors
 		private static void OnPartnerChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
 		{
 			if (sender is not UIElement element)
-			{
 				return;
-			}
 
 			element.RemoveHandler(ScrollViewer.ScrollChangedEvent, (ScrollChangedEventHandler)OnScrollChanged);
 			if (e.NewValue != null)
-			{
 				element.AddHandler(ScrollViewer.ScrollChangedEvent, (ScrollChangedEventHandler)OnScrollChanged);
-			}
 		}
 
 		private static void OnScrollChanged(Object sender, ScrollChangedEventArgs e)
 		{
 			DependencyObject own = (DependencyObject)sender;
 			if (!GetIsEnabled(own) || GetPartner(own) is not { } other || e.OriginalSource is not ScrollViewer source || (e.VerticalChange == 0 && e.HorizontalChange == 0))
-			{
 				return;
-			}
 
 			// The scroll bar that was just moved by the program is not followed back.
 			if (FollowedBars.TryGetValue(source, out Followed? followed))
 			{
 				FollowedBars.Remove(source);
 				if (Math.Abs(source.VerticalOffset - followed.Vertical) < 1 && Math.Abs(source.HorizontalOffset - followed.Horizontal) < 1)
-				{
 					return;
-				}
 			}
 
 			Int32 index = VisualTree.ScrollViewersOf((DependencyObject)sender).IndexOf(source);
 			List<ScrollViewer> candidates = VisualTree.ScrollViewersOf(other);
 			if (index < 0 || index >= candidates.Count)
-			{
 				return;
-			}
 
 			ScrollViewer target = candidates[index];
 			Double vertical = Math.Min(source.VerticalOffset, target.ScrollableHeight);
 			Double horizontal = Math.Min(source.HorizontalOffset, target.ScrollableWidth);
 			if (Math.Abs(target.VerticalOffset - vertical) < 0.5 && Math.Abs(target.HorizontalOffset - horizontal) < 0.5)
-			{
 				return;
-			}
 
 			FollowedBars.AddOrUpdate(target, new Followed(vertical, horizontal));
 			target.ScrollToVerticalOffset(vertical);

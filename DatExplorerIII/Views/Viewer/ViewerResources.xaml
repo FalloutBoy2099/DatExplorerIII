@@ -37,4 +37,25 @@
         </Style.Triggers>
     </Style>
 
+    <!--
+        The two labels of the button that plays and pauses are both in the button, one over the other, and only one shows: the button
+        has the width of the longer one, whatever the language, and does not change its size when it is pressed.
+    -->
+    <Style x:Key="ShownWhenStopped" TargetType="TextBlock">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsPlaying}" Value="True">
+                <Setter Property="Visibility" Value="Hidden" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="ShownWhenPlaying" TargetType="TextBlock">
+        <Setter Property="Visibility" Value="Hidden" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsPlaying}" Value="True">
+                <Setter Property="Visibility" Value="Visible" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
 </ResourceDictionary>

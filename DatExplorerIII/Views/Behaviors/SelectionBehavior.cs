@@ -42,9 +42,7 @@ namespace DatExplorerIII.Views.Behaviors
 			};
 
 			if (items != null)
-			{
 				return items.Cast<Object>().ToList();
-			}
 
 			return selector.SelectedItem == null ? Array.Empty<Object>() : [selector.SelectedItem];
 		}
@@ -52,31 +50,23 @@ namespace DatExplorerIII.Views.Behaviors
 		private static void OnCommandChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
 		{
 			if (sender is not Selector selector)
-			{
 				return;
-			}
 
 			selector.SelectionChanged -= OnSelectionChanged;
 			if (e.NewValue != null)
-			{
 				selector.SelectionChanged += OnSelectionChanged;
-			}
 		}
 
 		private static void OnSelectionChanged(Object sender, SelectionChangedEventArgs e)
 		{
 			// The event also comes from the controls inside the items.
 			if (!ReferenceEquals(e.OriginalSource, sender))
-			{
 				return;
-			}
 
 			Selector selector = (Selector)sender;
 			IReadOnlyList<Object> selected = SelectedOf(selector);
 			if (GetCommand(selector) is { } command && command.CanExecute(selected))
-			{
 				command.Execute(selected);
-			}
 		}
 	}
 }

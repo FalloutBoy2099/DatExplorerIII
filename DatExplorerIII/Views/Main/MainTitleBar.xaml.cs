@@ -5,8 +5,8 @@ namespace DatExplorerIII.Views.Main
 	using System.Windows.Controls;
 	using System.Windows.Controls.Primitives;
 	using System.Windows.Media;
-	using Models;
-	using Services;
+	using Models.Interface;
+	using Services.Interface;
 	using ViewModels.Main;
 
 	/// <summary>The title bar of the main window, in the theme of the program: the buttons of the theme, of the language and of the window.</summary>
@@ -35,9 +35,7 @@ namespace DatExplorerIII.Views.Main
 		private void OnStateChanged(Object? sender, EventArgs e)
 		{
 			if (Host is { } window)
-			{
 				ShowMaximizeGlyph(window);
-			}
 		}
 
 		/// <summary>The button shows what it does: it maximizes the window, or it restores it.</summary>
@@ -49,17 +47,13 @@ namespace DatExplorerIII.Views.Main
 		private void OnMinimizeClick(Object sender, RoutedEventArgs e)
 		{
 			if (Host is { } window)
-			{
 				SystemCommands.MinimizeWindow(window);
-			}
 		}
 
 		private void OnMaximizeClick(Object sender, RoutedEventArgs e)
 		{
 			if (Host is not { } window)
-			{
 				return;
-			}
 
 			if (window.WindowState == WindowState.Maximized)
 			{
@@ -74,9 +68,7 @@ namespace DatExplorerIII.Views.Main
 		private void OnCloseClick(Object sender, RoutedEventArgs e)
 		{
 			if (Host is { } window)
-			{
 				SystemCommands.CloseWindow(window);
-			}
 		}
 
 		private void OnThemeButtonClick(Object sender, RoutedEventArgs e)

@@ -7,7 +7,8 @@ namespace DatExplorerIII.Tests
 	using System.Text;
 	using System.Threading.Tasks;
 	using DatExplorerIII.Core;
-	using DatExplorerIII.Services;
+	using DatExplorerIII.Services.Checks;
+	using DatExplorerIII.Services.Syntax;
 	using DatExplorerIII.ViewModels;
 	using DatExplorerIII.ViewModels.Viewer;
 
@@ -15,7 +16,7 @@ namespace DatExplorerIII.Tests
 	public sealed class LstCheckTests : IDisposable
 	{
 		private readonly String _root = Path.Combine(Path.GetTempPath(), "DatExplorerIII.Tests", Path.GetRandomFileName());
-		private readonly List<DatArchive> _archives = new();
+		private readonly List<DatArchive> _archives = [];
 
 		public void Dispose()
 		{
@@ -25,9 +26,7 @@ namespace DatExplorerIII.Tests
 			}
 
 			if (Directory.Exists(_root))
-			{
 				Directory.Delete(_root, true);
-			}
 		}
 
 		/// <summary>A folder opened as an archive, with the files given by their path in it.</summary>

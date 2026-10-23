@@ -3,7 +3,6 @@ namespace DatExplorerIII.Views
 	using System;
 	using System.Windows;
 	using System.Windows.Input;
-	using Services;
 	using ViewModels;
 
 	/// <summary>

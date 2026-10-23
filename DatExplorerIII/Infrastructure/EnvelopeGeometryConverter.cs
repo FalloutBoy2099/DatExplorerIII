@@ -22,9 +22,7 @@ namespace DatExplorerIII.Infrastructure
 		public static Geometry? CreateShape(Byte[] envelope)
 		{
 			if (envelope.Length == 0)
-			{
 				return null;
-			}
 
 			StreamGeometry geometry = new();
 			using (StreamGeometryContext context = geometry.Open())

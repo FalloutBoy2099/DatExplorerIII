@@ -6,7 +6,7 @@ namespace DatExplorerIII.Core
 	using System.Linq;
 	using System.Threading;
 	using System.Threading.Tasks;
-	using Models;
+	using Models.Archives;
 
 	/// <summary>How a file of two archives compares.</summary>
 	public enum DatCompareState
@@ -54,7 +54,7 @@ namespace DatExplorerIII.Core
 
 			List<String> keys = leftByKey.Keys.Union(rightByKey.Keys).OrderBy(key => key, StringComparer.Ordinal).ToList();
 			DatCompareItem[] items = new DatCompareItem[keys.Count];
-			List<Int32> toRead = new();
+			List<Int32> toRead = [];
 
 			for (Int32 index = 0; index < keys.Count; index++)
 			{
@@ -68,9 +68,7 @@ namespace DatExplorerIII.Core
 					DatCompareState state = leftEntry.UnpackedSize != rightEntry.UnpackedSize && !isText ? DatCompareState.Different : DatCompareState.Identical;
 					items[index] = new DatCompareItem(leftEntry.FullPath, state, leftEntry, rightEntry);
 					if (state == DatCompareState.Identical)
-					{
 						toRead.Add(index);
-					}
 				}
 				else
 				{
@@ -87,9 +85,7 @@ namespace DatExplorerIII.Core
 			{
 				DatCompareItem item = items[index];
 				if (!ContentEquals(left, item.Left!, right, item.Right!, text))
-				{
 					items[index] = item with { State = DatCompareState.Different };
-				}
 
 				throttle.Report(item.Path, Interlocked.Increment(ref done));
 			});
@@ -105,9 +101,7 @@ namespace DatExplorerIII.Core
 		{
 			Boolean isText = text != null && text.AppliesTo(leftEntry.Name);
 			if ((leftEntry.UnpackedSize != rightEntry.UnpackedSize && !isText) || leftEntry.IsDamaged || rightEntry.IsDamaged)
-			{
 				return false;
-			}
 
 			try
 			{
@@ -119,9 +113,7 @@ namespace DatExplorerIII.Core
 					Byte[] leftStored = left.ReadStored(leftEntry);
 					Byte[] rightStored = right.ReadStored(rightEntry);
 					if (leftStored.AsSpan().SequenceEqual(rightStored))
-					{
 						return true;
-					}
 
 					leftData = left.Unpack(leftEntry, leftStored);
 					rightData = right.Unpack(rightEntry, rightStored);
@@ -157,7 +149,7 @@ namespace DatExplorerIII.Core
 		/// <summary>The files of an archive by lower case path (the first one when two have the same path).</summary>
 		private static Dictionary<String, DatEntry> Index(DatArchive archive)
 		{
-			Dictionary<String, DatEntry> byKey = new(StringComparer.Ordinal);
+			Dictionary<String, DatEntry> byKey = [with(StringComparer.Ordinal)];
 			foreach (DatEntry entry in archive.Entries)
 			{
 				byKey.TryAdd(entry.Key, entry);

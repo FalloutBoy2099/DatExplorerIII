@@ -47,18 +47,10 @@
                             </Style>
                         </TextBlock.Style>
                     </TextBlock>
-                    <TextBlock Margin="8,0,0,0" VerticalAlignment="Center">
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="Text" Value="{DynamicResource Str.ViewerPlay}" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsPlaying}" Value="True">
-                                        <Setter Property="Text" Value="{DynamicResource Str.ViewerPause}" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
+                    <Grid Margin="8,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Style="{StaticResource ShownWhenStopped}" Text="{DynamicResource Str.ViewerPlay}" />
+                        <TextBlock Style="{StaticResource ShownWhenPlaying}" Text="{DynamicResource Str.ViewerPause}" />
+                    </Grid>
                 </StackPanel>
             </Button>
 

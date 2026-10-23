@@ -20,26 +20,20 @@ namespace DatExplorerIII.Scripts
 		{
 			OpcodeAttributes? attributes;
 			if (game == ScriptGame.Fallout1 && Fallout1Attributes.TryGetValue(opcode, out attributes))
-			{
 				return attributes;
-			}
 			if (!Fallout2Attributes.TryGetValue(opcode, out attributes))
-			{
 				throw new ScriptFormatException($"Error: Attempt to obtain attributes of unknown opcode 0x{(UInt16)opcode:X4}");
-			}
 			return attributes;
 		}
 
 		private static HashSet<String> CreateFunctionNames()
 		{
-			HashSet<String> names = new(StringComparer.OrdinalIgnoreCase);
+			HashSet<String> names = [with(StringComparer.OrdinalIgnoreCase)];
 			foreach (OpcodeAttributes attributes in Fallout2Attributes.Values.Concat(Fallout1Attributes.Values))
 			{
 				String name = attributes.Name;
 				if (name.Length > 0 && (Char.IsAsciiLetter(name[0]) || name[0] == '_') && name.All(character => Char.IsAsciiLetterOrDigit(character) || character == '_'))
-				{
 					names.Add(name);
-				}
 			}
 
 			return names;

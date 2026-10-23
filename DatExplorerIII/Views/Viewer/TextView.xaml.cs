@@ -8,6 +8,7 @@ namespace DatExplorerIII.Views.Viewer
 	using ICSharpCode.AvalonEdit.Document;
 	using ICSharpCode.AvalonEdit.Editing;
 	using ViewModels.Viewer;
+	using Services.Syntax;
 
 	/// <summary>
 	/// A text. A text with colors (a message file, a script) is shown by an editor that draws only the lines that can be seen, with
@@ -56,23 +57,17 @@ namespace DatExplorerIII.Views.Viewer
 		private void OnDataContextChanged(Object sender, DependencyPropertyChangedEventArgs e)
 		{
 			if (_text != null)
-			{
 				_text.PropertyChanged -= OnTextChanged;
-			}
 
 			_text = e.NewValue as TextViewerViewModel;
 			if (_text != null)
-			{
 				_text.PropertyChanged += OnTextChanged;
-			}
 		}
 
 		private void OnTextChanged(Object? sender, PropertyChangedEventArgs e)
 		{
 			if (sender is not TextViewerViewModel text)
-			{
 				return;
-			}
 
 			if (e.PropertyName == nameof(TextViewerViewModel.SyntaxSpans))
 			{

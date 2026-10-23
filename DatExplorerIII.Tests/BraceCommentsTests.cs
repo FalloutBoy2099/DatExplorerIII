@@ -3,8 +3,8 @@ namespace DatExplorerIII.Tests
 	using System;
 	using System.Data;
 	using System.Linq;
-	using DatExplorerIII.Formats;
-	using DatExplorerIII.Models;
+	using DatExplorerIII.Formats.GameFiles;
+	using DatExplorerIII.Models.GameFiles;
 	using DatExplorerIII.ViewModels;
 	using DatExplorerIII.ViewModels.Viewer;
 

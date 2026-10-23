@@ -36,9 +36,7 @@ namespace DatExplorerIII.Scripts
 			{
 				Opcode op = headerTail[index].Operator;
 				if (op != Opcode.O_STRINGOP && op != Opcode.O_FLOATOP && op != Opcode.O_INTOP)
-				{
 					throw new ScriptFormatException("Error: Malformed \"Global variables\" section");
-				}
 
 				_globalVariables.Add(headerTail[index]);
 			}
@@ -119,9 +117,7 @@ namespace DatExplorerIII.Scripts
 						{
 							headerTail.RemoveAt(headerTail.Count - 1);
 							if (opcode.Argument != startProcedureAddress)
-							{
 								_messages.Add("Warning: Invalid jump address");
-							}
 						}
 						else
 						{
@@ -171,29 +167,21 @@ namespace DatExplorerIII.Scripts
 			for (; index < source.Count; index++)
 			{
 				if (source[index].Operator == delimiter)
-				{
 					break;
-				}
 			}
 
 			if (index >= source.Count)
-			{
 				return;
-			}
 
 			if (index < itemSize - 1)
-			{
 				throw new ScriptFormatException(errorMessage);
-			}
 
 			while (index < source.Count && source[index].Operator == delimiter)
 			{
 				for (Int32 checkIndex = 0; checkIndex < itemSize - 1; checkIndex++)
 				{
 					if (!check(source[index - (Int32)itemSize + 1 + checkIndex].Operator, checkIndex))
-					{
 						throw new ScriptFormatException(errorMessage);
-					}
 				}
 
 				Int32 removeOffset = index - (Int32)itemSize + 1;
@@ -205,9 +193,7 @@ namespace DatExplorerIII.Scripts
 
 				source.RemoveAt(removeOffset);
 				if (index + 1 > source.Count)
-				{
 					break;
-				}
 			}
 		}
 

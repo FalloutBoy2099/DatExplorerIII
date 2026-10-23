@@ -5,8 +5,9 @@ namespace DatExplorerIII.ViewModels.Main
 	using System.Linq;
 	using System.Threading.Tasks;
 	using Core;
-	using Models;
-	using Services;
+	using Models.Archives;
+	using Models.Interface;
+	using Services.Interface;
 
 	public sealed partial class MainViewModel
 	{
@@ -17,9 +18,7 @@ namespace DatExplorerIII.ViewModels.Main
 		{
 			DatDocument? document = CurrentDocument;
 			if (document == null)
-			{
 				return;
-			}
 
 			DatVerifyResult? result = null;
 			Boolean completed = await RunBusyAsync(
@@ -32,9 +31,7 @@ namespace DatExplorerIII.ViewModels.Main
 			RefreshItems();
 
 			if (!completed || result == null)
-			{
 				return;
-			}
 
 			if (result.Damaged.Count == 0)
 			{
@@ -45,9 +42,7 @@ namespace DatExplorerIII.ViewModels.Main
 
 			List<String> lines = result.Damaged.Take(MaxListedItems).Select(entry => entry.FullPath).ToList();
 			if (result.Damaged.Count > MaxListedItems)
-			{
 				lines.Add(Loc.Format("Str.AndMore", result.Damaged.Count - MaxListedItems));
-			}
 
 			String question = Loc.Format("Str.VerifyDamaged", result.Damaged.Count, result.Checked)
 				+ Environment.NewLine + Environment.NewLine + String.Join(Environment.NewLine, lines)
@@ -55,17 +50,13 @@ namespace DatExplorerIII.ViewModels.Main
 
 			StatusText = Loc.Format("Str.VerifyDamaged", result.Damaged.Count, result.Checked);
 			if (_dialogs.Confirm(Title, question, DialogIcon.Warning))
-			{
 				RemoveDamagedFiles(document);
-			}
 		}
 
 		private void RemoveDamaged()
 		{
 			if (CurrentDocument is { } document && _dialogs.Confirm(Title, Loc.Format("Str.RemoveDamagedPrompt", document.Archive.DamagedCount), DialogIcon.Warning))
-			{
 				RemoveDamagedFiles(document);
-			}
 		}
 
 		private void RemoveDamagedFiles(DatDocument document)
@@ -79,9 +70,7 @@ namespace DatExplorerIII.ViewModels.Main
 		private void ShowProblems()
 		{
 			if (CurrentDocument is not { } document)
-			{
 				return;
-			}
 
 			DatArchive archive = document.Archive;
 			if (archive.Issues.Count == 0)

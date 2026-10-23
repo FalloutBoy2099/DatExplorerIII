@@ -7,8 +7,12 @@ namespace DatExplorerIII.Tests
 	using System.Text;
 	using System.Threading.Tasks;
 	using DatExplorerIII.Core;
-	using DatExplorerIII.Models;
-	using DatExplorerIII.Services;
+	using DatExplorerIII.Models.Archives;
+	using DatExplorerIII.Models.Comparison;
+	using DatExplorerIII.Models.GameFiles;
+	using DatExplorerIII.Models.Interface;
+	using DatExplorerIII.Services.Interface;
+	using DatExplorerIII.Services.Platform;
 	using DatExplorerIII.ViewModels;
 	using DatExplorerIII.ViewModels.Main;
 	using DatExplorerIII.ViewModels.Viewer;
@@ -26,7 +30,7 @@ namespace DatExplorerIII.Tests
 			Directory.CreateDirectory(_root);
 		}
 
-		private readonly List<MainViewModel> _viewModels = new();
+		private readonly List<MainViewModel> _viewModels = [];
 
 		public void Dispose()
 		{
@@ -263,9 +267,9 @@ namespace DatExplorerIII.Tests
 		{
 			public SaveAsChoice? Choice { get; set; }
 
-			public List<String> Errors { get; } = new();
+			public List<String> Errors { get; } = [];
 
-			public List<String> Messages { get; } = new();
+			public List<String> Messages { get; } = [];
 
 			public Int32 SaveAsAsked { get; private set; }
 
@@ -312,8 +316,7 @@ namespace DatExplorerIII.Tests
 			public String? PickFolder(String title, String? initialFolder) => null;
 
 			public void ShowSearchResults(String title, IReadOnlyList<DatEntry> results, Action<DatEntry> goTo)
-			{
-			}
+			{ }
 
 			public Int32 ViewersShown { get; private set; }
 
@@ -327,13 +330,12 @@ namespace DatExplorerIII.Tests
 			public Boolean ShowSettings(SettingsDialogViewModel settings) => SettingsScript?.Invoke(settings) ?? false;
 
 			/// <summary>The problems of message files that were shown.</summary>
-			public List<MsgIssuesViewModel> ShownIssues { get; } = new();
+			public List<MsgIssuesViewModel> ShownIssues { get; } = [];
 
 			public void ShowMessageIssues(MsgIssuesViewModel issues) => ShownIssues.Add(issues);
 
 			public void ShowAbout()
-			{
-			}
+			{ }
 		}
 
 		private MainViewModel CreateViewModel(FakeDialogs dialogs)
@@ -750,7 +752,7 @@ namespace DatExplorerIII.Tests
 			Assert.True(first.HasMessageIssues);
 
 			// A result tells the view (the check runs in the background: it can end before anything listens, so it is given again).
-			List<String?> changes = new();
+			List<String?> changes = [];
 			first.PropertyChanged += (_, args) => changes.Add(args.PropertyName);
 			first.SetMessages(first.Messages!);
 			Assert.Contains(nameof(ListEntry.HasMessageIssues), changes);
@@ -864,7 +866,7 @@ namespace DatExplorerIII.Tests
 			MainViewModel viewModel = CreateViewModel(new FakeDialogs());
 			await viewModel.OpenFilesAsync([MakeFolderWithMessages()]);
 			viewModel.SelectFolder(Assert.Single(viewModel.Roots).Document.FindNode("text\\english\\game")!);
-			List<String?> changes = new();
+			List<String?> changes = [];
 			viewModel.PropertyChanged += (_, args) => changes.Add(args.PropertyName);
 
 			Assert.Equal("Str.ExtractFiles", viewModel.ExtractItemsText);
@@ -1001,7 +1003,7 @@ namespace DatExplorerIII.Tests
 			viewModel.TogglePreviewCommand.Execute(null);
 			Assert.Equal(preview, viewModel.IsPreviewVisible);
 
-			List<String?> changes = new();
+			List<String?> changes = [];
 			viewModel.PropertyChanged += (_, e) => changes.Add(e.PropertyName);
 			Int32 requests = viewModel.SearchFocusRequests;
 			viewModel.FocusSearchCommand.Execute(null);
@@ -1009,7 +1011,7 @@ namespace DatExplorerIII.Tests
 			Assert.Contains(nameof(MainViewModel.SearchFocusRequests), changes);
 
 			// Enter goes to the next entry that matches, Shift+Enter to the previous one; the list is told to show it.
-			List<ListEntry> revealed = new();
+			List<ListEntry> revealed = [];
 			viewModel.RevealRequested += revealed.Add;
 			viewModel.SearchText = "e";
 			viewModel.FindNextCommand.Execute(null);

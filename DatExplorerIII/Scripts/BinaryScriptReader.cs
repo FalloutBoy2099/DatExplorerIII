@@ -21,9 +21,7 @@ namespace DatExplorerIII.Scripts
 		public void Seek(UInt32 position)
 		{
 			if (position > _data.Length)
-			{
 				throw new ScriptFormatException("Error: Seek past end of input");
-			}
 
 			Position = position;
 		}
@@ -56,9 +54,7 @@ namespace DatExplorerIII.Scripts
 		private void Ensure(UInt32 count)
 		{
 			if (Position + count > _data.Length)
-			{
 				throw new ScriptFormatException("Error: Unexpected end of input");
-			}
 		}
 	}
 }

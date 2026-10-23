@@ -4,7 +4,7 @@ namespace DatExplorerIII.Views.Main
 	using System.ComponentModel;
 	using System.Windows;
 	using System.Windows.Controls;
-	using Models;
+	using Models.Interface;
 	using ViewModels;
 	using ViewModels.Main;
 
@@ -35,9 +35,7 @@ namespace DatExplorerIII.Views.Main
 
 			_viewModel = e.NewValue as MainViewModel;
 			if (_viewModel == null)
-			{
 				return;
-			}
 
 			_viewModel.PropertyChanged += OnViewModelPropertyChanged;
 			_viewModel.RevealRequested += OnRevealRequested;
@@ -54,9 +52,7 @@ namespace DatExplorerIII.Views.Main
 		private void OnViewModelPropertyChanged(Object? sender, PropertyChangedEventArgs e)
 		{
 			if (e.PropertyName == nameof(MainViewModel.IsPreviewVisible))
-			{
 				ApplyPreviewVisibility();
-			}
 		}
 
 		/// <summary>
@@ -67,9 +63,7 @@ namespace DatExplorerIII.Views.Main
 		{
 			Boolean visible = _viewModel!.IsPreviewVisible;
 			if (!visible && PreviewColumn.Width.IsStar && ListColumn.Width.Value > 0)
-			{
 				_previewShare = PreviewColumn.Width.Value / ListColumn.Width.Value;
-			}
 
 			PreviewSplitterColumn.Width = visible ? GridLength.Auto : new GridLength(0);
 			ListColumn.Width = new GridLength(1, GridUnitType.Star);
@@ -81,14 +75,10 @@ namespace DatExplorerIII.Views.Main
 		private void RestoreBlockWidths()
 		{
 			if (_viewModel!.TreeWidth >= SettingsData.MinimumTreeWidth)
-			{
 				TreeColumn.Width = new GridLength(_viewModel.TreeWidth);
-			}
 
 			if (_viewModel.PreviewShare > 0)
-			{
 				_previewShare = _viewModel.PreviewShare;
-			}
 		}
 
 		/// <summary>The share of the width of the preview compared with the list, as it is now (or as it was when the preview was hidden).</summary>

@@ -5,9 +5,11 @@ namespace DatExplorerIII.Tests
 	using System.Collections.Generic;
 	using System.Linq;
 	using System.Text;
-	using DatExplorerIII.Models;
-	using DatExplorerIII.Services;
-	using ScrLib;
+	using DatExplorerIII.Models.Interface;
+	using DatExplorerIII.ScrLib;
+	using DatExplorerIII.Services.ArcanumScripts;
+	using DatExplorerIII.Services.Platform;
+	using DatExplorerIII.Services.Texts;
 
 	/// <summary>The scripts of Arcanum (.scr), shown as text like the decompiled scripts.</summary>
 	public sealed class ScrTextTests

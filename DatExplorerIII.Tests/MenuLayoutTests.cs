@@ -6,7 +6,9 @@ namespace DatExplorerIII.Tests
 	using System.Linq;
 	using System.Text.RegularExpressions;
 	using System.Xml.Linq;
-	using DatExplorerIII.Models;
+	using DatExplorerIII.Models.Comparison;
+	using DatExplorerIII.Models.Interface;
+	using DatExplorerIII.Services.Platform;
 
 	/// <summary>The order of the lines of the menus, and the defaults of the options of the view.</summary>
 	public sealed class MenuLayoutTests
@@ -33,9 +35,7 @@ namespace DatExplorerIII.Tests
 			return menu.Elements().Select(element =>
 			{
 				if (element.Name.LocalName == "Separator")
-				{
 					return "-";
-				}
 
 				// A title that opens a sub menu holds its text in a TextBlock (to line it up with the other lines).
 				String header = (String?)element.Attribute("Header") ?? (String?)element.Descendants(Presentation + "TextBlock").FirstOrDefault()?.Attribute("Text") ?? String.Empty;

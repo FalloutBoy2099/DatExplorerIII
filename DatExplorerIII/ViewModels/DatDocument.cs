@@ -6,14 +6,14 @@ namespace DatExplorerIII.ViewModels
 	using System.Linq;
 	using Core;
 	using Infrastructure;
-	using Models;
+	using Models.Archives;
 
 	/// <summary>
 	/// An open DAT archive and the folder tree shown for it.
 	/// </summary>
 	public sealed class DatDocument : ObservableObject
 	{
-		private readonly Dictionary<String, FolderNode> _nodes = new(StringComparer.Ordinal);
+		private readonly Dictionary<String, FolderNode> _nodes = [with(StringComparer.Ordinal)];
 
 		public DatDocument(DatArchive archive)
 		{
@@ -75,9 +75,7 @@ namespace DatExplorerIII.ViewModels
 			{
 				String newKey = newPath.ToLowerInvariant() + key.Substring(oldKey.Length);
 				if (_nodes.TryGetValue(newKey, out FolderNode? renamed))
-				{
 					renamed.IsExpanded = true;
-				}
 			}
 
 			return _nodes[newPath.ToLowerInvariant()];
@@ -88,7 +86,7 @@ namespace DatExplorerIII.ViewModels
 		/// </summary>
 		private void SyncTree()
 		{
-			Dictionary<String, String> folders = new(StringComparer.Ordinal);
+			Dictionary<String, String> folders = [with(StringComparer.Ordinal)];
 			foreach (String path in Archive.Folders)
 			{
 				folders[path.ToLowerInvariant()] = path;

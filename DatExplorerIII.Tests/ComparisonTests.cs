@@ -8,8 +8,11 @@ namespace DatExplorerIII.Tests
 	using System.Threading;
 	using System.Threading.Tasks;
 	using DatExplorerIII.Core;
-	using DatExplorerIII.Models;
-	using DatExplorerIII.Services;
+	using DatExplorerIII.Models.Archives;
+	using DatExplorerIII.Models.Comparison;
+	using DatExplorerIII.Models.Interface;
+	using DatExplorerIII.Services.Interface;
+	using DatExplorerIII.Services.Platform;
 	using DatExplorerIII.ViewModels;
 	using DatExplorerIII.ViewModels.Main;
 	using DatExplorerIII.ViewModels.Viewer;
@@ -18,8 +21,8 @@ namespace DatExplorerIII.Tests
 	public sealed class ComparisonTests : IDisposable
 	{
 		private readonly String _root = Path.Combine(Path.GetTempPath(), "DatExplorerIII.Tests", Path.GetRandomFileName());
-		private readonly List<DatArchive> _archives = new();
-		private readonly List<MainViewModel> _viewModels = new();
+		private readonly List<DatArchive> _archives = [];
+		private readonly List<MainViewModel> _viewModels = [];
 
 		public ComparisonTests()
 		{
@@ -147,7 +150,7 @@ namespace DatExplorerIII.Tests
 			cancelled.Cancel();
 			Assert.ThrowsAny<OperationCanceledException>(() => DatComparer.Compare(leftArchive, rightArchive, null, cancelled.Token));
 
-			List<DatProgress> reports = new();
+			List<DatProgress> reports = [];
 			DatComparer.Compare(leftArchive, rightArchive, new SynchronousProgress(reports.Add));
 			Assert.NotEmpty(reports);
 			Assert.Equal(60, reports[^1].Total);
@@ -302,9 +305,9 @@ namespace DatExplorerIII.Tests
 
 			public Boolean Answer { get; set; } = true;
 
-			public List<String> Questions { get; } = new();
+			public List<String> Questions { get; } = [];
 
-			public List<String> Messages { get; } = new();
+			public List<String> Messages { get; } = [];
 
 			public String? Choose(String title, String message, DialogIcon icon, IReadOnlyList<DialogButton> buttons) => null;
 
@@ -345,25 +348,22 @@ namespace DatExplorerIII.Tests
 			public String? PickFolder(String title, String? initialFolder) => null;
 
 			public void ShowSearchResults(String title, IReadOnlyList<DatEntry> results, Action<DatEntry> goTo)
-			{
-			}
+			{ }
 
 			public void ShowViewer(ViewerViewModel viewer)
-			{
-			}
+			{ }
 
 			public Func<SettingsDialogViewModel, Boolean>? SettingsScript { get; set; }
 
 			public Boolean ShowSettings(SettingsDialogViewModel settings) => SettingsScript?.Invoke(settings) ?? false;
 
 			/// <summary>The problems of message files that were shown.</summary>
-			public List<MsgIssuesViewModel> ShownIssues { get; } = new();
+			public List<MsgIssuesViewModel> ShownIssues { get; } = [];
 
 			public void ShowMessageIssues(MsgIssuesViewModel issues) => ShownIssues.Add(issues);
 
 			public void ShowAbout()
-			{
-			}
+			{ }
 		}
 
 		private MainViewModel CreateViewModel(Dialogs dialogs)
@@ -493,7 +493,7 @@ namespace DatExplorerIII.Tests
 			Assert.True(viewModel.Comparison.IsCompareGroupsSide);
 			Assert.True(viewModel.Comparison.IsCompareTreeVisible);
 
-			List<String> changed = new();
+			List<String> changed = [];
 			viewModel.Comparison.PropertyChanged += (_, args) => changed.Add(args.PropertyName!);
 
 			viewModel.Comparison.IsCompareListStacked = false;

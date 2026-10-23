@@ -5,8 +5,8 @@ namespace DatExplorerIII.Tests
 	using System.IO.Pipes;
 	using System.Linq;
 	using System.Threading.Tasks;
-	using DatExplorerIII.Models;
-	using DatExplorerIII.Services;
+	using DatExplorerIII.Models.Interface;
+	using DatExplorerIII.Services.Platform;
 
 	/// <summary>A second launch of the program hands its files to the one that is running.</summary>
 	public sealed class SingleInstanceTests
@@ -49,7 +49,7 @@ namespace DatExplorerIII.Tests
 		public void SeveralLaunches_AreEachServed()
 		{
 			String name = NewPipeName();
-			List<String> all = new();
+			List<String> all = [];
 			using SingleInstance server = new(name, paths =>
 			{
 				lock (all)
@@ -122,7 +122,7 @@ namespace DatExplorerIII.Tests
 		public void AnInvalidMessage_DoesNotStopTheServer()
 		{
 			String name = NewPipeName();
-			List<String> received = new();
+			List<String> received = [];
 			using SingleInstance server = new(name, paths =>
 			{
 				lock (received)

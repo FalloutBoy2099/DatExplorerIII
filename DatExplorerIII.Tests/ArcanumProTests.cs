@@ -8,8 +8,9 @@ namespace DatExplorerIII.Tests
 	using System.Text;
 	using System.Threading.Tasks;
 	using DatExplorerIII.Core;
-	using DatExplorerIII.Formats;
-	using DatExplorerIII.Models;
+	using DatExplorerIII.Formats.Prototypes;
+	using DatExplorerIII.Models.Archives;
+	using DatExplorerIII.Models.Prototypes;
 	using DatExplorerIII.ViewModels;
 	using DatExplorerIII.ViewModels.Viewer;
 
@@ -56,9 +57,7 @@ namespace DatExplorerIII.Tests
 			for (Int32 bit = 0; bit < bitmapSize * 8; bit++)
 			{
 				if (!ArcanumFields.TryGetWireType(type, bit, out ArcanumWireType wire))
-				{
 					continue;
-				}
 
 				switch (wire)
 				{
@@ -233,9 +232,7 @@ namespace DatExplorerIII.Tests
 				}
 
 				if (round % 3 == 0)
-				{
 					data = data[..random.Next(0, data.Length)];
-				}
 
 				if (ArcanumProReader.IsArcanumPro(data))
 				{
@@ -244,8 +241,7 @@ namespace DatExplorerIII.Tests
 						ArcanumProReader.Read(data);
 					}
 					catch (InvalidDataException)
-					{
-					}
+					{ }
 				}
 			}
 
@@ -259,8 +255,7 @@ namespace DatExplorerIII.Tests
 						ArcanumProReader.Read(data);
 					}
 					catch (InvalidDataException)
-					{
-					}
+					{ }
 				}
 			}
 		}

@@ -5,7 +5,7 @@ namespace DatExplorerIII.Tests
 	using System.IO;
 	using System.Linq;
 	using System.Xml.Linq;
-	using DatExplorerIII.Services;
+	using DatExplorerIII.Services.Interface;
 
 	/// <summary>
 	/// What <see cref="LocalizationTests"/> does not check: no text is empty, the file dialog filters keep their patterns, and a

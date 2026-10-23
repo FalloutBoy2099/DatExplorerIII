@@ -11,8 +11,11 @@ namespace DatExplorerIII.ViewModels.Main
 	using System.Windows.Input;
 	using Core;
 	using Infrastructure;
-	using Models;
-	using Services;
+	using Models.Archives;
+	using Models.GameFiles;
+	using Models.Interface;
+	using Services.Checks;
+	using Services.Interface;
 
 	/// <summary>
 	/// The check of the message files (.msg): the files of the folder that is shown are checked in the background and get a
@@ -21,7 +24,7 @@ namespace DatExplorerIII.ViewModels.Main
 	public sealed partial class MainViewModel
 	{
 		/// <summary>What was found in the files that were checked, by file (a file that was replaced is another file).</summary>
-		private readonly ConditionalWeakTable<DatEntry, MsgFileReport> _messageReports = new();
+		private readonly ConditionalWeakTable<DatEntry, MsgFileReport> _messageReports = [];
 
 		private CancellationTokenSource? _messageScan;
 
@@ -65,7 +68,7 @@ namespace DatExplorerIII.ViewModels.Main
 			CancelMessageScan();
 			MessageScan = Task.CompletedTask;
 
-			List<ListEntry> pending = new();
+			List<ListEntry> pending = [];
 			foreach (ListEntry item in items.Where(item => item.IsMessageFile))
 			{
 				if (_messageReports.TryGetValue(item.Entry!, out MsgFileReport? known))
@@ -79,24 +82,20 @@ namespace DatExplorerIII.ViewModels.Main
 			}
 
 			if (pending.Count == 0)
-			{
 				return;
-			}
 
 			CancellationTokenSource source = new();
 			_messageScan = source;
 			CancellationToken token = source.Token;
 			MessageScan = Task.Run(() =>
 			{
-				List<(ListEntry Item, MsgFileReport Report)> ready = new();
+				List<(ListEntry Item, MsgFileReport Report)> ready = [];
 				Stopwatch sinceShown = Stopwatch.StartNew();
 
 				void ShowReady()
 				{
 					if (ready.Count == 0)
-					{
 						return;
-					}
 
 					List<(ListEntry Item, MsgFileReport Report)> batch = ready.ToList();
 					ready.Clear();
@@ -118,17 +117,13 @@ namespace DatExplorerIII.ViewModels.Main
 					foreach (ListEntry item in pending)
 					{
 						if (token.IsCancellationRequested)
-						{
 							return;
-						}
 
 						MsgFileReport report = MsgScanner.ScanEntry(archive, item.Entry!);
 						_messageReports.AddOrUpdate(item.Entry!, report);
 						ready.Add((item, report));
 						if (sinceShown.ElapsedMilliseconds >= MessageScanFlushMilliseconds)
-						{
 							ShowReady();
-						}
 					}
 
 					ShowReady();
@@ -145,9 +140,7 @@ namespace DatExplorerIII.ViewModels.Main
 			List<ListEntry> files = SelectedMessageFiles();
 			DatArchive? archive = CurrentDocument?.Archive;
 			if (archive == null || files.Count == 0)
-			{
 				return;
-			}
 
 			if (AllMessageChecksOff)
 			{
@@ -163,9 +156,7 @@ namespace DatExplorerIII.ViewModels.Main
 		{
 			DatArchive? archive = CurrentDocument?.Archive;
 			if (archive == null)
-			{
 				return;
-			}
 
 			if (AllMessageChecksOff)
 			{
@@ -180,25 +171,19 @@ namespace DatExplorerIII.ViewModels.Main
 			});
 
 			if (!done || reports == null)
-			{
 				return;
-			}
 
 			// What the check found is kept: the files of the list that is shown get their warning too.
 			foreach (MsgFileReport report in reports)
 			{
 				if (archive.Find(report.Path) is { } entry)
-				{
 					_messageReports.AddOrUpdate(entry, report);
-				}
 			}
 
 			foreach (ListEntry item in Items.Where(item => item.IsMessageFile))
 			{
 				if (_messageReports.TryGetValue(item.Entry!, out MsgFileReport? known))
-				{
 					item.SetMessages(known.Without(DisabledMessageChecks));
-				}
 			}
 
 			ShowMessageReports(reports);
@@ -208,9 +193,7 @@ namespace DatExplorerIII.ViewModels.Main
 		private MsgFileReport CheckedReport(DatArchive archive, DatEntry entry)
 		{
 			if (_messageReports.TryGetValue(entry, out MsgFileReport? known))
-			{
 				return known;
-			}
 
 			MsgFileReport report = MsgScanner.ScanEntry(archive, entry);
 			_messageReports.AddOrUpdate(entry, report);
@@ -225,9 +208,7 @@ namespace DatExplorerIII.ViewModels.Main
 			foreach (ListEntry item in Items.Where(item => item.IsMessageFile))
 			{
 				if (_messageReports.TryGetValue(item.Entry!, out MsgFileReport? known))
-				{
 					item.SetMessages(known.Without(DisabledMessageChecks));
-				}
 			}
 		}
 
@@ -240,15 +221,11 @@ namespace DatExplorerIII.ViewModels.Main
 		{
 			DatArchive? archive = CurrentDocument?.Archive;
 			if (!_settings.Data.DoubleClickMessageProblems || !item.IsMessageFile || archive == null || AllMessageChecksOff)
-			{
 				return false;
-			}
 
 			MsgFileReport report = (await Task.Run(() => CheckedReport(archive, item.Entry!))).Without(DisabledMessageChecks);
 			if (!report.HasIssues)
-			{
 				return false;
-			}
 
 			ShowMessageReports([report]);
 			return true;
