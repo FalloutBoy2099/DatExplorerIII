@@ -136,6 +136,8 @@
     <sys:String x:Key="Str.ExtractModeQuestion">How should the files be extracted?</sys:String>
     <sys:String x:Key="Str.ExtractKeepTree">Keep the folder structure</sys:String>
     <sys:String x:Key="Str.ExtractFlat">Without folder structure</sys:String>
+    <sys:String x:Key="Str.ExtractMode">Extraction mode</sys:String>
+    <sys:String x:Key="Str.ExtractAsk">Ask every time</sys:String>
     <sys:String x:Key="Str.ExtractFailures">{0} file(s) could not be extracted:</sys:String>
     <sys:String x:Key="Str.ImportFailures">{0} file(s) could not be imported:</sys:String>
     <sys:String x:Key="Str.BlockedFile">Programs and scripts are not started from a DAT file. Extract the file if you really want to run it.</sys:String>

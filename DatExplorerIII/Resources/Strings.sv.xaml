@@ -136,6 +136,8 @@
     <sys:String x:Key="Str.ExtractModeQuestion">Hur ska filerna extraheras?</sys:String>
     <sys:String x:Key="Str.ExtractKeepTree">Behåll mappstrukturen</sys:String>
     <sys:String x:Key="Str.ExtractFlat">Utan mappstruktur</sys:String>
+    <sys:String x:Key="Str.ExtractMode">Extraheringsläge</sys:String>
+    <sys:String x:Key="Str.ExtractAsk">Fråga varje gång</sys:String>
     <sys:String x:Key="Str.ExtractFailures">{0} fil(er) kunde inte extraheras:</sys:String>
     <sys:String x:Key="Str.ImportFailures">{0} fil(er) kunde inte importeras:</sys:String>
     <sys:String x:Key="Str.BlockedFile">Program och skript startas inte från en DAT-fil. Extrahera filen om du verkligen vill köra den.</sys:String>

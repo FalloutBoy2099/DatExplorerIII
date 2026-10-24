@@ -136,6 +136,8 @@
     <sys:String x:Key="Str.ExtractModeQuestion">Jak extrahovat soubory?</sys:String>
     <sys:String x:Key="Str.ExtractKeepTree">Zachovat strukturu složek</sys:String>
     <sys:String x:Key="Str.ExtractFlat">Bez struktury složek</sys:String>
+    <sys:String x:Key="Str.ExtractMode">Způsob extrakce</sys:String>
+    <sys:String x:Key="Str.ExtractAsk">Vždy se zeptat</sys:String>
     <sys:String x:Key="Str.ExtractFailures">Počet souborů, které se nepodařilo rozbalit: {0}. Seznam:</sys:String>
     <sys:String x:Key="Str.ImportFailures">Počet souborů, které se nepodařilo importovat: {0}. Seznam:</sys:String>
     <sys:String x:Key="Str.BlockedFile">Programy a skripty se ze souboru DAT nespouštějí. Pokud jej opravdu chcete spustit, nejprve jej rozbalte.</sys:String>

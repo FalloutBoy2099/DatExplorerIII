@@ -56,6 +56,9 @@ namespace DatExplorerIII.Models.Interface
 		/// <summary>Whether the files are extracted with no folders (the last choice of the extraction); false keeps the folders of the DAT.</summary>
 		public Boolean ExtractFlat { get; set; }
 
+		/// <summary>How the files are extracted (<see cref="ExtractMode"/>): "Ask" asks each time, with the last answer as the default one.</summary>
+		public String ExtractMode { get; set; } = "Ask";
+
 		/// <summary>How many notches of the wheel of the mouse change the magnification of a picture by one step (1 to 3).</summary>
 		public Int32 WheelNotchesPerZoom { get; set; } = 3;
 

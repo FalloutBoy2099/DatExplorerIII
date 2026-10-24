@@ -136,6 +136,8 @@
     <sys:String x:Key="Str.ExtractModeQuestion">Как извлечь файлы?</sys:String>
     <sys:String x:Key="Str.ExtractKeepTree">Сохранить структуру папок</sys:String>
     <sys:String x:Key="Str.ExtractFlat">Без структуры папок</sys:String>
+    <sys:String x:Key="Str.ExtractMode">Режим извлечения</sys:String>
+    <sys:String x:Key="Str.ExtractAsk">Спрашивать каждый раз</sys:String>
     <sys:String x:Key="Str.ExtractFailures">Не удалось извлечь файлов: {0}</sys:String>
     <sys:String x:Key="Str.ImportFailures">Не удалось импортировать файлов: {0}</sys:String>
     <sys:String x:Key="Str.BlockedFile">Программы и скрипты не запускаются из DAT файла. Извлеките файл, если вы действительно хотите его запустить.</sys:String>

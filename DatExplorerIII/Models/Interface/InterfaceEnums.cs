@@ -22,6 +22,16 @@ namespace DatExplorerIII.Models.Interface
 	}
 
 	/// <summary>
+	/// How the files are extracted: the question is asked each time, or the folders of the DAT are kept, or every file goes straight in the destination.
+	/// </summary>
+	public enum ExtractMode
+	{
+		Ask,
+		KeepTree,
+		Flat,
+	}
+
+	/// <summary>
 	/// The picture of a message dialog.
 	/// </summary>
 	public enum DialogIcon

@@ -136,6 +136,8 @@
     <sys:String x:Key="Str.ExtractModeQuestion">Jak wyodrębnić pliki?</sys:String>
     <sys:String x:Key="Str.ExtractKeepTree">Zachowaj strukturę folderów</sys:String>
     <sys:String x:Key="Str.ExtractFlat">Bez struktury folderów</sys:String>
+    <sys:String x:Key="Str.ExtractMode">Tryb wyodrębniania</sys:String>
+    <sys:String x:Key="Str.ExtractAsk">Pytaj za każdym razem</sys:String>
     <sys:String x:Key="Str.ExtractFailures">Pliki, których nie udało się wyodrębnić ({0}):</sys:String>
     <sys:String x:Key="Str.ImportFailures">Pliki, których nie udało się zaimportować ({0}):</sys:String>
     <sys:String x:Key="Str.BlockedFile">Programy i skrypty nie są uruchamiane z pliku DAT. Wyodrębnij plik, jeśli naprawdę chcesz go uruchomić.</sys:String>

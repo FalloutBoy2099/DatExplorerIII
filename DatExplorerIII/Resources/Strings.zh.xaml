@@ -136,6 +136,8 @@
     <sys:String x:Key="Str.ExtractModeQuestion">如何解压文件？</sys:String>
     <sys:String x:Key="Str.ExtractKeepTree">保留文件夹结构</sys:String>
     <sys:String x:Key="Str.ExtractFlat">不保留文件夹结构</sys:String>
+    <sys:String x:Key="Str.ExtractMode">解压模式</sys:String>
+    <sys:String x:Key="Str.ExtractAsk">每次询问</sys:String>
     <sys:String x:Key="Str.ExtractFailures">有 {0} 个文件无法提取：</sys:String>
     <sys:String x:Key="Str.ImportFailures">有 {0} 个文件无法导入：</sys:String>
     <sys:String x:Key="Str.BlockedFile">不会从 DAT 文件中直接运行程序和脚本。如果确实要运行，请先提取该文件。</sys:String>

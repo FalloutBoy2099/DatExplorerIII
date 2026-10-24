@@ -136,6 +136,8 @@
     <sys:String x:Key="Str.ExtractModeQuestion">Wie sollen die Dateien extrahiert werden?</sys:String>
     <sys:String x:Key="Str.ExtractKeepTree">Ordnerstruktur beibehalten</sys:String>
     <sys:String x:Key="Str.ExtractFlat">Ohne Ordnerstruktur</sys:String>
+    <sys:String x:Key="Str.ExtractMode">Extraktionsmodus</sys:String>
+    <sys:String x:Key="Str.ExtractAsk">Jedes Mal fragen</sys:String>
     <sys:String x:Key="Str.ExtractFailures">{0} Datei(en) konnten nicht extrahiert werden:</sys:String>
     <sys:String x:Key="Str.ImportFailures">{0} Datei(en) konnten nicht importiert werden:</sys:String>
     <sys:String x:Key="Str.BlockedFile">Programme und Skripte werden nicht aus einer DAT-Datei gestartet. Extrahieren Sie die Datei, wenn Sie sie wirklich ausführen möchten.</sys:String>

@@ -92,6 +92,7 @@ namespace DatExplorerIII.ViewModels.Main
 			RemoveDamagedCommand = new RelayCommand(RemoveDamaged, () => CanBrowse() && CurrentDocument?.Archive.DamagedCount > 0);
 
 			SetViewModeCommand = new RelayCommand(parameter => ViewMode = Enum.Parse<DatViewMode>((String)parameter!));
+			SetExtractModeCommand = new RelayCommand(parameter => ExtractMode = Enum.Parse<ExtractMode>((String)parameter!));
 			AssociateCommand = new RelayCommand(Associate);
 			AssociatePatchesCommand = new RelayCommand(AssociatePatches);
 			ChangeLanguageCommand = new RelayCommand(parameter => ChangeLanguage((String)parameter!));
@@ -197,6 +198,9 @@ namespace DatExplorerIII.ViewModels.Main
 
 		public ICommand SetViewModeCommand { get; }
 
+		/// <summary>Chooses how the files are extracted; the parameter is the name of an <see cref="Models.Interface.ExtractMode"/>.</summary>
+		public ICommand SetExtractModeCommand { get; }
+
 		public ICommand AssociateCommand { get; }
 
 		public ICommand AssociatePatchesCommand { get; }
@@ -252,6 +256,25 @@ namespace DatExplorerIII.ViewModels.Main
 				OnPropertyChanged(nameof(IsIconsView));
 			}
 		}
+
+		public ExtractMode ExtractMode
+		{
+			get => Enum.TryParse(_settings.Data.ExtractMode, out ExtractMode mode) ? mode : ExtractMode.Ask;
+			set
+			{
+				_settings.Data.ExtractMode = value.ToString();
+				OnPropertyChanged();
+				OnPropertyChanged(nameof(IsExtractAsk));
+				OnPropertyChanged(nameof(IsExtractKeepTree));
+				OnPropertyChanged(nameof(IsExtractFlat));
+			}
+		}
+
+		public Boolean IsExtractAsk => ExtractMode == ExtractMode.Ask;
+
+		public Boolean IsExtractKeepTree => ExtractMode == ExtractMode.KeepTree;
+
+		public Boolean IsExtractFlat => ExtractMode == ExtractMode.Flat;
 
 		public Boolean IsDetailsView => _viewMode == DatViewMode.Details;
 

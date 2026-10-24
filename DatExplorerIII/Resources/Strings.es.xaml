@@ -136,6 +136,8 @@
     <sys:String x:Key="Str.ExtractModeQuestion">¿Cómo extraer los archivos?</sys:String>
     <sys:String x:Key="Str.ExtractKeepTree">Conservar la estructura de carpetas</sys:String>
     <sys:String x:Key="Str.ExtractFlat">Sin estructura de carpetas</sys:String>
+    <sys:String x:Key="Str.ExtractMode">Modo de extracción</sys:String>
+    <sys:String x:Key="Str.ExtractAsk">Preguntar cada vez</sys:String>
     <sys:String x:Key="Str.ExtractFailures">No se pudieron extraer {0} archivo(s):</sys:String>
     <sys:String x:Key="Str.ImportFailures">No se pudieron importar {0} archivo(s):</sys:String>
     <sys:String x:Key="Str.BlockedFile">Los programas y scripts no se ejecutan desde un archivo DAT. Extraiga el archivo si realmente desea ejecutarlo.</sys:String>

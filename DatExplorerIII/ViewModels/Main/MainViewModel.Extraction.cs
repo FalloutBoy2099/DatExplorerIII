@@ -68,21 +68,29 @@ namespace DatExplorerIII.ViewModels.Main
 				return;
 			}
 
-			// The folders of the DAT are kept, or every file goes straight in the destination; the last choice is the default one.
+			// The folders of the DAT are kept, or every file goes straight in the destination: the choice of the Edit menu, or the
+			// answer to a question (the last answer is the default one).
 			Boolean flat = _settings.Data.ExtractFlat;
-			DialogButton[] modes =
-			[
-				new("tree", Loc.Get("Str.ExtractKeepTree"), IsDefault: !flat),
-				new("flat", Loc.Get("Str.ExtractFlat"), IsDefault: flat),
-				new("cancel", Loc.Get("Str.Cancel"), IsCancel: true),
-			];
+			if (ExtractMode == ExtractMode.Ask)
+			{
+				DialogButton[] modes =
+				[
+					new("tree", Loc.Get("Str.ExtractKeepTree"), IsDefault: !flat),
+					new("flat", Loc.Get("Str.ExtractFlat"), IsDefault: flat),
+					new("cancel", Loc.Get("Str.Cancel"), IsCancel: true),
+				];
 
-			String? mode = _dialogs.Choose(Title, Loc.Get("Str.ExtractModeQuestion"), DialogIcon.Question, modes);
-			if (mode is not ("tree" or "flat"))
-				return;
+				String? mode = _dialogs.Choose(Title, Loc.Get("Str.ExtractModeQuestion"), DialogIcon.Question, modes);
+				if (mode is not ("tree" or "flat"))
+					return;
 
-			flat = mode == "flat";
-			_settings.Data.ExtractFlat = flat;
+				flat = mode == "flat";
+				_settings.Data.ExtractFlat = flat;
+			}
+			else
+			{
+				flat = ExtractMode == ExtractMode.Flat;
+			}
 
 			String? destination = _dialogs.PickFolder(Loc.Get("Str.SelectDestination"), _settings.Data.LastExtractFolder);
 			if (destination == null)

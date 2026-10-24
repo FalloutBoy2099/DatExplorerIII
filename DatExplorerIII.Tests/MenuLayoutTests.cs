@@ -49,10 +49,23 @@ namespace DatExplorerIII.Tests
 		{
 			Assert.Equal(
 				[
-					"ViewDetails", "ViewList", "-", "ViewIcons", "-", "PreviewPane", "-", "DoubleClickOpens", "WheelZoom", "-",
+					"ViewDetails", "ViewList", "ViewIcons", "-", "PreviewPane", "-", "DoubleClickOpens", "WheelZoom", "-",
 					"CompareLayout", "-", "Up", "Refresh",
 				],
 				Lines("Str.View"));
+		}
+
+		[Fact]
+		public void TheEditMenu_OffersTheExtractionMode_AfterTheExtractions_BetweenTwoSeparators()
+		{
+			List<String> lines = Lines("Str.Edit");
+			Int32 extractAll = lines.IndexOf("ExtractAll");
+			Assert.Equal(["ExtractAll", "-", "ExtractMode", "-", "ImportFiles"], lines.Skip(extractAll).Take(5));
+
+			// The three ways to extract, in the order asked.
+			XDocument window = XDocument.Load(Path.Combine(SolutionFolder(), "DatExplorerIII", "Views", "Main", "MainMenu.xaml"));
+			XElement mode = window.Descendants(Presentation + "MenuItem").First(item => (String?)item.Attribute("Header") == "{DynamicResource Str.ExtractMode}");
+			Assert.Equal(["{DynamicResource Str.ExtractAsk}", "{DynamicResource Str.ExtractKeepTree}", "{DynamicResource Str.ExtractFlat}"], mode.Elements().Select(item => (String?)item.Attribute("Header")));
 		}
 
 		[Fact]

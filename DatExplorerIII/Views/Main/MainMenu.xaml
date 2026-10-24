@@ -69,6 +69,27 @@
             <MenuItem Command="{Binding ExtractFolderCommand}" Header="{DynamicResource Str.ExtractFolder}" />
             <MenuItem Command="{Binding ExtractAllCommand}" Header="{DynamicResource Str.ExtractAll}" />
             <Separator />
+            <MenuItem Header="{DynamicResource Str.ExtractMode}">
+                <MenuItem
+                    Command="{Binding SetExtractModeCommand}"
+                    CommandParameter="Ask"
+                    Header="{DynamicResource Str.ExtractAsk}"
+                    IsCheckable="True"
+                    IsChecked="{Binding IsExtractAsk, Mode=OneWay}" />
+                <MenuItem
+                    Command="{Binding SetExtractModeCommand}"
+                    CommandParameter="KeepTree"
+                    Header="{DynamicResource Str.ExtractKeepTree}"
+                    IsCheckable="True"
+                    IsChecked="{Binding IsExtractKeepTree, Mode=OneWay}" />
+                <MenuItem
+                    Command="{Binding SetExtractModeCommand}"
+                    CommandParameter="Flat"
+                    Header="{DynamicResource Str.ExtractFlat}"
+                    IsCheckable="True"
+                    IsChecked="{Binding IsExtractFlat, Mode=OneWay}" />
+            </MenuItem>
+            <Separator />
             <MenuItem Command="{Binding ImportFilesCommand}" Header="{DynamicResource Str.ImportFiles}" />
             <MenuItem Command="{Binding ImportFolderCommand}" Header="{DynamicResource Str.ImportFolder}" />
             <MenuItem Command="{Binding NewFolderCommand}" Header="{DynamicResource Str.NewFolder}" />
@@ -101,7 +122,6 @@
                 Header="{DynamicResource Str.ViewList}"
                 IsCheckable="True"
                 IsChecked="{Binding IsListView, Mode=OneWay}" />
-            <Separator />
             <MenuItem
                 Command="{Binding SetViewModeCommand}"
                 CommandParameter="Icons"
