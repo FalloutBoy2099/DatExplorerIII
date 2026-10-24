@@ -308,7 +308,7 @@ namespace DatExplorerIII.Formats.Prototypes
 
 		private static Dictionary<Int32, ArcanumWireType> ItemDerived(Dictionary<Int32, ArcanumWireType> itemBits, Int32 lastInteger, Int32 intArray, Int32 longArray)
 		{
-			Dictionary<Int32, ArcanumWireType> map = [with(itemBits)];
+			Dictionary<Int32, ArcanumWireType> map = new(itemBits);
 			Range(map, 96, lastInteger, ArcanumWireType.Int32);
 			map[intArray] = ArcanumWireType.Int32Array;
 			map[longArray] = ArcanumWireType.Int64Array;
@@ -317,7 +317,7 @@ namespace DatExplorerIII.Formats.Prototypes
 
 		private static Dictionary<Int32, ArcanumWireType> Merge(Dictionary<Int32, ArcanumWireType> baseBits, Dictionary<Int32, ArcanumWireType> specific)
 		{
-			Dictionary<Int32, ArcanumWireType> map = [with(baseBits)];
+			Dictionary<Int32, ArcanumWireType> map = new(baseBits);
 			foreach (KeyValuePair<Int32, ArcanumWireType> pair in specific)
 			{
 				map[pair.Key] = pair.Value;

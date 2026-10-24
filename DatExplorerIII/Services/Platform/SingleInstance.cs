@@ -185,7 +185,7 @@ namespace DatExplorerIII.Services.Platform
 			if (count < 0 || count > MaxFiles)
 				throw new InvalidDataException("The number of files is not valid.");
 
-			List<String> paths = [with(count)];
+			List<String> paths = new(count);
 			for (Int32 i = 0; i < count; i++)
 			{
 				Int32 length = await ReadInt32Async(pipe, timeout.Token);

@@ -114,7 +114,7 @@ namespace DatExplorerIII.ViewModels.Main
 		/// </summary>
 		private List<DatEntry>? ResolveOverwrites(IReadOnlyList<DatEntry> entries, String destination, String stripPrefix, IReadOnlyDictionary<DatEntry, String>? flatNames)
 		{
-			List<DatEntry> selected = [with(entries.Count)];
+			List<DatEntry> selected = new(entries.Count);
 			ConflictResolver resolver = new(_dialogs, Title);
 
 			foreach (DatEntry entry in entries)

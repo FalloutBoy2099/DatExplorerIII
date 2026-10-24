@@ -303,7 +303,7 @@ namespace DatExplorerIII.Core
 
 			try
 			{
-				List<String> directories = [with(directoryCount)];
+				List<String> directories = new(directoryCount);
 				for (Int32 index = 0; index < directoryCount; index++)
 				{
 					String name = ReadString(buffered).Trim('\\');
@@ -662,7 +662,7 @@ namespace DatExplorerIII.Core
 		public static Dictionary<DatEntry, String> GetFlatNames(IEnumerable<DatEntry> entries)
 		{
 			Dictionary<DatEntry, String> names = [];
-			HashSet<String> taken = [with(StringComparer.OrdinalIgnoreCase)];
+			HashSet<String> taken = new(StringComparer.OrdinalIgnoreCase);
 			foreach (DatEntry entry in entries)
 			{
 				String name = entry.Name;

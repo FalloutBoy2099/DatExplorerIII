@@ -13,7 +13,7 @@ namespace DatExplorerIII.ViewModels
 	/// </summary>
 	public sealed class DatDocument : ObservableObject
 	{
-		private readonly Dictionary<String, FolderNode> _nodes = [with(StringComparer.Ordinal)];
+		private readonly Dictionary<String, FolderNode> _nodes = new(StringComparer.Ordinal);
 
 		public DatDocument(DatArchive archive)
 		{
@@ -86,7 +86,7 @@ namespace DatExplorerIII.ViewModels
 		/// </summary>
 		private void SyncTree()
 		{
-			Dictionary<String, String> folders = [with(StringComparer.Ordinal)];
+			Dictionary<String, String> folders = new(StringComparer.Ordinal);
 			foreach (String path in Archive.Folders)
 			{
 				folders[path.ToLowerInvariant()] = path;

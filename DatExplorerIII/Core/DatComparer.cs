@@ -149,7 +149,7 @@ namespace DatExplorerIII.Core
 		/// <summary>The files of an archive by lower case path (the first one when two have the same path).</summary>
 		private static Dictionary<String, DatEntry> Index(DatArchive archive)
 		{
-			Dictionary<String, DatEntry> byKey = [with(StringComparer.Ordinal)];
+			Dictionary<String, DatEntry> byKey = new(StringComparer.Ordinal);
 			foreach (DatEntry entry in archive.Entries)
 			{
 				byKey.TryAdd(entry.Key, entry);

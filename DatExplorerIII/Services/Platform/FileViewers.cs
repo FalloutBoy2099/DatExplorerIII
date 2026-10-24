@@ -57,7 +57,7 @@ namespace DatExplorerIII.Services.Platform
 
 		private static Dictionary<String, FileViewerKind> Build()
 		{
-			Dictionary<String, FileViewerKind> kinds = [with(StringComparer.OrdinalIgnoreCase)];
+			Dictionary<String, FileViewerKind> kinds = new(StringComparer.OrdinalIgnoreCase);
 
 			// Texts: lists, dialogs, game variables, scripts and configuration files.
 			foreach (String extension in new[] { ".lst", ".txt", ".msg", ".bio", ".cfg", ".ini", ".log", ".ssl", ".int", ".scr", ".lua", ".h", ".csv", ".xml", ".json", ".md", ".bat", ".cmd", ".ps1", ".vbs" })

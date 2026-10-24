@@ -24,7 +24,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 				new(Loc.Get("Str.LipMarkerCount"), CharacterViewerViewModel.Number(file.Markers.Count)),
 			];
 
-			List<CharacterRow> phonemes = [with(file.Phonemes.Count)];
+			List<CharacterRow> phonemes = new(file.Phonemes.Count);
 			for (Int32 index = 0; index < file.Phonemes.Count; index++)
 			{
 				Byte code = file.Phonemes[index];
@@ -32,7 +32,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 				phonemes.Add(new CharacterRow((index + 1).ToString(CultureInfo.CurrentCulture), Loc.Format("Str.LipPhonemeValue", ipa, frame, code.ToString("X2", CultureInfo.InvariantCulture))));
 			}
 
-			List<CharacterRow> markers = [with(file.Markers.Count)];
+			List<CharacterRow> markers = new(file.Markers.Count);
 			for (Int32 index = 0; index < file.Markers.Count; index++)
 			{
 				LipMarker marker = file.Markers[index];

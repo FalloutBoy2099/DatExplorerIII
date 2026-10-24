@@ -11,12 +11,11 @@ namespace DatExplorerIII.Services.Syntax
 	public static class LuaSyntax
 	{
 		/// <summary>The reserved words of Lua, with the values <c>true</c>, <c>false</c> and <c>nil</c>.</summary>
-		private static readonly HashSet<String> Keywords =
-		[
-			with(StringComparer.Ordinal),
+		private static readonly HashSet<String> Keywords = new(StringComparer.Ordinal)
+		{
 			"and", "break", "do", "else", "elseif", "end", "false", "for", "function", "goto", "if", "in",
 			"local", "nil", "not", "or", "repeat", "return", "then", "true", "until", "while",
-		];
+		};
 
 		/// <summary>The parts of a text, in order, with no gap and no overlap: together they cover the whole text.</summary>
 		public static IReadOnlyList<SyntaxSpan> Tokenize(String text)

@@ -185,8 +185,8 @@ namespace DatExplorerIII.Core
 					return new LineSet(lines, null);
 
 				IReadOnlyList<String> text = options.IgnoreComments ? StripComments(lines) : lines;
-				List<String> keys = [with(lines.Count)];
-				List<Int32> kept = [with(lines.Count)];
+				List<String> keys = new(lines.Count);
+				List<Int32> kept = new(lines.Count);
 				for (Int32 index = 0; index < lines.Count; index++)
 				{
 					Boolean blank = String.IsNullOrWhiteSpace(lines[index]);
@@ -236,7 +236,7 @@ namespace DatExplorerIII.Core
 				end++;
 			}
 
-			List<Pair> pairs = [with(Math.Max(left.Count, right.Count))];
+			List<Pair> pairs = new(Math.Max(left.Count, right.Count));
 			for (Int32 index = 0; index < start; index++)
 			{
 				pairs.Add(new Pair(DiffKind.Same, index, index));
@@ -412,7 +412,7 @@ namespace DatExplorerIII.Core
 		/// </summary>
 		private static List<DiffRow> BuildRows(IReadOnlyList<String> left, IReadOnlyList<String> right, List<Int32>? leftKept, List<Int32>? rightKept, List<Pair> pairs)
 		{
-			List<DiffRow> rows = [with(pairs.Count)];
+			List<DiffRow> rows = new(pairs.Count);
 			Int32 nextLeft = 0;
 			Int32 nextRight = 0;
 

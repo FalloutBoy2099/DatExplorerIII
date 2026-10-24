@@ -60,7 +60,7 @@ namespace DatExplorerIII.ViewModels
 		/// <returns>The steps to run, or null when the user cancelled.</returns>
 		public static List<ImportStep>? Plan(DatArchive archive, String targetPath, IReadOnlyList<ImportItem> items, ConflictResolver resolver, out List<DatEntry> replaced)
 		{
-			List<ImportStep> steps = [with(items.Count)];
+			List<ImportStep> steps = new(items.Count);
 			replaced = [];
 
 			foreach (ImportItem item in items)

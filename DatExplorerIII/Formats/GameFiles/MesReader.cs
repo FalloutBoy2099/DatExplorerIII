@@ -28,8 +28,8 @@ namespace DatExplorerIII.Formats.GameFiles
 		{
 			List<BraceText.Item> items = BraceText.ReadItems(text);
 			List<String> values = items.Where(item => !item.IsComment).Select(item => item.Text).ToList();
-			List<MesEntry> entries = [with(values.Count / 2)];
-			List<Int32> lastValues = [with(values.Count / 2)];
+			List<MesEntry> entries = new(values.Count / 2);
+			List<Int32> lastValues = new(values.Count / 2);
 			Int32 skipped = 0;
 
 			// The values go by pairs; a value that is not a number cannot start a message, so it is skipped alone and the

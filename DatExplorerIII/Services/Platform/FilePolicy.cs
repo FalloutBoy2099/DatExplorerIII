@@ -21,14 +21,13 @@ namespace DatExplorerIII.Services.Platform
 
 		private static HashSet<String> BuildBlockedExtensions()
 		{
-			HashSet<String> extensions =
-			[
-				with(StringComparer.OrdinalIgnoreCase),
+			HashSet<String> extensions = new(StringComparer.OrdinalIgnoreCase)
+			{
 				".exe", ".com", ".bat", ".cmd", ".scr", ".pif", ".dll", ".sys", ".drv", ".ocx", ".cpl", ".msc",
 				".msi", ".msp", ".mst", ".appx", ".msix", ".appxbundle", ".msixbundle", ".application", ".appref-ms", ".gadget",
 				".ps1", ".ps1xml", ".psm1", ".psd1", ".vbs", ".vbe", ".vb", ".js", ".jse", ".wsf", ".wsh", ".hta", ".jar",
 				".lnk", ".url", ".scf", ".inf", ".reg", ".chm", ".xll", ".docm", ".xlsm", ".pptm", ".iqy",
-			];
+			};
 
 			// The extensions Windows itself runs as programs.
 			String? pathExt = Environment.GetEnvironmentVariable("PATHEXT");

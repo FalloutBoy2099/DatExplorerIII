@@ -517,7 +517,7 @@ namespace DatExplorerIII.Core
 		/// </summary>
 		private SavePlan WriteFallout1(FileStream output, IProgress<DatProgress>? progress)
 		{
-			SortedDictionary<String, List<DatEntry>> directories = [with(StringComparer.Ordinal)];
+			SortedDictionary<String, List<DatEntry>> directories = new(StringComparer.Ordinal);
 			foreach (DatEntry entry in _entries)
 			{
 				String directory = ToUpperAscii(entry.Directory.TrimEnd('\\'));

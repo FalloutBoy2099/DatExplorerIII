@@ -37,7 +37,7 @@ namespace DatExplorerIII.Formats.Graphics
 			Int32 spaceWidth = BinaryPrimitives.ReadUInt16BigEndian(data.AsSpan(8));
 			Int32 lineSpacing = BinaryPrimitives.ReadUInt16BigEndian(data.AsSpan(10));
 
-			List<FontGlyph> glyphs = [with(GlyphCount)];
+			List<FontGlyph> glyphs = new(GlyphCount);
 			for (Int32 index = 0; index < GlyphCount; index++)
 			{
 				ReadOnlySpan<Byte> entry = data.AsSpan(DirectoryStart + index * EntrySize, EntrySize);
@@ -99,7 +99,7 @@ namespace DatExplorerIII.Formats.Graphics
 			if (dataStart > data.Length)
 				throw new InvalidDataException("The list of the characters is cut.");
 
-			List<FontGlyph> glyphs = [with(count)];
+			List<FontGlyph> glyphs = new(count);
 			for (Int32 index = 0; index < count; index++)
 			{
 				Int32 width = ReadInt(HeaderSize + index * EntrySize);

@@ -83,7 +83,7 @@ namespace DatExplorerIII.Core
 			stream.ReadExactly(index);
 
 			Int32 count = BinaryPrimitives.ReadInt32LittleEndian(index);
-			List<ToeeRecord> records = [with(Math.Max(count, 0))];
+			List<ToeeRecord> records = new(Math.Max(count, 0));
 			Int32 position = 4;
 			while (records.Count < count && position + 4 <= index.Length)
 			{

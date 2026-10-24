@@ -79,7 +79,7 @@ namespace DatExplorerIII.Services.Checks
 			if (Directory.Exists(path))
 			{
 				List<String> files = Directory.EnumerateFiles(path, "*.msg", SearchOption.AllDirectories).OrderBy(file => file, StringComparer.OrdinalIgnoreCase).ToList();
-				List<MsgFileReport> reports = [with(files.Count)];
+				List<MsgFileReport> reports = new(files.Count);
 				for (Int32 index = 0; index < files.Count; index++)
 				{
 					cancellation.ThrowIfCancellationRequested();

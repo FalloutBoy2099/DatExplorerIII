@@ -50,7 +50,7 @@ namespace DatExplorerIII.Formats.Graphics
 				directionCount++;
 			}
 
-			List<FrmDirection> directions = [with(directionCount)];
+			List<FrmDirection> directions = new(directionCount);
 			for (Int32 d = 0; d < directionCount; d++)
 			{
 				directions.Add(new FrmDirection(shiftX[d], shiftY[d], ReadFrames(data, HeaderSize + offsets[d], framesPerDirection)));
@@ -61,7 +61,7 @@ namespace DatExplorerIII.Formats.Graphics
 
 		private static List<FrmFrame> ReadFrames(Byte[] data, Int64 start, Int32 count)
 		{
-			List<FrmFrame> frames = [with(count)];
+			List<FrmFrame> frames = new(count);
 			Int64 position = start;
 
 			for (Int32 i = 0; i < count; i++)

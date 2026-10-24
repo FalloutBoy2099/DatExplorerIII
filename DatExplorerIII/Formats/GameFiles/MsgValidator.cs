@@ -263,7 +263,7 @@ namespace DatExplorerIII.Formats.GameFiles
 
 			private List<MsgIssue> Build()
 			{
-				List<MsgIssue> issues = [with(_found.Count)];
+				List<MsgIssue> issues = new(_found.Count);
 				foreach ((MsgIssueKind kind, Int32 line, Int32 position, Int64 value, Int64 other) in _found)
 				{
 					Int32 start = line - 1 < _lineStarts.Count ? _lineStarts[line - 1] : 0;

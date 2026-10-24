@@ -28,7 +28,7 @@ namespace DatExplorerIII.Scripts
 
 		private static HashSet<String> CreateFunctionNames()
 		{
-			HashSet<String> names = [with(StringComparer.OrdinalIgnoreCase)];
+			HashSet<String> names = new(StringComparer.OrdinalIgnoreCase);
 			foreach (OpcodeAttributes attributes in Fallout2Attributes.Values.Concat(Fallout1Attributes.Values))
 			{
 				String name = attributes.Name;

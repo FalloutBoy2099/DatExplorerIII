@@ -177,7 +177,7 @@ namespace DatExplorerIII.ViewModels
 		private Boolean _showDifferences;
 		private CancellationTokenSource? _diffCancellation;
 		private ComparisonFolder _selectedFolder;
-		private readonly Dictionary<String, ComparisonFolder> _folderByPath = [with(StringComparer.OrdinalIgnoreCase)];
+		private readonly Dictionary<String, ComparisonFolder> _folderByPath = new(StringComparer.OrdinalIgnoreCase);
 
 		private readonly Func<IEnumerable<DatArchive>> _archives;
 

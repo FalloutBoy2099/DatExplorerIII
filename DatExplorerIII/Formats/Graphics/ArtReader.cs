@@ -50,7 +50,7 @@ namespace DatExplorerIII.Formats.Graphics
 			Int64 frameCount = Header(8);
 			Boolean isStatic = (flags & 1) != 0;
 
-			List<Palette> palettes = [with(paletteCount)];
+			List<Palette> palettes = new(paletteCount);
 			Int64 position = HeaderSize;
 			if (position + ((Int64)paletteCount * PaletteSize) > data.Length)
 				throw new InvalidDataException("The palettes lie outside of the file.");
@@ -101,11 +101,11 @@ namespace DatExplorerIII.Formats.Graphics
 			if (position + total > data.Length)
 				return null;
 
-			List<FrmDirection> directions = [with(rotations)];
+			List<FrmDirection> directions = new(rotations);
 			Int64 dataPosition = position;
 			for (Int32 r = 0; r < rotations; r++)
 			{
-				List<FrmFrame> frameList = [with(frames)];
+				List<FrmFrame> frameList = new(frames);
 				for (Int32 f = 0; f < frames; f++)
 				{
 					var info = infos[((Int64)r * frames) + f];

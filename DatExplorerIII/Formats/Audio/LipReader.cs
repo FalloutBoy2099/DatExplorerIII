@@ -52,7 +52,7 @@ namespace DatExplorerIII.Formats.Audio
 			String name = Encoding.ASCII.GetString(nameBytes[..(nameEnd < 0 ? NameLength : nameEnd)]);
 
 			Byte[] phonemes = data.AsSpan(HeaderSize, phonemeCount).ToArray();
-			List<LipMarker> markers = [with(markerCount)];
+			List<LipMarker> markers = new(markerCount);
 			Int32 position = HeaderSize + phonemeCount;
 			for (Int32 index = 0; index < markerCount; index++)
 			{

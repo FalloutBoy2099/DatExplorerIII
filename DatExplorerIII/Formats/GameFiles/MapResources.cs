@@ -14,7 +14,7 @@ namespace DatExplorerIII.Formats.GameFiles
 	public sealed class MapResources
 	{
 		private readonly Func<String, Byte[]?> _read;
-		private readonly Dictionary<String, IReadOnlyList<String>> _lists = [with(StringComparer.OrdinalIgnoreCase)];
+		private readonly Dictionary<String, IReadOnlyList<String>> _lists = new(StringComparer.OrdinalIgnoreCase);
 		private readonly Dictionary<Int32, Int32?> _subtypes = [];
 		private IReadOnlyDictionary<Int32, String>? _maps;
 

@@ -31,8 +31,8 @@ namespace DatExplorerIII.Formats.GameFiles
 		{
 			List<BraceText.Item> items = BraceText.ReadItems(text);
 			List<String> values = items.Where(item => !item.IsComment).Select(item => item.Text).ToList();
-			List<DlgEntry> entries = [with(values.Count / FieldCount)];
-			List<Int32> lastValues = [with(values.Count / FieldCount)];
+			List<DlgEntry> entries = new(values.Count / FieldCount);
+			List<Int32> lastValues = new(values.Count / FieldCount);
 			Int32 skipped = 0;
 
 			// The values go by seven. The number starts a line: when the value where it should be is not a number, the

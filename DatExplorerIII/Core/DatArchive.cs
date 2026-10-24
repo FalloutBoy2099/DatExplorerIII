@@ -19,11 +19,11 @@ namespace DatExplorerIII.Core
 		internal static readonly Encoding NameEncoding = Encoding.Latin1;
 
 		private readonly List<DatEntry> _entries = [];
-		private readonly Dictionary<String, DatEntry> _byKey = [with(StringComparer.Ordinal)];
-		private readonly Dictionary<String, List<DatEntry>> _byDirectory = [with(StringComparer.Ordinal)];
+		private readonly Dictionary<String, DatEntry> _byKey = new(StringComparer.Ordinal);
+		private readonly Dictionary<String, List<DatEntry>> _byDirectory = new(StringComparer.Ordinal);
 
 		/// <summary>Lower case folder path to original case folder path. Includes empty folders.</summary>
-		private readonly Dictionary<String, String> _folders = [with(StringComparer.Ordinal)];
+		private readonly Dictionary<String, String> _folders = new(StringComparer.Ordinal);
 
 		private readonly List<DatIssue> _issues = [];
 		private readonly Object _streamLock = new();
@@ -214,7 +214,7 @@ namespace DatExplorerIII.Core
 
 		public void Remove(IEnumerable<DatEntry> entries)
 		{
-			HashSet<DatEntry> removed = [with(entries)];
+			HashSet<DatEntry> removed = new(entries);
 			if (removed.Count == 0)
 				return;
 
@@ -226,7 +226,7 @@ namespace DatExplorerIII.Core
 			{
 				if (_byDirectory.TryGetValue(group.Key, out List<DatEntry>? list))
 				{
-					HashSet<DatEntry> inDirectory = [with(group)];
+					HashSet<DatEntry> inDirectory = new(group);
 					list.RemoveAll(inDirectory.Contains);
 				}
 			}

@@ -15,14 +15,13 @@ namespace DatExplorerIII.Services.Syntax
 		public const Int32 MaxLength = 512 * 1024;
 
 		/// <summary>The words of the language (the compilers do not tell upper case from lower case).</summary>
-		private static readonly HashSet<String> Keywords =
-		[
-			with(StringComparer.OrdinalIgnoreCase),
+		private static readonly HashSet<String> Keywords = new(StringComparer.OrdinalIgnoreCase)
+		{
 			"procedure", "begin", "end", "variable", "import", "export", "critical",
 			"if", "then", "else", "while", "do", "for", "foreach", "in", "switch", "case", "default",
 			"call", "return", "break", "continue", "when",
 			"and", "or", "not", "bwand", "bwor", "bwxor", "bwnot", "andalso", "orelse",
-		];
+		};
 
 		/// <summary>The parts of a text, in order, with no gap and no overlap: together they cover the whole text.</summary>
 		public static IReadOnlyList<SyntaxSpan> Tokenize(String text)
