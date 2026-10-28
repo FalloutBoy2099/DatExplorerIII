@@ -3,6 +3,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 	using System;
 	using System.Collections.Generic;
 	using System.Globalization;
+	using System.IO;
 	using System.Linq;
 	using System.Windows.Input;
 	using Infrastructure;
@@ -30,9 +31,17 @@ namespace DatExplorerIII.ViewModels.Viewer
 	public sealed class ImageViewerViewModel : ObservableObject, IDisposable
 	{
 		private readonly Dictionary<(Int32 Direction, Int32 Frame, Int32 Palette), PixelImage> _cache = [];
+		/// <summary>The speed of the animations of a sprite, which the file does not give.</summary>
+		private const Int32 SpriteFramesPerSecond = 10;
+
 		private readonly IUiTimer _timer;
 
 		private FrmImage? _animation;
+		private SprFile? _sprite;
+		private SprSequence? _sequence;
+		private SprCollection? _collection;
+		private IReadOnlyList<String> _animationNames = Array.Empty<String>();
+		private Int32 _animationIndex;
 		private Int32 _canvasWidth;
 		private Int32 _canvasHeight;
 		private PixelImage? _picture;
@@ -184,7 +193,30 @@ namespace DatExplorerIII.ViewModels.Viewer
 			}
 		}
 
-		public Int32 DirectionCount => _animation?.Directions.Count ?? 0;
+		/// <summary>The animations of a sprite of Fallout Tactics ("Stand", "Walk"...), which can be chosen when it has several.</summary>
+		public IReadOnlyList<String> Animations => _animationNames;
+
+		public Boolean HasAnimations => _animationNames.Count > 1;
+
+		/// <summary>The number of the animation shown, from 0.</summary>
+		public Int32 SelectedAnimationIndex
+		{
+			get => _animationIndex;
+			set
+			{
+				if (_sprite != null && value >= 0 && value < _sprite.Sequences.Count && value != _animationIndex)
+				{
+					SelectSequence(value);
+				}
+				else if (value < 0)
+				{
+					// The box gave up its selection (its list was replaced): it gets the animation that is shown back.
+					OnPropertyChanged();
+				}
+			}
+		}
+
+		public Int32 DirectionCount => _collection?.Directions ?? _animation?.Directions.Count ?? 0;
 
 		public Boolean HasDirections => DirectionCount > 1;
 
@@ -197,7 +229,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 			get => _direction;
 			set
 			{
-				if (_animation != null && value >= 0 && value < DirectionCount && value != _direction)
+				if (HasFrames && value >= 0 && value < DirectionCount && value != _direction)
 				{
 					_direction = value;
 					_frame = 0;
@@ -231,7 +263,9 @@ namespace DatExplorerIII.ViewModels.Viewer
 			}
 		}
 
-		public Int32 FrameCount => _animation?.FramesPerDirection ?? 0;
+		public Int32 FrameCount => _sequence?.Frames.Count ?? _animation?.FramesPerDirection ?? 0;
+
+		private Boolean HasFrames => _animation != null || _collection != null;
 
 		public Boolean IsAnimated => FrameCount > 1;
 
@@ -241,7 +275,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 			get => _frame;
 			set
 			{
-				if (_animation != null && value >= 0 && value < FrameCount && value != _frame)
+				if (HasFrames && value >= 0 && value < FrameCount && value != _frame)
 				{
 					_frame = value;
 					OnPropertyChanged();
@@ -367,6 +401,55 @@ namespace DatExplorerIII.ViewModels.Viewer
 			RenderCurrent();
 		}
 
+		/// <summary>Shows a sprite of Fallout Tactics: its animations, the directions and the frames of the one that is chosen.</summary>
+		/// <param name="sequence">The animation shown first.</param>
+		/// <param name="collection">The pictures of that animation.</param>
+		public void ShowSprite(SprFile file, Int32 sequence, SprCollection collection)
+		{
+			Reset();
+			_sprite = file;
+			_animationNames = file.Sequences.Select(item => item.Name).ToList();
+			_animationIndex = sequence;
+			_sequence = file.Sequences[sequence];
+			_collection = collection;
+			OnAnimationChanged();
+			UpdateSpriteInfo();
+			RenderCurrent();
+		}
+
+		/// <summary>Shows another animation of the sprite, from its first direction and frame.</summary>
+		private void SelectSequence(Int32 index)
+		{
+			SprSequence sequence = _sprite!.Sequences[index];
+			SprCollection collection;
+			try
+			{
+				collection = _sprite.GetCollection(sequence.CollectionIndex);
+			}
+			catch (InvalidDataException)
+			{
+				// Its pictures are damaged: the animation that was shown stays.
+				OnPropertyChanged(nameof(SelectedAnimationIndex));
+				return;
+			}
+
+			Stop();
+			_animationIndex = index;
+			_sequence = sequence;
+			_collection = collection;
+			_direction = 0;
+			_frame = 0;
+			OnPropertyChanged(nameof(SelectedAnimationIndex));
+			OnAnimationChanged();
+			UpdateSpriteInfo();
+			RenderCurrent();
+		}
+
+		private void UpdateSpriteInfo()
+		{
+			Info = Loc.Format("Str.ViewerSpr", _collection!.Width, _collection.Height, _animationNames.Count, DirectionCount, FrameCount);
+		}
+
 		/// <summary>Shows a picture file (PNG, BMP, JPEG, GIF) that was decoded.</summary>
 		public void ShowBitmap(PixelImage bitmap, String? info = null)
 		{
@@ -436,6 +519,11 @@ namespace DatExplorerIII.ViewModels.Viewer
 			OnEndingTextChanged();
 			_cache.Clear();
 			_animation = null;
+			_sprite = null;
+			_sequence = null;
+			_collection = null;
+			_animationNames = Array.Empty<String>();
+			_animationIndex = 0;
 			_direction = 0;
 			_frame = 0;
 			_paletteChoices = Array.Empty<PaletteChoice>();
@@ -449,6 +537,9 @@ namespace DatExplorerIII.ViewModels.Viewer
 			// The list is the same object until the picture changes: a box that gets a new list forgets its selection.
 			if (_directions.Count != DirectionCount)
 				_directions = Enumerable.Range(1, DirectionCount).ToList();
+			OnPropertyChanged(nameof(Animations));
+			OnPropertyChanged(nameof(HasAnimations));
+			OnPropertyChanged(nameof(SelectedAnimationIndex));
 			OnPropertyChanged(nameof(PaletteChoices));
 			OnPropertyChanged(nameof(HasPaletteChoices));
 			OnPropertyChanged(nameof(SelectedPalette));
@@ -465,6 +556,20 @@ namespace DatExplorerIII.ViewModels.Viewer
 
 		private void RenderCurrent()
 		{
+			if (_collection != null && _sequence != null)
+			{
+				(Int32, Int32, Int32) spriteKey = (_direction, _frame, _animationIndex);
+				if (!_cache.TryGetValue(spriteKey, out PixelImage? picture))
+				{
+					picture = ImageRenderer.Render(_collection, _collection.GetFrame(_direction, _sequence.Frames[_frame]));
+					_cache[spriteKey] = picture;
+				}
+
+				Picture = picture;
+				OnPropertyChanged(nameof(FrameLabel));
+				return;
+			}
+
 			if (_animation == null || _selectedPalette == null)
 				return;
 
@@ -502,7 +607,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 				return;
 			}
 
-			Int32 fps = _animation?.FramesPerSecond ?? 0;
+			Int32 fps = _collection != null ? SpriteFramesPerSecond : _animation?.FramesPerSecond ?? 0;
 			_timer.Interval = TimeSpan.FromMilliseconds(1000.0 / (fps > 0 ? Math.Min(fps, 30) : 10));
 			_timer.Start();
 			IsPlaying = true;

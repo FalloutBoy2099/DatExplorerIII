@@ -2,6 +2,7 @@ namespace DatExplorerIII.Models.Interface
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Linq;
 	using Models.Comparison;
 	using Models.GameFiles;
 	using Services.Platform;
@@ -50,6 +51,12 @@ namespace DatExplorerIII.Models.Interface
 		/// <summary>Whether the preview pane next to the file list is shown (the name is new: an old setting made when it was off by default is ignored).</summary>
 		public Boolean PreviewPaneVisible { get; set; } = true;
 
+		/// <summary>Whether the block of the folders (the tree) is shown.</summary>
+		public Boolean TreeVisible { get; set; } = true;
+
+		/// <summary>Whether the block of the files of the selected folder is shown.</summary>
+		public Boolean FilesVisible { get; set; } = true;
+
 		/// <summary>Whether a line shows the limit between the three blocks of the main window: folders, files, preview (on by default).</summary>
 		public Boolean BlockSeparatorsVisible { get; set; } = true;
 
@@ -86,6 +93,9 @@ namespace DatExplorerIII.Models.Interface
 		/// <summary>Comparison: whether the differences of the lines of the files made of text are shown instead of the two versions side by side.</summary>
 		public Boolean CompareShowDifferences { get; set; }
 
+		/// <summary>Comparison: the message files (.msg, .mes) are compared by their ids only (the ids that are added or missing), not by their text.</summary>
+		public Boolean CompareLanguageIds { get; set; }
+
 		/// <summary>Comparison: what the comparison of the files ignores, and how it compares their content.</summary>
 		public ComparisonOptions ComparisonOptions { get; set; } = new();
 
@@ -118,6 +128,15 @@ namespace DatExplorerIII.Models.Interface
 		/// <summary>Whether a sound of the viewer starts again when it ends.</summary>
 		public Boolean AudioLoop { get; set; }
 
+		/// <summary>Whether the list of the files shows every file (the default), or only those of the extensions of <see cref="VisibleExtensions"/>.</summary>
+		public Boolean ShowAllExtensions { get; set; } = true;
+
+		/// <summary>The extensions (with the dot, in lower case) that the list shows when it does not show all of them; null: all the formats the program knows.</summary>
+		public List<String>? VisibleExtensions { get; set; }
+
+		/// <summary>Whether a file of an extension that the program does not know is opened in the viewer as a text (the default), instead of not being viewable.</summary>
+		public Boolean UnknownExtensionsAsText { get; set; } = true;
+
 		/// <summary>Whether a double click on a file that has a viewer opens it there instead of in the default program.</summary>
 		public Boolean DoubleClickOpensViewer { get; set; } = true;
 
@@ -144,6 +163,12 @@ namespace DatExplorerIII.Models.Interface
 
 		/// <summary>Whether a double click on a message file (.msg) that has problems opens the window of the problems instead of the file.</summary>
 		public Boolean DoubleClickMessageProblems { get; set; }
+
+		/// <summary>The extensions that the list of the files shows, or null when it shows every file.</summary>
+		public HashSet<String>? GetVisibleExtensionSet()
+		{
+			return ShowAllExtensions ? null : new HashSet<String>(VisibleExtensions ?? FileViewers.AllExtensions.ToList(), StringComparer.OrdinalIgnoreCase);
+		}
 
 		/// <summary>Where the main window was when the program ended.</summary>
 		public WindowPlacement? Window { get; set; }

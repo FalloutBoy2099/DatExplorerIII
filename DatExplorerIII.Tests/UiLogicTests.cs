@@ -387,7 +387,7 @@ namespace DatExplorerIII.Tests
 		[InlineData("Arcanum.PATCH0", true)]
 		[InlineData("Arcanum.patch9", true)]
 		[InlineData(@"C:\Games\UAP\Modules\Time.PATCH9", true)]
-		[InlineData("Arcanum.patch10", false)]
+		[InlineData("Arcanum.patch10", true)]
 		[InlineData("Arcanum.patcha", false)]
 		[InlineData("Arcanum.patch", false)]
 		[InlineData("readme.txt", false)]

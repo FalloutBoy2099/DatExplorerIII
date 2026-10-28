@@ -3,6 +3,7 @@ namespace DatExplorerIII.Tests
 	using System;
 	using System.Collections.Generic;
 	using System.IO;
+	using System.IO.Compression;
 	using System.Linq;
 	using System.Text;
 	using DatExplorerIII.Core;
@@ -331,6 +332,64 @@ namespace DatExplorerIII.Tests
 			Assert.True(reopened.Find("art\\critters\\hero.frm")!.IsCompressed);
 			Assert.False(reopened.Find("art\\critters\\npc.frm")!.IsCompressed);
 			Assert.Equal(700, reopened.Find("art\\critters\\npc.frm")!.PackedSize);
+		}
+
+		[Fact]
+		public void Arcanum_WritesSortedIndexAndOriginalEngineMarker()
+		{
+			using DatArchive archive = BuildSample(DatFormat.Arcanum, "official.dat", out Dictionary<String, Byte[]> expected);
+			archive.AddFolder("z_last\\empty");
+			archive.Save();
+
+			using FileStream stream = new(archive.FilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+			using BinaryReader reader = new(stream, Encoding.Latin1, true);
+			stream.Position = stream.Length - 12;
+			Assert.Equal(0x44415431u, reader.ReadUInt32());
+			Int32 namesSize = reader.ReadInt32();
+			Int32 indexSize = reader.ReadInt32();
+			Int64 indexStart = stream.Length - indexSize;
+			stream.Position = indexStart - 4;
+			Assert.Equal(indexStart, (Int64)reader.ReadUInt32());
+			Int32 count = reader.ReadInt32();
+			Assert.Equal(archive.Count + archive.Folders.Count(), count);
+			String previous = String.Empty;
+			Int32 actualNamesSize = 0;
+			Dictionary<String, (UInt32 Flags, Int32 Size, Int32 Packed, UInt32 Offset)> files = new(StringComparer.Ordinal);
+			for (Int32 i = 0; i < count; i++)
+			{
+				Int32 nameLength = reader.ReadInt32();
+				Byte[] rawName = reader.ReadBytes(nameLength);
+				Assert.Equal(0, rawName[^1]);
+				actualNamesSize += nameLength;
+				String name = Encoding.Latin1.GetString(rawName, 0, nameLength - 1).ToLowerInvariant();
+				Assert.True(String.CompareOrdinal(previous, name) <= 0, $"Index out of order: {previous}, {name}");
+				previous = name;
+				reader.ReadInt32();
+				UInt32 flags = reader.ReadUInt32();
+				Int32 size = reader.ReadInt32();
+				Int32 packed = reader.ReadInt32();
+				UInt32 offset = reader.ReadUInt32();
+				if ((flags & 0x400) == 0) files.Add(name, (flags, size, packed, offset));
+			}
+			Assert.Equal(namesSize, actualNamesSize);
+			Assert.Equal(expected.Count, files.Count);
+			foreach (KeyValuePair<String, Byte[]> pair in expected)
+			{
+				var info = files[pair.Key];
+				Assert.True((Int64)info.Offset + info.Packed <= indexStart - 4);
+				stream.Position = info.Offset;
+				Byte[] data = reader.ReadBytes(info.Packed);
+				if ((info.Flags & 2) != 0)
+				{
+					using MemoryStream packed = new(data);
+					using ZLibStream inflater = new(packed, CompressionMode.Decompress);
+					using MemoryStream expanded = new();
+					inflater.CopyTo(expanded);
+					data = expanded.ToArray();
+				}
+				Assert.Equal(info.Size, data.Length);
+				Assert.Equal(pair.Value, data);
+			}
 		}
 
 		[Fact]

@@ -188,7 +188,7 @@ namespace DatExplorerIII.ViewModels.Main
 			if (await OpenMessageProblemsInsteadAsync(item))
 				return;
 
-			if (_settings.Data.DoubleClickOpensViewer && FileViewers.IsViewable(item.Name))
+			if (_settings.Data.DoubleClickOpensViewer && FileViewers.IsViewable(item.Name, _settings.Data.UnknownExtensionsAsText))
 			{
 				await ViewEntryAsync(item.Entry!);
 				return;

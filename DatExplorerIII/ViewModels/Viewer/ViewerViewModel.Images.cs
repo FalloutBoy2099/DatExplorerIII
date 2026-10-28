@@ -7,8 +7,10 @@ namespace DatExplorerIII.ViewModels.Viewer
 	using System.Threading;
 	using System.Threading.Tasks;
 	using Core;
+	using Formats.GameFiles;
 	using Formats.Graphics;
 	using Models.Archives;
+	using Models.GameFiles;
 	using Models.Graphics;
 	using Models.Interface;
 	using Services.Checks;
@@ -65,6 +67,68 @@ namespace DatExplorerIII.ViewModels.Viewer
 				ArtImage art = ArtReader.Read(data);
 				List<PaletteChoice> artPalettes = art.Palettes.Select((palette, index) => new PaletteChoice(Loc.Format("Str.PaletteNumber", index + 1), palette)).ToList();
 				OnUi(() => Image.ShowAnimation(art.Image, artPalettes));
+			}
+			else if (extension == ".zar")
+			{
+				ZarImage zar = ZarReader.Read(data);
+				PixelImage picture = ImageRenderer.Render(zar);
+				OnUi(() => Image.ShowBitmap(picture));
+			}
+			else if (extension == ".til")
+			{
+				TilImage tile = TilReader.Read(data);
+				PixelImage picture = ImageRenderer.RenderSheet(tile.Frames, 8);
+				String info = Loc.Format("Str.ViewerTil", tile.Width, tile.Height, tile.Frames.Count);
+				OnUi(() => Image.ShowBitmap(picture, info));
+			}
+			else if (extension == ".spr")
+			{
+				SprFile sprite = SprReader.Read(data);
+				Int32 first = sprite.DefaultSequence;
+				SprCollection collection = sprite.GetCollection(sprite.Sequences[first].CollectionIndex);
+				OnUi(() => Image.ShowSprite(sprite, first, collection));
+			}
+			else if (extension == ".mis")
+			{
+				MisFile mission = MisReader.Read(data);
+				String info = Loc.Format("Str.ViewerMis", mission.Version, mission.Teams.Count, String.Join(", ", mission.Teams), mission.TextFile.Length > 0 ? mission.TextFile : "-");
+				if (mission.Preview != null)
+				{
+					PixelImage picture = ImageRenderer.Render(mission.Preview);
+					OnUi(() => Image.ShowBitmap(picture, info));
+				}
+				else
+				{
+					// Most missions hold no picture of the map: what was read of them is shown as text.
+					List<String> lines = [.. mission.Teams, String.Empty, mission.TextFile];
+					if (mission.TileInstances >= 0)
+						lines.Add(Loc.Format("Str.ViewerMisMap", mission.TilePrototypes, mission.TileInstances));
+
+					Byte[] text = System.Text.Encoding.UTF8.GetBytes(String.Join(Environment.NewLine, lines));
+					OnUi(() => Text.Show(text, text.Length, ".txt", info));
+					OnUi(() => Show(FileViewerKind.Text, String.Empty));
+					return;
+				}
+			}
+			else if (extension == ".sec")
+			{
+				SecFile sector = SecReader.Read(data);
+				PixelImage picture = ImageRenderer.Render(sector);
+				Int32 kinds = sector.Tiles.Where(tile => tile is not (0 or UInt32.MaxValue)).Select(SecReader.KindOf).Distinct().Count();
+				String info = Loc.Format("Str.ViewerSec", kinds, sector.Lights.Count, sector.ObjectCount, sector.TileScripts.Count, sector.Version);
+				OnUi(() => Image.ShowBitmap(picture, info));
+			}
+			else if (extension == ".tma")
+			{
+				MaskImage area = TmaReader.Read(data);
+				PixelImage picture = ImageRenderer.Render(area);
+				String info = Loc.Format("Str.ViewerTma", area.Width, area.Height, (Int32)Math.Round(100.0 * area.SetCount / area.Pixels.Length));
+				OnUi(() => Image.ShowBitmap(picture, info));
+			}
+			else if (extension is ".qoi" or ".ktx2")
+			{
+				PixelImage bitmap = extension == ".qoi" ? QoiReader.Read(data) : Ktx2Reader.Read(data);
+				OnUi(() => Image.ShowBitmap(bitmap));
 			}
 			else if (extension == ".msk")
 			{

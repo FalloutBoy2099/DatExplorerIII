@@ -1,7 +1,10 @@
 namespace DatExplorerIII.Services.Media
 {
 	using System;
+	using System.Collections.Generic;
 	using System.Linq;
+	using Formats.GameFiles;
+	using Models.GameFiles;
 	using Models.Graphics;
 
 	/// <summary>
@@ -46,6 +49,117 @@ namespace DatExplorerIII.Services.Media
 			}
 
 			return Create(image.Width, image.Height, bgra);
+		}
+
+		/// <summary>Draws a picture of Fallout Tactics, which already has its colors and its transparency.</summary>
+		public static PixelImage Render(ZarImage image)
+		{
+			return RenderSheet([image], 1);
+		}
+
+		/// <summary>
+		/// Draws a picture of a sprite of Fallout Tactics on the area that holds all the pictures of its collection, at its place from the
+		/// origin of the sprite, so that the frames of an animation stay aligned.
+		/// </summary>
+		public static PixelImage Render(SprCollection collection, SprFrame frame)
+		{
+			Byte[] bgra = new Byte[collection.Width * collection.Height * 4];
+			ZarImage image = frame.Image;
+			Int32 left = frame.OffsetX - collection.Left;
+			Int32 top = frame.OffsetY - collection.Top;
+			for (Int32 y = 0; y < image.Height; y++)
+			{
+				Array.Copy(image.Bgra, y * image.Width * 4, bgra, (((top + y) * collection.Width) + left) * 4, image.Width * 4);
+			}
+
+			return Create(collection.Width, collection.Height, bgra);
+		}
+
+		/// <summary>
+		/// Draws pictures of Fallout Tactics side by side in a table, a picture per cell (the size of the largest), from left to right then
+		/// from top to bottom.
+		/// </summary>
+		/// <param name="columns">How many pictures a line holds.</param>
+		public static PixelImage RenderSheet(IReadOnlyList<ZarImage> frames, Int32 columns)
+		{
+			columns = Math.Clamp(columns, 1, Math.Max(1, frames.Count));
+			Int32 gap = frames.Count > 1 ? 2 : 0;
+			Int32 cellWidth = Math.Max(1, frames.Max(frame => frame.Width));
+			Int32 cellHeight = Math.Max(1, frames.Max(frame => frame.Height));
+			Int32 rows = (frames.Count + columns - 1) / columns;
+			Int32 width = (columns * cellWidth) + ((columns - 1) * gap);
+			Int32 height = (rows * cellHeight) + ((rows - 1) * gap);
+			Byte[] bgra = new Byte[width * height * 4];
+
+			for (Int32 index = 0; index < frames.Count; index++)
+			{
+				ZarImage frame = frames[index];
+				Int32 left = (index % columns) * (cellWidth + gap);
+				Int32 top = (index / columns) * (cellHeight + gap);
+				for (Int32 y = 0; y < frame.Height; y++)
+				{
+					Array.Copy(frame.Bgra, y * frame.Width * 4, bgra, (((top + y) * width) + left) * 4, frame.Width * 4);
+				}
+			}
+
+			return Create(width, height, bgra);
+		}
+
+		/// <summary>
+		/// Draws the tiles of a sector of Arcanum as a map of colors, 4 pixels a tile: each kind of tile has a color of its own (the pictures
+		/// of the tiles are not drawn). The tiles that are empty are left clear.
+		/// </summary>
+		public static PixelImage Render(SecFile sector)
+		{
+			const Int32 cell = 4;
+			Int32 side = SecReader.Side;
+			Int32 width = side * cell;
+			Byte[] bgra = new Byte[width * width * 4];
+			for (Int32 tile = 0; tile < sector.Tiles.Length; tile++)
+			{
+				UInt32 value = sector.Tiles[tile];
+				if (value is 0 or UInt32.MaxValue)
+					continue;
+
+				// The kind of the tile is its number without the variant that is drawn at a place.
+				UInt32 mixed = SecReader.KindOf(value) * 2654435761u;
+				Double hue = (mixed >> 8) % 360;
+				Double lightness = 0.55 + (((mixed >> 4) & 7) * 0.04);
+				(Byte red, Byte green, Byte blue) = FromHsv(hue, 0.5, lightness);
+				Int32 left = (tile % side) * cell;
+				Int32 top = (tile / side) * cell;
+				for (Int32 y = 0; y < cell; y++)
+				{
+					for (Int32 x = 0; x < cell; x++)
+					{
+						Int32 offset = (((top + y) * width) + left + x) * 4;
+						bgra[offset] = blue;
+						bgra[offset + 1] = green;
+						bgra[offset + 2] = red;
+						bgra[offset + 3] = 255;
+					}
+				}
+			}
+
+			return Create(width, width, bgra);
+		}
+
+		private static (Byte Red, Byte Green, Byte Blue) FromHsv(Double hue, Double saturation, Double value)
+		{
+			Double chroma = value * saturation;
+			Double sector = hue / 60;
+			Double second = chroma * (1 - Math.Abs((sector % 2) - 1));
+			(Double r, Double g, Double b) = (Int32)sector switch
+			{
+				0 => (chroma, second, 0.0),
+				1 => (second, chroma, 0.0),
+				2 => (0.0, chroma, second),
+				3 => (0.0, second, chroma),
+				4 => (second, 0.0, chroma),
+				_ => (chroma, 0.0, second),
+			};
+			Double match = value - chroma;
+			return ((Byte)Math.Round((r + match) * 255), (Byte)Math.Round((g + match) * 255), (Byte)Math.Round((b + match) * 255));
 		}
 
 		/// <summary>Draws a mask: the pixels that are set are white, the others black.</summary>

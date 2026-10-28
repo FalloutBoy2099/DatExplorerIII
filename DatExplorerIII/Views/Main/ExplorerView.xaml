@@ -24,7 +24,7 @@
                 x:Name="TreeColumn"
                 Width="280"
                 MinWidth="160" />
-            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition x:Name="TreeSplitterColumn" Width="Auto" />
             <ColumnDefinition
                 x:Name="ListColumn"
                 Width="*"
@@ -69,7 +69,10 @@
             </TreeView.ContextMenu>
         </TreeView>
 
-        <GridSplitter Grid.Column="1" Style="{StaticResource BlockSplitterStyle}" />
+        <GridSplitter
+            x:Name="TreeSplitter"
+            Grid.Column="1"
+            Style="{StaticResource BlockSplitterStyle}" />
 
         <ListView
             x:Name="FilesList"
@@ -137,7 +140,10 @@
             </ListView.ContextMenu>
         </ListView>
 
-        <GridSplitter Grid.Column="3" Style="{StaticResource BlockSplitterStyle}" />
+        <GridSplitter
+            x:Name="PreviewSplitter"
+            Grid.Column="3"
+            Style="{StaticResource BlockSplitterStyle}" />
 
         <Border
             Grid.Column="4"

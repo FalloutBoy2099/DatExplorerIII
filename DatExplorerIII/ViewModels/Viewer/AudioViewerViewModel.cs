@@ -181,7 +181,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 
 		/// <summary>Decodes and shows a sound.</summary>
 		/// <param name="data">The content of the sound file.</param>
-		/// <param name="extension">The extension of the file (.acm, .wav or .mp3), which tells how it is decoded.</param>
+		/// <param name="extension">The extension of the file (.acm, .wav, .mp3 or .snd), which tells how it is decoded.</param>
 		public async Task ShowAsync(Byte[] data, String extension)
 		{
 			Reset();
@@ -331,6 +331,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 			{
 				".acm" => AcmReader.Read(source, channels),
 				".mp3" => Mp3Reader.Read(source),
+				".snd" => SndReader.Read(source),
 				_ => WavReader.Read(source),
 			};
 		}

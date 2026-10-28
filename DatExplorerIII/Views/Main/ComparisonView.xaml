@@ -23,7 +23,6 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <!--  The tool bar: only icons, the text is the tool tip.  -->
@@ -95,6 +94,13 @@
                 Style="{StaticResource IconToggle}"
                 ToolTip="{DynamicResource Str.CompareShowDifferences}">
                 <TextBlock Style="{StaticResource ToolIcon}" Text="&#xE746;" />
+            </ToggleButton>
+            <ToggleButton
+                AutomationProperties.Name="{DynamicResource Str.CompareLanguage}"
+                IsChecked="{Binding Comparison.IsCompareLanguage}"
+                Style="{StaticResource IconToggle}"
+                ToolTip="{DynamicResource Str.CompareLanguage}">
+                <TextBlock Style="{StaticResource ToolIcon}" Text="&#xE774;" />
             </ToggleButton>
             <ToggleButton
                 AutomationProperties.Name="{DynamicResource Str.CompareLayoutListStacked}"
@@ -440,6 +446,13 @@
                                 ToolTip="{DynamicResource Str.CompareDiffNext}">
                                 <TextBlock Style="{StaticResource ToolIcon}" Text="&#xE70D;" />
                             </Button>
+                            <ToggleButton
+                                AutomationProperties.Name="{DynamicResource Str.CompareDiffOnly}"
+                                IsChecked="{Binding Comparison.Current.Diff.OnlyDifferences}"
+                                Style="{StaticResource IconToggle}"
+                                ToolTip="{DynamicResource Str.CompareDiffOnly}">
+                                <TextBlock Style="{StaticResource ToolIcon}" Text="&#xE71C;" />
+                            </ToggleButton>
                             <TextBlock
                                 Margin="8,0,0,0"
                                 VerticalAlignment="Center"
@@ -522,12 +535,5 @@
                 </Grid>
             </views:SplitPair.Second>
         </views:SplitPair>
-
-        <TextBlock
-            Grid.Row="2"
-            Margin="0,6,0,0"
-            Opacity="0.7"
-            Text="{Binding Comparison.Current.SummaryText}"
-            TextTrimming="CharacterEllipsis" />
     </Grid>
 </UserControl>

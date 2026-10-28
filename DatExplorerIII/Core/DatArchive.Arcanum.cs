@@ -5,6 +5,7 @@ namespace DatExplorerIII.Core
 	using System.Collections.Generic;
 	using System.IO;
 	using System.Linq;
+	using System.Text;
 	using Models.Archives;
 
 	/// <summary>
@@ -17,13 +18,15 @@ namespace DatExplorerIII.Core
 	/// folders of the archive, empty ones included.</para>
 	/// <para>The footer is a GUID of 16 bytes (the identity of a module, which saved games remember), the signature "1TAD",
 	/// the total length of the names, and the length of the index and the footer together. Some archives have no GUID: their
-	/// signature is " TAD" and the footer is 12 bytes.</para>
+	/// signature is " TAD" and the footer is 12 bytes. The archives of the beta versions have no length of the names: the footer is
+	/// the GUID, the signature and the length of the index and the footer together (8 bytes without the GUID).</para>
 	/// </remarks>
 	public sealed partial class DatArchive
 	{
 		private const UInt32 ArcanumGuidMagic = 0x44415431;
 		private const UInt32 ArcanumPlainMagic = 0x44415420;
 		private const Int32 ArcanumTailSize = 12;
+		private const Int32 ArcanumLegacyTailSize = 8;
 		private const Int32 ArcanumGuidSize = 16;
 		private const Int32 ArcanumFlagStored = 0x01;
 		private const Int32 ArcanumFlagCompressed = 0x02;
@@ -35,9 +38,9 @@ namespace DatExplorerIII.Core
 		/// <summary>The identity of the archive (the GUID of its footer); it is kept when the archive is written again.</summary>
 		private Byte[]? _arcanumGuid;
 
-		private readonly record struct ArcanumFooter(Boolean HasGuid, Int32 NameTableSize, Int32 IndexSize, Byte[] GuidBytes)
+		private readonly record struct ArcanumFooter(Boolean HasGuid, Int32 NameTableSize, Int32 IndexSize, Byte[] GuidBytes, Boolean IsLegacy = false)
 		{
-			public Int32 Size => HasGuid ? ArcanumGuidSize + ArcanumTailSize : ArcanumTailSize;
+			public Int32 Size => (HasGuid ? ArcanumGuidSize : 0) + (IsLegacy ? ArcanumLegacyTailSize : ArcanumTailSize);
 		}
 
 		/// <summary>Reads the end of the file; true when it is the footer of an Arcanum archive.</summary>
@@ -53,7 +56,7 @@ namespace DatExplorerIII.Core
 
 			UInt32 magic = BinaryPrimitives.ReadUInt32LittleEndian(tail);
 			if (magic != ArcanumGuidMagic && magic != ArcanumPlainMagic)
-				return false;
+				return TryReadLegacyArcanumFooter(stream, length, tail, out footer);
 
 			Boolean hasGuid = magic == ArcanumGuidMagic;
 			Int64 footerSize = hasGuid ? ArcanumGuidSize + ArcanumTailSize : ArcanumTailSize;
@@ -72,6 +75,31 @@ namespace DatExplorerIII.Core
 			}
 
 			footer = new ArcanumFooter(hasGuid, (Int32)nameTableSize, (Int32)indexSize, guid);
+			return true;
+		}
+
+		/// <summary>The footer of the beta versions: the signature, then the length of the index and the footer; the names have no length.</summary>
+		private static Boolean TryReadLegacyArcanumFooter(FileStream stream, Int64 length, Byte[] tail, out ArcanumFooter footer)
+		{
+			footer = default;
+			UInt32 magic = BinaryPrimitives.ReadUInt32LittleEndian(tail.AsSpan(4));
+			if (magic != ArcanumGuidMagic && magic != ArcanumPlainMagic)
+				return false;
+
+			Boolean hasGuid = magic == ArcanumGuidMagic;
+			Int64 footerSize = (hasGuid ? ArcanumGuidSize : 0) + ArcanumLegacyTailSize;
+			UInt32 indexSize = BinaryPrimitives.ReadUInt32LittleEndian(tail.AsSpan(8));
+			if (length < footerSize || indexSize < footerSize + 4 || indexSize > length)
+				return false;
+
+			Byte[] guid = new Byte[ArcanumGuidSize];
+			if (hasGuid)
+			{
+				stream.Position = length - footerSize;
+				stream.ReadExactly(guid);
+			}
+
+			footer = new ArcanumFooter(hasGuid, 0, (Int32)indexSize, guid, true);
 			return true;
 		}
 
@@ -163,8 +191,19 @@ namespace DatExplorerIII.Core
 			return true;
 		}
 
+		private static String ArcanumIndexKey(String path)
+		{
+			Byte[] bytes = NameEncoding.GetBytes(path);
+			for (Int32 index = 0; index < bytes.Length; index++)
+			{
+				if (bytes[index] >= (Byte)'A' && bytes[index] <= (Byte)'Z')
+					bytes[index] += (Byte)('a' - 'A');
+			}
+			return Encoding.Latin1.GetString(bytes);
+		}
+
 		/// <summary>
-		/// Writes the data of the files, then the index (the folders first, then the files in the order of their paths) and
+		/// Writes the data of the files, then the index in path order and
 		/// the footer.
 		/// </summary>
 		private SavePlan WriteArcanum(Stream output, IProgress<DatProgress>? progress)
@@ -175,8 +214,12 @@ namespace DatExplorerIII.Core
 			Int32 nameTableSize = 0;
 			using (BinaryWriter writer = new(index, NameEncoding, true))
 			{
-				List<String> folders = _folders.Values.OrderBy(path => path, StringComparer.OrdinalIgnoreCase).ToList();
-				writer.Write(folders.Count + _entries.Count);
+				List<(String Path, DatEntry? Entry)> records = _folders.Values
+					.Select(folder => (Path: folder.TrimEnd('\\'), Entry: (DatEntry?)null))
+					.Concat(_entries.Select(entry => (Path: entry.FullPath, Entry: (DatEntry?)entry)))
+					.OrderBy(record => ArcanumIndexKey(record.Path), StringComparer.Ordinal)
+					.ToList();
+				writer.Write(records.Count);
 
 				void WriteEntry(String path, Int32 flags, Int32 unpackedSize, Int32 packedSize, UInt32 offset)
 				{
@@ -191,27 +234,28 @@ namespace DatExplorerIII.Core
 					nameTableSize += name.Length;
 				}
 
-				foreach (String folder in folders)
+				foreach ((String path, DatEntry? entry) in records)
 				{
-					WriteEntry(folder.TrimEnd('\\'), ArcanumFlagFolder, 0, 0, 0);
-				}
+					if (entry == null)
+					{
+						WriteEntry(path, ArcanumFlagFolder, 0, 0, 0);
+						continue;
+					}
 
-				foreach (DatEntry entry in _entries)
-				{
 					Placement placement = plan.Placements[entry];
-					WriteEntry(
-						entry.FullPath,
-						placement.IsCompressed ? ArcanumFlagCompressed : ArcanumFlagStored,
-						placement.UnpackedSize,
-						placement.IsCompressed ? placement.PackedSize : placement.UnpackedSize,
+					WriteEntry(path, placement.IsCompressed ? ArcanumFlagCompressed : ArcanumFlagStored,
+						placement.UnpackedSize, placement.IsCompressed ? placement.PackedSize : placement.UnpackedSize,
 						placement.Offset);
 				}
 			}
 
-			Int64 archiveSize = output.Position + index.Length + ArcanumGuidSize + ArcanumTailSize;
+			Int64 archiveSize = output.Position + 4 + index.Length + ArcanumGuidSize + ArcanumTailSize;
 			if (archiveSize > UInt32.MaxValue)
 				throw new DatException(DatErrorKind.ArchiveTooLarge, "The archive would exceed 4 GB.");
 
+			Byte[] marker = new Byte[4];
+			BinaryPrimitives.WriteUInt32LittleEndian(marker, checked((UInt32)(output.Position + 4)));
+			output.Write(marker);
 			index.Position = 0;
 			index.CopyTo(output);
 

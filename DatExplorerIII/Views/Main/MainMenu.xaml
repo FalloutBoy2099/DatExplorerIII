@@ -24,7 +24,7 @@
                 Command="{Binding OpenCommand}"
                 Header="{DynamicResource Str.Open}"
                 InputGestureText="{DynamicResource Str.GestureOpen}" />
-            <MenuItem Command="{Binding OpenFolderCommand}" Header="{DynamicResource Str.OpenFolder}" />
+            <MenuItem Command="{Binding OpenFolderCommand}" InputGestureText="{DynamicResource Str.GestureOpenFolder}" Header="{DynamicResource Str.OpenFolder}" />
             <MenuItem Header="{DynamicResource Str.New}">
                 <MenuItem Command="{Binding NewFallout1Command}" Header="{DynamicResource Str.NewFallout1}" />
                 <MenuItem Command="{Binding NewFallout2Command}" Header="{DynamicResource Str.NewFallout2}" />
@@ -45,7 +45,7 @@
                 Command="{Binding CloseDatCommand}"
                 Header="{DynamicResource Str.CloseDat}"
                 InputGestureText="{DynamicResource Str.GestureClose}" />
-            <MenuItem Command="{Binding CloseAllDatsCommand}" Header="{DynamicResource Str.CloseAllDats}" />
+            <MenuItem Command="{Binding CloseAllDatsCommand}" InputGestureText="{DynamicResource Str.GestureCloseAll}" Header="{DynamicResource Str.CloseAllDats}" />
             <Separator />
             <MenuItem
                 x:Name="ExitMenuItem"
@@ -65,9 +65,9 @@
                 ToolTip="{DynamicResource Str.ViewFileTip}" />
             <MenuItem Command="{Binding OpenExternalCommand}" Header="{DynamicResource Str.OpenExternal}" />
             <Separator />
-            <MenuItem Command="{Binding ExtractItemsCommand}" Header="{Binding ExtractItemsText}" />
+            <MenuItem Command="{Binding ExtractItemsCommand}" InputGestureText="{DynamicResource Str.GestureExtract}" Header="{Binding ExtractItemsText}" />
             <MenuItem Command="{Binding ExtractFolderCommand}" Header="{DynamicResource Str.ExtractFolder}" />
-            <MenuItem Command="{Binding ExtractAllCommand}" Header="{DynamicResource Str.ExtractAll}" />
+            <MenuItem Command="{Binding ExtractAllCommand}" InputGestureText="{DynamicResource Str.GestureExtractAll}" Header="{DynamicResource Str.ExtractAll}" />
             <Separator />
             <MenuItem Header="{DynamicResource Str.ExtractMode}">
                 <MenuItem
@@ -90,9 +90,9 @@
                     IsChecked="{Binding IsExtractFlat, Mode=OneWay}" />
             </MenuItem>
             <Separator />
-            <MenuItem Command="{Binding ImportFilesCommand}" Header="{DynamicResource Str.ImportFiles}" />
-            <MenuItem Command="{Binding ImportFolderCommand}" Header="{DynamicResource Str.ImportFolder}" />
-            <MenuItem Command="{Binding NewFolderCommand}" Header="{DynamicResource Str.NewFolder}" />
+            <MenuItem Command="{Binding ImportFilesCommand}" InputGestureText="{DynamicResource Str.GestureImportFiles}" Header="{DynamicResource Str.ImportFiles}" />
+            <MenuItem Command="{Binding ImportFolderCommand}" InputGestureText="{DynamicResource Str.GestureImportFolder}" Header="{DynamicResource Str.ImportFolder}" />
+            <MenuItem Command="{Binding NewFolderCommand}" InputGestureText="{DynamicResource Str.GestureNewFolder}" Header="{DynamicResource Str.NewFolder}" />
             <Separator />
             <MenuItem
                 Command="{Binding RenameItemCommand}"
@@ -107,28 +107,38 @@
                 Header="{DynamicResource Str.Lowercase}"
                 ToolTip="{DynamicResource Str.LowercaseTip}" />
             <Separator />
-            <MenuItem Command="{Binding GlobalSearchCommand}" Header="{DynamicResource Str.SearchAll}" />
+            <MenuItem Command="{Binding GlobalSearchCommand}" InputGestureText="{DynamicResource Str.GestureSearchAll}" Header="{DynamicResource Str.SearchAll}" />
         </MenuItem>
         <MenuItem Header="{DynamicResource Str.View}">
             <MenuItem
-                Command="{Binding SetViewModeCommand}"
+                Command="{Binding SetViewModeCommand}" InputGestureText="{DynamicResource Str.GestureViewDetails}"
                 CommandParameter="Details"
                 Header="{DynamicResource Str.ViewDetails}"
                 IsCheckable="True"
                 IsChecked="{Binding IsDetailsView, Mode=OneWay}" />
             <MenuItem
-                Command="{Binding SetViewModeCommand}"
+                Command="{Binding SetViewModeCommand}" InputGestureText="{DynamicResource Str.GestureViewList}"
                 CommandParameter="List"
                 Header="{DynamicResource Str.ViewList}"
                 IsCheckable="True"
                 IsChecked="{Binding IsListView, Mode=OneWay}" />
             <MenuItem
-                Command="{Binding SetViewModeCommand}"
+                Command="{Binding SetViewModeCommand}" InputGestureText="{DynamicResource Str.GestureViewIcons}"
                 CommandParameter="Icons"
                 Header="{DynamicResource Str.ViewIcons}"
                 IsCheckable="True"
                 IsChecked="{Binding IsIconsView, Mode=OneWay}" />
             <Separator />
+            <MenuItem
+                Header="{DynamicResource Str.TreePane}"
+                InputGestureText="{DynamicResource Str.GestureTree}"
+                IsCheckable="True"
+                IsChecked="{Binding IsTreeVisible, Mode=TwoWay}" />
+            <MenuItem
+                Header="{DynamicResource Str.FilesPane}"
+                InputGestureText="{DynamicResource Str.GestureFiles}"
+                IsCheckable="True"
+                IsChecked="{Binding IsFilesVisible, Mode=TwoWay}" />
             <MenuItem
                 Header="{DynamicResource Str.PreviewPane}"
                 InputGestureText="{DynamicResource Str.GesturePreview}"
@@ -232,7 +242,7 @@
         </MenuItem>
         <MenuItem Header="{DynamicResource Str.Tools}">
             <MenuItem
-                Command="{Binding VerifyCommand}"
+                Command="{Binding VerifyCommand}" InputGestureText="{DynamicResource Str.GestureVerify}"
                 Header="{DynamicResource Str.VerifyIntegrity}"
                 ToolTip="{DynamicResource Str.VerifyTip}" />
             <MenuItem Command="{Binding ShowProblemsCommand}" Header="{DynamicResource Str.ShowProblems}" />
@@ -245,15 +255,15 @@
                 Header="{DynamicResource Str.MsgScanCommand}"
                 ToolTip="{DynamicResource Str.MsgScanTip}" />
             <Separator />
-            <MenuItem Command="{Binding Comparison.CompareCommand}" Header="{DynamicResource Str.Compare}" />
+            <MenuItem Command="{Binding Comparison.CompareCommand}" InputGestureText="{DynamicResource Str.GestureCompare}" Header="{DynamicResource Str.Compare}" />
             <MenuItem Command="{Binding Comparison.CloseComparisonCommand}" Header="{DynamicResource Str.CompareClose}" />
             <Separator />
-            <MenuItem Command="{Binding SettingsCommand}" Header="{DynamicResource Str.Settings}" />
+            <MenuItem Command="{Binding SettingsCommand}" InputGestureText="{DynamicResource Str.GestureSettings}" Header="{DynamicResource Str.Settings}" />
         </MenuItem>
         <MenuItem Header="{DynamicResource Str.Help}">
             <MenuItem Command="{Binding AssociateCommand}" Header="{DynamicResource Str.Associate}" />
             <MenuItem Command="{Binding AssociatePatchesCommand}" Header="{DynamicResource Str.AssociatePatches}" />
-            <MenuItem Command="{Binding AboutCommand}" Header="{DynamicResource Str.About}" />
+            <MenuItem Command="{Binding AboutCommand}" InputGestureText="{DynamicResource Str.GestureAbout}" Header="{DynamicResource Str.About}" />
         </MenuItem>
     </Menu>
 </UserControl>

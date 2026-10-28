@@ -46,7 +46,8 @@ A rewrite in **.NET 10 / WPF (Fluent theme)** of *DAT Explorer II* by Mr.STALIN,
   - `.gcd` character sheets (statistics, resistances, tagged skills and traits, names translated into the 11 languages);
   - `.pro` prototypes of Arcanum (detected automatically: an Arcanum `.pro` starts with `77 00 00 00` and the integer −1, a Fallout one with an identifier whose first byte is 0 to 5): type of object, number and fields with their technical names (verified on real files for the ammunition and the characters);
   - Arcanum files: `.art` images (rotations, pictures, up to four palettes), tables for the `.mes` messages and the `.dlg` dialogs (sortable, with the detected encoding);
-  - common `.png`, `.bmp`, `.jpg`, `.gif` images and `.mp3` sounds (NLayer decoder, MIT license: no Windows codec needed);
+  - common `.png`, `.bmp`, `.jpg`, `.gif` images, `.qoi` pictures and `.ktx2` textures (8 bits per channel, raw, Zstandard or zlib; ZstdSharp.Port, MIT license) and `.mp3` sounds (NLayer decoder, MIT license: no Windows codec needed);
+  - the town maps of Arcanum: `.tma` areas (drawn as a mask), `.tmi` information (as text); the `.snd` sounds of the interface (`tig.dat`: 8 bit mono, played at 22050 Hz, a rate the file does not state);
   - `.acm` sounds (built-in decoder, mono/stereo detected from the sound because the header is wrong for speech and sound effects, with a manual choice) and `.wav`: play and pause, a bar to go anywhere in the sound, a mark on the waveform that follows the playback, a volume (for the sounds made of plain 16 bit samples) and a repeat button, both remembered.
 
     ![An .acm sound: waveform, play button and choice of the channels](_screenshots/datex3_2.jpg)

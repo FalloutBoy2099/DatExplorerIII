@@ -50,6 +50,10 @@ namespace DatExplorerIII.ViewModels.Main
 
 		public ICommand TogglePreviewCommand { get; private set; } = null!;
 
+		public ICommand ToggleTreeCommand { get; private set; } = null!;
+
+		public ICommand ToggleFilesCommand { get; private set; } = null!;
+
 		/// <summary>Asks for the search box to take the focus.</summary>
 		public ICommand FocusSearchCommand { get; private set; } = null!;
 
@@ -80,9 +84,31 @@ namespace DatExplorerIII.ViewModels.Main
 			ListSelectionChangedCommand = new RelayCommand(parameter => SetSelectedItems(((IEnumerable<Object>)parameter!).OfType<ListEntry>().ToList()), parameter => parameter is IEnumerable<Object>);
 			SortCommand = new RelayCommand(parameter => SortBy(Enum.Parse<DatSortColumn>((String)parameter!)), parameter => parameter is String name && Enum.TryParse<DatSortColumn>(name, out _));
 			TogglePreviewCommand = new RelayCommand(() => IsPreviewVisible = !IsPreviewVisible);
+			ToggleTreeCommand = new RelayCommand(() => IsTreeVisible = !IsTreeVisible);
+			ToggleFilesCommand = new RelayCommand(() => IsFilesVisible = !IsFilesVisible);
 			FocusSearchCommand = new RelayCommand(() => SearchFocusRequests++);
 			FindNextCommand = new RelayCommand(() => Find(true));
 			FindPreviousCommand = new RelayCommand(() => Find(false));
+		}
+
+		/// <summary>Selects the next (or previous) file of the current folder, the last one being followed by the first one.</summary>
+		public void StepFile(Boolean forward)
+		{
+			Int32 count = Items.Count;
+			if (count == 0)
+				return;
+
+			ListEntry? current = forward ? SelectedItems.LastOrDefault() : SelectedItems.FirstOrDefault();
+			Int32 start = current == null ? (forward ? -1 : count) : ListIndexOf(current);
+			for (Int32 step = 1; step <= count; step++)
+			{
+				Int32 index = forward ? (start + step) % count : (((start - step) % count) + count) % count;
+				if (!Items[index].IsFolder)
+				{
+					RevealRequested?.Invoke(Items[index]);
+					return;
+				}
+			}
 		}
 
 		private static IReadOnlyList<String> PathsOf(Object? parameter)

@@ -17,6 +17,7 @@
     Closing="OnClosing"
     FontSize="12"
     Icon="pack://application:,,,/Resources/app.ico"
+    PreviewMouseDown="OnPreviewMouseDown"
     StateChanged="OnStateChanged">
 
     <Window.InputBindings>
@@ -44,6 +45,75 @@
             Key="P"
             Command="{Binding TogglePreviewCommand}"
             Modifiers="Ctrl" />
+        <KeyBinding
+            Key="O"
+            Command="{Binding OpenFolderCommand}"
+            Modifiers="Ctrl+Shift" />
+        <KeyBinding
+            Key="W"
+            Command="{Binding CloseAllDatsCommand}"
+            Modifiers="Ctrl+Shift" />
+        <KeyBinding
+            Key="E"
+            Command="{Binding ExtractItemsCommand}"
+            Modifiers="Ctrl" />
+        <KeyBinding
+            Key="E"
+            Command="{Binding ExtractAllCommand}"
+            Modifiers="Ctrl+Shift" />
+        <KeyBinding
+            Key="I"
+            Command="{Binding ImportFilesCommand}"
+            Modifiers="Ctrl" />
+        <KeyBinding
+            Key="I"
+            Command="{Binding ImportFolderCommand}"
+            Modifiers="Ctrl+Shift" />
+        <KeyBinding
+            Key="N"
+            Command="{Binding NewFolderCommand}"
+            Modifiers="Ctrl+Shift" />
+        <KeyBinding
+            Key="F"
+            Command="{Binding GlobalSearchCommand}"
+            Modifiers="Ctrl+Shift" />
+        <KeyBinding
+            Key="D1"
+            Command="{Binding SetViewModeCommand}"
+            CommandParameter="Details"
+            Modifiers="Ctrl" />
+        <KeyBinding
+            Key="D2"
+            Command="{Binding SetViewModeCommand}"
+            CommandParameter="List"
+            Modifiers="Ctrl" />
+        <KeyBinding
+            Key="D3"
+            Command="{Binding SetViewModeCommand}"
+            CommandParameter="Icons"
+            Modifiers="Ctrl" />
+        <KeyBinding
+            Key="T"
+            Command="{Binding ToggleTreeCommand}"
+            Modifiers="Ctrl+Shift" />
+        <KeyBinding
+            Key="L"
+            Command="{Binding ToggleFilesCommand}"
+            Modifiers="Ctrl+Shift" />
+        <KeyBinding
+            Key="C"
+            Command="{Binding Comparison.CompareCommand}"
+            Modifiers="Ctrl+Shift" />
+        <KeyBinding
+            Key="OemComma"
+            Command="{Binding SettingsCommand}"
+            Modifiers="Ctrl" />
+        <KeyBinding
+            Key="F7"
+            Command="{Binding VerifyCommand}" />
+        <KeyBinding
+            Key="F1"
+            Command="{Binding AboutCommand}" />
         <KeyBinding Key="F3" Command="{Binding ViewItemCommand}" />
         <KeyBinding Key="F5" Command="{Binding RefreshCommand}" />
     </Window.InputBindings>

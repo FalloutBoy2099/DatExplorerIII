@@ -3,6 +3,7 @@ namespace DatExplorerIII.Views.Main
 	using System;
 	using System.ComponentModel;
 	using System.Windows;
+	using System.Windows.Input;
 	using ViewModels.Main;
 
 	/// <summary>
@@ -29,6 +30,16 @@ namespace DatExplorerIII.Views.Main
 		{
 			if (e.PropertyName == nameof(MainViewModel.IsWindowFrameVisible))
 				ApplyWindowFrame();
+		}
+
+		/// <summary>The back and forward buttons of the mouse go to the previous and to the next file of the folder.</summary>
+		private void OnPreviewMouseDown(Object sender, MouseButtonEventArgs e)
+		{
+			if (e.ChangedButton is not (MouseButton.XButton1 or MouseButton.XButton2))
+				return;
+
+			_viewModel.StepFile(e.ChangedButton == MouseButton.XButton2);
+			e.Handled = true;
 		}
 
 		private void OnClosing(Object? sender, CancelEventArgs e)

@@ -2,6 +2,7 @@ namespace DatExplorerIII.ViewModels.Main
 {
 	using System;
 	using System.Collections.Generic;
+	using System.IO;
 	using System.Linq;
 	using Core;
 	using Models.Archives;
@@ -89,7 +90,10 @@ namespace DatExplorerIII.ViewModels.Main
 			DatArchive archive = folder.Document.Archive;
 			List<ListEntry> list = folder.Children.Select(child => new ListEntry(child)).ToList();
 			Int32 folderCount = list.Count;
-			list.AddRange(archive.GetEntries(folder.Path).Select(entry => new ListEntry(entry, archive.IsFolderBacked)));
+			HashSet<String>? visible = _settings.Data.GetVisibleExtensionSet();
+			list.AddRange(archive.GetEntries(folder.Path)
+				.Where(entry => visible == null || visible.Contains(Path.GetExtension(entry.Name)))
+				.Select(entry => new ListEntry(entry, archive.IsFolderBacked)));
 			list.Sort(Compare);
 
 			Items = list;

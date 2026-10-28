@@ -213,6 +213,17 @@
                 <StackPanel
                     Margin="0,0,14,4"
                     Orientation="Horizontal"
+                    Visibility="{Binding HasAnimations, Converter={StaticResource BoolToVisibility}}">
+                    <TextBlock Style="{StaticResource ToolbarLabel}" Text="{DynamicResource Str.ViewerAnimation}" />
+                    <ComboBox
+                        MinWidth="150"
+                        ItemsSource="{Binding Animations}"
+                        SelectedIndex="{Binding SelectedAnimationIndex}" />
+                </StackPanel>
+
+                <StackPanel
+                    Margin="0,0,14,4"
+                    Orientation="Horizontal"
                     Visibility="{Binding HasDirections, Converter={StaticResource BoolToVisibility}}">
                     <TextBlock Style="{StaticResource ToolbarLabel}" Text="{DynamicResource Str.ViewerDirection}" />
                     <ComboBox

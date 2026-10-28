@@ -75,6 +75,16 @@ namespace DatExplorerIII.Services.Texts
 						lines = SplitLines(ScrText.Render(data));
 						return FileTextResult.Lines;
 
+					case FileViewerKind.Text when ArcanumFileText.Handles(Path.GetExtension(fileName)):
+						// The files of the saved games of Arcanum are compared as the text they are shown as.
+						lines = SplitLines(ArcanumFileText.Render(Path.GetExtension(fileName), data));
+						return FileTextResult.Lines;
+
+					case FileViewerKind.Text when Path.GetExtension(fileName).Equals(".ent", StringComparison.OrdinalIgnoreCase) || Path.GetExtension(fileName).Equals(".chr", StringComparison.OrdinalIgnoreCase):
+						// An entity of Fallout Tactics is compared as the text it is shown as.
+						lines = SplitLines(EntReader.ToText(EntReader.Read(data)));
+						return FileTextResult.Lines;
+
 					case FileViewerKind.Text:
 						DecodedText decoded = TextDecoder.Decode(data);
 						if (decoded.LooksBinary)
@@ -84,7 +94,9 @@ namespace DatExplorerIII.Services.Texts
 						return FileTextResult.Lines;
 
 					case FileViewerKind.Prototype:
-						lines = SheetLines(ArcanumProReader.IsArcanumPro(data) ? PrototypeViewerViewModel.Build(ArcanumProReader.Read(data)) : PrototypeViewerViewModel.Build(ProReader.Read(data)));
+						lines = SheetLines(ArcanumProReader.IsArcanumMob(data)
+							? PrototypeViewerViewModel.Build(ArcanumProReader.ReadMob(data))
+							: ArcanumProReader.IsArcanumPro(data) ? PrototypeViewerViewModel.Build(ArcanumProReader.Read(data)) : PrototypeViewerViewModel.Build(ProReader.Read(data)));
 						return FileTextResult.Lines;
 
 					case FileViewerKind.Character:

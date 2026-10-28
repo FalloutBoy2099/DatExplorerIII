@@ -5,6 +5,7 @@ namespace DatExplorerIII.Services.Texts
 	using System.IO;
 	using System.Linq;
 	using Core;
+	using Formats.GameFiles;
 	using Models.Archives;
 	using Models.Comparison;
 	using Models.GameFiles;
@@ -23,12 +24,83 @@ namespace DatExplorerIII.Services.Texts
 	public static class TextContentComparer
 	{
 		/// <summary>How the comparison of the files of two archives treats the files made of text; null when it is byte for byte.</summary>
-		public static TextEquality? CreateEquality(ComparisonOptions options)
+		public static TextEquality? CreateEquality(ComparisonOptions options, Boolean messageIdsOnly = false)
 		{
+			if (messageIdsOnly)
+			{
+				// The message files are the same when they hold the same ids; the other files are compared as the options say.
+				Boolean binary = options.Method == CompareMethod.Binary;
+				return new TextEquality(
+					name => IsMessageFile(name) || (!binary && AppliesTo(name)),
+					(left, right) => IsMessageFile(left.Name)
+						? MessageIdsEqual(left, right)
+						: !binary && AreEqual(left, right, options));
+			}
+
 			if (options.Method == CompareMethod.Binary)
 				return null;
 
 			return new TextEquality(AppliesTo, (left, right) => AreEqual(left, right, options));
+		}
+
+		/// <summary>Whether a file is a message file: .msg (Fallout) or .mes (Arcanum).</summary>
+		public static Boolean IsMessageFile(String fileName)
+		{
+			String extension = Path.GetExtension(fileName);
+			return String.Equals(extension, ".msg", StringComparison.OrdinalIgnoreCase) || String.Equals(extension, ".mes", StringComparison.OrdinalIgnoreCase);
+		}
+
+		/// <summary>The ids of the messages of a message file, in order and without repeats; null when the file cannot be read as one.</summary>
+		public static IReadOnlyList<Int32>? MessageIds(String fileName, Byte[] data)
+		{
+			if (data.Length > FileTextView.MaxBytes)
+				return null;
+
+			DecodedText decoded = TextDecoder.Decode(data);
+			if (decoded.LooksBinary)
+				return null;
+
+			SortedSet<Int32> ids = [];
+			if (String.Equals(Path.GetExtension(fileName), ".mes", StringComparison.OrdinalIgnoreCase))
+			{
+				foreach (MesEntry entry in MesReader.Parse(decoded.Text).Entries)
+				{
+					ids.Add(entry.Number);
+				}
+			}
+			else
+			{
+				// {id}{audio}{text}: the values go by three; one that is not a number cannot start a message.
+				List<String> values = BraceText.ReadValues(decoded.Text);
+				Int32 index = 0;
+				while (index < values.Count)
+				{
+					if (index + 2 < values.Count && BraceText.TryReadNumber(values[index], out Int32 number))
+					{
+						ids.Add(number);
+						index += 3;
+					}
+					else
+					{
+						index++;
+					}
+				}
+			}
+
+			return ids.ToList();
+		}
+
+		/// <summary>The ids of a message file as lines, for the display of the differences; null when it cannot be read.</summary>
+		public static IReadOnlyList<String>? MessageIdLines(String fileName, Byte[] data)
+		{
+			return MessageIds(fileName, data)?.Select(id => id.ToString(System.Globalization.CultureInfo.InvariantCulture)).ToList();
+		}
+
+		private static Boolean MessageIdsEqual(ComparedFile left, ComparedFile right)
+		{
+			IReadOnlyList<Int32>? leftIds = MessageIds(left.Name, left.Data);
+			IReadOnlyList<Int32>? rightIds = MessageIds(right.Name, right.Data);
+			return leftIds != null && rightIds != null && leftIds.SequenceEqual(rightIds);
 		}
 
 		/// <summary>
@@ -44,7 +116,7 @@ namespace DatExplorerIII.Services.Texts
 		public static Boolean IsScript(String fileName)
 		{
 			String extension = Path.GetExtension(fileName);
-			return String.Equals(extension, ".int", StringComparison.OrdinalIgnoreCase) || String.Equals(extension, ".scr", StringComparison.OrdinalIgnoreCase);
+			return String.Equals(extension, ".int", StringComparison.OrdinalIgnoreCase) || String.Equals(extension, ".scr", StringComparison.OrdinalIgnoreCase) || String.Equals(extension, ".ent", StringComparison.OrdinalIgnoreCase) || String.Equals(extension, ".chr", StringComparison.OrdinalIgnoreCase) || ArcanumFileText.Handles(extension);
 		}
 
 		/// <summary>

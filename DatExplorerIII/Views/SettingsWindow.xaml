@@ -221,6 +221,54 @@
                         Style="{StaticResource OptionBox}" />
                 </StackPanel>
             </TabItem>
+            <TabItem x:Name="ExtensionsTab" Header="{DynamicResource Str.SettingsTabExtensions}">
+                <StackPanel Margin="14,14,14,10">
+                    <CheckBox
+                        x:Name="ShowAllExtensionsBox"
+                        Content="{DynamicResource Str.SettingsShowAllExtensions}"
+                        IsChecked="{Binding ShowAllExtensions}"
+                        Style="{StaticResource OptionBox}" />
+                    <CheckBox
+                        x:Name="UnknownAsTextBox"
+                        Content="{DynamicResource Str.SettingsUnknownAsText}"
+                        IsChecked="{Binding UnknownExtensionsAsText}"
+                        Style="{StaticResource OptionBox}" />
+                    <Separator Margin="0,6" />
+                    <TextBlock Style="{StaticResource GroupTitle}" Text="{DynamicResource Str.SettingsVisibleExtensions}" />
+                    <StackPanel IsEnabled="{Binding ExtensionsEditable}">
+                        <StackPanel Margin="0,0,0,6" Orientation="Horizontal">
+                            <Button
+                                x:Name="SelectAllExtensionsButton"
+                                MinWidth="88"
+                                Click="OnSelectAllExtensions"
+                                Content="{DynamicResource Str.SettingsSelectAll}" />
+                            <Button
+                                x:Name="SelectNoExtensionsButton"
+                                MinWidth="88"
+                                Margin="8,0,0,0"
+                                Click="OnSelectNoExtensions"
+                                Content="{DynamicResource Str.SettingsSelectNone}" />
+                        </StackPanel>
+                        <ScrollViewer MaxHeight="230" VerticalScrollBarVisibility="Auto">
+                            <ItemsControl x:Name="ExtensionsList" ItemsSource="{Binding Extensions}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <UniformGrid Columns="4" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <CheckBox
+                                            Content="{Binding Extension}"
+                                            IsChecked="{Binding IsVisible}"
+                                            Style="{StaticResource OptionBox}" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </StackPanel>
+                </StackPanel>
+            </TabItem>
             <TabItem x:Name="MessagesTab" Header="{DynamicResource Str.SettingsTabMsg}">
                 <StackPanel Margin="14,14,14,10">
                     <CheckBox

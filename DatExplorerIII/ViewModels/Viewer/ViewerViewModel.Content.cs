@@ -11,12 +11,12 @@ namespace DatExplorerIII.ViewModels.Viewer
 	using Formats.GameFiles;
 	using Formats.Movies;
 	using Formats.Prototypes;
+	using Services.Texts;
 	using Models.Archives;
 	using Models.Audio;
 	using Models.GameFiles;
 	using Models.Interface;
 	using Services.Checks;
-	using Services.Texts;
 	using Scripts;
 
 	/// <summary>The content of a file: what is made of each kind of file to show it.</summary>
@@ -40,6 +40,18 @@ namespace DatExplorerIII.ViewModels.Viewer
 					if (Path.GetExtension(entry.Name).Equals(".scr", StringComparison.OrdinalIgnoreCase))
 					{
 						ShowScr(archive, data);
+						break;
+					}
+
+					if (ArcanumFileText.Handles(Path.GetExtension(entry.Name)))
+					{
+						ShowArcanumFile(archive, entry, data);
+						break;
+					}
+
+					if (Path.GetExtension(entry.Name).Equals(".ent", StringComparison.OrdinalIgnoreCase) || Path.GetExtension(entry.Name).Equals(".chr", StringComparison.OrdinalIgnoreCase))
+					{
+						ShowEnt(data);
 						break;
 					}
 
@@ -92,7 +104,11 @@ namespace DatExplorerIII.ViewModels.Viewer
 					break;
 
 				case FileViewerKind.Prototype:
-					if (ArcanumProReader.IsArcanumPro(data))
+					if (ArcanumProReader.IsArcanumMob(data))
+					{
+						Prototype.Show(ArcanumProReader.ReadMob(data));
+					}
+					else if (ArcanumProReader.IsArcanumPro(data))
 					{
 						Prototype.Show(ArcanumProReader.Read(data));
 					}

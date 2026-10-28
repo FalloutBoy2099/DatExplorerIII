@@ -161,6 +161,23 @@ namespace DatExplorerIII.ViewModels
 			}
 		}
 
+		/// <summary>Comparison: the message files are compared by their ids only; the comparison that is shown is made again when it changes.</summary>
+		public Boolean IsCompareLanguage
+		{
+			get => _settings.Data.CompareLanguageIds;
+			set
+			{
+				if (_settings.Data.CompareLanguageIds != value)
+				{
+					_settings.Data.CompareLanguageIds = value;
+					_settings.Save();
+					OnPropertyChanged();
+					if (IsComparing && !_host.Busy.IsBusy)
+						_ = CompareAgainAsync();
+				}
+			}
+		}
+
 		private void CreateCommands()
 		{
 			CompareCommand = new AsyncRelayCommand(CompareAsync, _host.CanBrowse);
@@ -236,7 +253,8 @@ namespace DatExplorerIII.ViewModels
 		{
 			IReadOnlyList<DatCompareItem>? items = null;
 			ComparisonOptions options = _settings.Data.ComparisonOptions;
-			TextEquality? text = TextContentComparer.CreateEquality(options);
+			Boolean languageIds = _settings.Data.CompareLanguageIds;
+			TextEquality? text = TextContentComparer.CreateEquality(options, languageIds);
 			Boolean done = await _host.RunBusyAsync(Loc.Get("Str.Comparing"), true, async (progress, token) =>
 			{
 				items = await Task.Run(() => DatComparer.Compare(left.Archive, right.Archive, progress, token, text), token);
@@ -246,10 +264,14 @@ namespace DatExplorerIII.ViewModels
 				return;
 
 			_comparison?.Dispose();
-			ComparisonViewModel comparison = new(left, right, items, _host.OpenArchives, _uiThread, options);
+			ComparisonViewModel comparison = new(left, right, items, _host.OpenArchives, _uiThread, options) { MessageIdsOnly = languageIds };
 			comparison.PropertyChanged += (_, args) =>
 			{
-				if (args.PropertyName == nameof(ComparisonViewModel.ShowDifferences))
+				if (args.PropertyName == nameof(ComparisonViewModel.SummaryText) && ReferenceEquals(_comparison, comparison))
+				{
+					_host.StatusText = comparison.SummaryText;
+				}
+				else if (args.PropertyName == nameof(ComparisonViewModel.ShowDifferences))
 				{
 					_settings.Data.CompareShowDifferences = comparison.ShowDifferences;
 					_settings.Save();
@@ -269,6 +291,7 @@ namespace DatExplorerIII.ViewModels
 			Current = null;
 			comparison?.Dispose();
 			_host.RefreshItems();
+			_host.StatusText = Loc.Get("Str.Ready");
 		}
 
 		/// <summary>
@@ -414,6 +437,8 @@ namespace DatExplorerIII.ViewModels
 		{
 			if (_comparison != null)
 			{
+				_comparison.LeftViewer.OpenUnknownAsText = _settings.Data.UnknownExtensionsAsText;
+				_comparison.RightViewer.OpenUnknownAsText = _settings.Data.UnknownExtensionsAsText;
 				_comparison.LeftViewer.ShowSubtitles = _settings.Data.ShowSubtitles;
 				_comparison.RightViewer.ShowSubtitles = _settings.Data.ShowSubtitles;
 			}

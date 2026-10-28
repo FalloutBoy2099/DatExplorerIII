@@ -45,11 +45,20 @@ namespace DatExplorerIII.Tests
 		}
 
 		[Fact]
+		public void TheTreeAndTheFiles_AreShownByDefault()
+		{
+			SettingsData data = new();
+			Assert.True(data.TreeVisible);
+			Assert.True(data.FilesVisible);
+			Assert.True(data.PreviewPaneVisible);
+		}
+
+		[Fact]
 		public void TheViewMenu_IsInTheOrderAsked()
 		{
 			Assert.Equal(
 				[
-					"ViewDetails", "ViewList", "ViewIcons", "-", "PreviewPane", "-", "DoubleClickOpens", "WheelZoom", "-",
+					"ViewDetails", "ViewList", "ViewIcons", "-", "TreePane", "FilesPane", "PreviewPane", "-", "DoubleClickOpens", "WheelZoom", "-",
 					"CompareLayout", "-", "Up", "Refresh",
 				],
 				Lines("Str.View"));

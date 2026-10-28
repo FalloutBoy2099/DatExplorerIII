@@ -15,6 +15,8 @@ namespace DatExplorerIII.ViewModels
 	/// </summary>
 	public sealed class DiffViewModel : ObservableObject
 	{
+		private IReadOnlyList<DiffRow> _all = [];
+		private Boolean _onlyDifferences;
 		private List<DiffRow> _list = [];
 		private IReadOnlyList<DiffRow> _rows = [];
 		private IReadOnlyList<Int32> _starts = [];
@@ -44,6 +46,17 @@ namespace DatExplorerIII.ViewModels
 			{
 				if (SetProperty(ref _rows, value))
 					OnPropertyChanged(nameof(HasRows));
+			}
+		}
+
+		/// <summary>Whether only the lines that differ are shown, not the ones that are the same.</summary>
+		public Boolean OnlyDifferences
+		{
+			get => _onlyDifferences;
+			set
+			{
+				if (SetProperty(ref _onlyDifferences, value) && _messageKey.Length == 0 && _all.Count > 0)
+					Apply();
 			}
 		}
 
@@ -90,6 +103,7 @@ namespace DatExplorerIII.ViewModels
 		{
 			_messageKey = key;
 			_starts = [];
+			_all = [];
 			_list = [];
 			Rows = _list;
 			SelectedRow = null;
@@ -108,8 +122,16 @@ namespace DatExplorerIII.ViewModels
 			_exact = exact;
 			_notes = notes ?? [];
 			_messageKey = String.Empty;
-			_starts = TextDiff.GroupStarts(rows);
-			_list = rows as List<DiffRow> ?? rows.ToList();
+			_all = rows;
+			Apply();
+		}
+
+		/// <summary>Sets the lines that are shown: all of them, or only the ones that differ.</summary>
+		private void Apply()
+		{
+			IReadOnlyList<DiffRow> shown = _onlyDifferences ? _all.Where(row => row.Kind != DiffKind.Same).ToList() : _all;
+			_starts = TextDiff.GroupStarts(shown);
+			_list = shown as List<DiffRow> ?? shown.ToList();
 			Message = String.Empty;
 			Rows = _list;
 			DifferenceCount = _starts.Count;

@@ -19,7 +19,7 @@ namespace DatExplorerIII.Views
 
 			// A tab control is as tall as the tab that is shown: all the tabs get the height of the tallest, so that the window does not
 			// change its size (and push its buttons out of the screen) when the tab changes.
-			FrameworkElement[] pages = [(FrameworkElement)GeneralTab.Content, (FrameworkElement)CompareTab.Content, (FrameworkElement)MessagesTab.Content];
+			FrameworkElement[] pages = [(FrameworkElement)GeneralTab.Content, (FrameworkElement)CompareTab.Content, (FrameworkElement)ExtensionsTab.Content, (FrameworkElement)MessagesTab.Content];
 			foreach (FrameworkElement page in pages)
 			{
 				page.Measure(new Size(Width - 80, Double.PositiveInfinity));
@@ -38,6 +38,16 @@ namespace DatExplorerIII.Views
 				if (Top + ActualHeight > area.Bottom)
 					Top = Math.Max(area.Top, area.Bottom - ActualHeight);
 			};
+		}
+
+		private void OnSelectAllExtensions(Object sender, RoutedEventArgs e)
+		{
+			((SettingsDialogViewModel)DataContext).SetAllExtensions(true);
+		}
+
+		private void OnSelectNoExtensions(Object sender, RoutedEventArgs e)
+		{
+			((SettingsDialogViewModel)DataContext).SetAllExtensions(false);
 		}
 
 		private void OnOk(Object sender, RoutedEventArgs e)

@@ -33,6 +33,26 @@ namespace DatExplorerIII.ViewModels
 		}
 	}
 
+	/// <summary>An extension of file that the list of the files can show, with its box.</summary>
+	public sealed class ExtensionOption : ObservableObject
+	{
+		private Boolean _isVisible;
+
+		public ExtensionOption(String extension, Boolean isVisible)
+		{
+			Extension = extension;
+			_isVisible = isVisible;
+		}
+
+		public String Extension { get; }
+
+		public Boolean IsVisible
+		{
+			get => _isVisible;
+			set => SetProperty(ref _isVisible, value);
+		}
+	}
+
 	/// <summary>The kinds of problems of a severity.</summary>
 	public sealed record MsgCheckGroup(String Title, IReadOnlyList<MsgCheckOption> Items);
 
@@ -43,6 +63,7 @@ namespace DatExplorerIII.ViewModels
 	public sealed class SettingsDialogViewModel : ObservableObject
 	{
 		private Boolean _isTextMethod;
+		private Boolean _showAllExtensions;
 
 		public SettingsDialogViewModel(SettingsData data)
 		{
@@ -62,6 +83,10 @@ namespace DatExplorerIII.ViewModels
 					group.Select(kind => new MsgCheckOption(kind, Loc.Get("Str.MsgCheck" + kind), !data.DisabledMessageChecks.Contains(kind))).ToList()))
 				.ToList();
 			ShowSubtitles = data.ShowSubtitles;
+			UnknownExtensionsAsText = data.UnknownExtensionsAsText;
+			_showAllExtensions = data.ShowAllExtensions;
+			HashSet<String> visible = new(data.VisibleExtensions ?? FileViewers.AllExtensions.ToList(), StringComparer.OrdinalIgnoreCase);
+			Extensions = FileViewers.AllExtensions.Select(extension => new ExtensionOption(extension, visible.Contains(extension))).ToList();
 			ScrollBarWidth = data.ScrollBarWidth;
 			ScrollBarMinimumThumb = data.ScrollBarMinimumThumb;
 
@@ -104,6 +129,41 @@ namespace DatExplorerIII.ViewModels
 		}
 
 		public Boolean ShowSubtitles { get; set; }
+
+		/// <summary>The files of an extension that is not known are shown as a text.</summary>
+		public Boolean UnknownExtensionsAsText { get; set; }
+
+		/// <summary>The list of the files shows every file, whatever its extension.</summary>
+		public Boolean ShowAllExtensions
+		{
+			get => _showAllExtensions;
+			set
+			{
+				if (SetProperty(ref _showAllExtensions, value))
+					OnPropertyChanged(nameof(ExtensionsEditable));
+			}
+		}
+
+		/// <summary>Whether the boxes of the extensions mean anything (they do not while every file is shown).</summary>
+		public Boolean ExtensionsEditable => !_showAllExtensions;
+
+		/// <summary>The extensions that the program knows, each with its box.</summary>
+		public IReadOnlyList<ExtensionOption> Extensions { get; }
+
+		/// <summary>The extensions that the list shows when it does not show all of them.</summary>
+		public List<String> VisibleExtensionList()
+		{
+			return Extensions.Where(option => option.IsVisible).Select(option => option.Extension).ToList();
+		}
+
+		/// <summary>Checks or unchecks the box of every extension.</summary>
+		public void SetAllExtensions(Boolean isVisible)
+		{
+			foreach (ExtensionOption option in Extensions)
+			{
+				option.IsVisible = isVisible;
+			}
+		}
 
 		/// <summary>The width of the scroll bars (a slider of the window gives a number with a fraction).</summary>
 		public Double ScrollBarWidth { get; set; }

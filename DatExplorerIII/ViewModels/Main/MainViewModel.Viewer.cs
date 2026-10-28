@@ -13,7 +13,35 @@ namespace DatExplorerIII.ViewModels.Main
 	public sealed partial class MainViewModel
 	{
 		/// <summary>The selected file when it is a file the viewer can show.</summary>
-		private DatEntry? SelectedViewableEntry => SelectedItems is [{ Entry: { } entry }] && FileViewers.IsViewable(entry.Name) ? entry : null;
+		private DatEntry? SelectedViewableEntry => SelectedItems is [{ Entry: { } entry }] && FileViewers.IsViewable(entry.Name, _settings.Data.UnknownExtensionsAsText) ? entry : null;
+
+		/// <summary>Whether the block of the folders (the tree) is shown.</summary>
+		public Boolean IsTreeVisible
+		{
+			get => _settings.Data.TreeVisible;
+			set
+			{
+				if (_settings.Data.TreeVisible != value)
+				{
+					_settings.Data.TreeVisible = value;
+					OnPropertyChanged();
+				}
+			}
+		}
+
+		/// <summary>Whether the block of the files of the selected folder is shown.</summary>
+		public Boolean IsFilesVisible
+		{
+			get => _settings.Data.FilesVisible;
+			set
+			{
+				if (_settings.Data.FilesVisible != value)
+				{
+					_settings.Data.FilesVisible = value;
+					OnPropertyChanged();
+				}
+			}
+		}
 
 		/// <summary>Whether the preview pane next to the list is shown.</summary>
 		public Boolean IsPreviewVisible

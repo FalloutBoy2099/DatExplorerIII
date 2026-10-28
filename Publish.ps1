@@ -40,8 +40,9 @@ New-Item -ItemType Directory -Path $output | Out-Null
 
 # One publish for each executable: its name in the "publish" folder, and whether it contains the .NET runtime.
 $builds = @(
-	@{ Name = 'DatExplorerIII.exe'; SelfContained = $false },
-	@{ Name = 'DatExplorerIII-NET.exe'; SelfContained = $true }
+	@{ Name = 'DatExplorerIII.exe'; SelfContained = $false }
+#,
+#	@{ Name = 'DatExplorerIII-NET.exe'; SelfContained = $true }
 )
 
 try {

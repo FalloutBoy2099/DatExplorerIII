@@ -27,16 +27,16 @@ namespace DatExplorerIII.Tests
 		public void EveryKeyBinding_NamesACommandOfTheViewModel()
 		{
 			String xaml = ReadMainWindowXaml();
-			List<String> names = Regex.Matches(xaml, "<KeyBinding[\\s][^>]*Command=\"\\{Binding (\\w+)")
+			List<String> names = Regex.Matches(xaml, "<KeyBinding[\\s][^>]*Command=\"\\{Binding ([\\w.]+)")
 				.Select(match => match.Groups[1].Value)
 				.ToList();
 
 			// Window, search box, tree and list: the shortcuts of the program.
-			Assert.True(names.Count == 16, "Found only " + names.Count + " key bindings.");
+			Assert.True(names.Count == 33, "Found only " + names.Count + " key bindings.");
 			foreach (String name in names)
 			{
 				Assert.True(
-					typeof(MainViewModel).GetProperty(name)?.PropertyType == typeof(ICommand),
+					Resolve(name) == typeof(ICommand),
 					name + " is not a command of MainViewModel.");
 			}
 		}

@@ -108,6 +108,9 @@ namespace DatExplorerIII.ViewModels.Viewer
 			private set => SetProperty(ref _isLoading, value);
 		}
 
+		/// <summary>Whether a file of an extension that is not known is shown as a text (otherwise the viewer says it cannot show it).</summary>
+		public Boolean OpenUnknownAsText { get; set; } = true;
+
 		/// <summary>Whether the subtitles of a movie (its .sve file) are shown over it.</summary>
 		public Boolean ShowSubtitles
 		{
@@ -156,7 +159,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 			Title = entry.Name;
 			Stop();
 
-			if (!FileViewers.TryGetKind(entry.Name, out FileViewerKind kind))
+			if (!FileViewers.TryGetKind(entry.Name, OpenUnknownAsText, out FileViewerKind kind))
 			{
 				Show(null, Loc.Get("Str.ViewerNotViewable"));
 				return;

@@ -19,13 +19,14 @@
 		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
 		<AnalysisLevel>latest</AnalysisLevel>
 		<NoWarn>$(NoWarn);WPF0001</NoWarn>
-		<AssemblyVersion>2026.10.16.10</AssemblyVersion>
-		<FileVersion>2026.10.16.10</FileVersion>
+		<AssemblyVersion>2026.10.28.14</AssemblyVersion>
+		<FileVersion>2026.10.28.14</FileVersion>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="AvalonEdit" Version="6.3.1.120" />
 		<PackageReference Include="NLayer" Version="3.0.0" />
+		<PackageReference Include="ZstdSharp.Port" Version="0.8.8" />
 	</ItemGroup>
 
 	<ItemGroup>

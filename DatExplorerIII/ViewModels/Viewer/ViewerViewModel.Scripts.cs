@@ -7,10 +7,12 @@ namespace DatExplorerIII.ViewModels.Viewer
 	using System.Threading;
 	using System.Threading.Tasks;
 	using Core;
+	using Formats.GameFiles;
 	using Models.Archives;
 	using Models.Interface;
 	using Services.ArcanumScripts;
 	using Services.Interface;
+	using Services.Texts;
 	using Scripts;
 
 	/// <summary>The scripts: a compiled script of Fallout (.int) is shown as the source it decompiles to, one of Arcanum (.scr) as a text.</summary>
@@ -37,6 +39,45 @@ namespace DatExplorerIII.ViewModels.Viewer
 				Show(FileViewerKind.Text, String.Empty);
 			}
 			catch (ScriptFormatException exception) when (!token.IsCancellationRequested)
+			{
+				Show(null, Loc.Format("Str.ViewerScriptError", exception.Message));
+			}
+		}
+
+		/// <summary>
+		/// Shows a file of Arcanum made of a few fields as text: a jump point list (.jmp), the index (.tfai) and the data (.tfaf) of a saved
+		/// game, the information of a saved game (.gsi), the fog of a town map (.tmf). The data of a saved game is listed with the help
+		/// of the index that has its name, when the archive has it.
+		/// </summary>
+		private void ShowArcanumFile(DatArchive archive, DatEntry entry, Byte[] data)
+		{
+			String extension = Path.GetExtension(entry.Name);
+			try
+			{
+				Byte[]? index = null;
+				if (extension.Equals(".tfaf", StringComparison.OrdinalIgnoreCase) && archive.Find(Path.Combine(entry.Directory, Path.GetFileNameWithoutExtension(entry.Name) + ".tfai")) is { IsDamaged: false } indexEntry)
+					index = archive.ReadData(indexEntry);
+
+				Byte[] text = System.Text.Encoding.UTF8.GetBytes(ArcanumFileText.Render(extension, data, index));
+				Text.Show(text, text.Length, ".txt", null);
+				Show(FileViewerKind.Text, String.Empty);
+			}
+			catch (InvalidDataException exception)
+			{
+				Show(null, Loc.Format("Str.ViewerScriptError", exception.Message));
+			}
+		}
+
+		/// <summary>Shows an entity of Fallout Tactics (.ent) as text: its class and its properties.</summary>
+		private void ShowEnt(Byte[] data)
+		{
+			try
+			{
+				Byte[] text = System.Text.Encoding.UTF8.GetBytes(EntReader.ToText(EntReader.Read(data)));
+				Text.Show(text, text.Length, ".txt", Loc.Get("Str.ViewerEnt"));
+				Show(FileViewerKind.Text, String.Empty);
+			}
+			catch (InvalidDataException exception)
 			{
 				Show(null, Loc.Format("Str.ViewerScriptError", exception.Message));
 			}

@@ -48,16 +48,51 @@ namespace DatExplorerIII.Formats.Prototypes
 			if (!IsArcanumPro(data))
 				throw new InvalidDataException("This is not a prototype of Arcanum.");
 
+			return ReadObject(data, false);
+		}
+
+		/// <summary>
+		/// True when the data is an object of a map (.mob): the version of the format, the identifier of its prototype (a type of 1), the
+		/// identifier of the object (a type of 2), then the kind of object.
+		/// </summary>
+		public static Boolean IsArcanumMob(ReadOnlySpan<Byte> data)
+		{
+			return data.Length >= 4 + IdentifierSize + IdentifierSize + 4
+				&& (data[0] == 0x77 || data[0] == 0x08)
+				&& data[1] == 0 && data[2] == 0 && data[3] == 0
+				&& BinaryPrimitives.ReadInt16LittleEndian(data[4..]) == 1
+				&& BinaryPrimitives.ReadInt16LittleEndian(data[(4 + IdentifierSize)..]) == 2;
+		}
+
+		/// <summary>
+		/// Reads an object of a map. It has the header of a prototype, but only the fields whose bit is set in the bitmap are stored.
+		/// </summary>
+		/// <exception cref="InvalidDataException">The data is not an object of Arcanum.</exception>
+		public static ArcanumProto ReadMob(Byte[] data)
+		{
+			if (!IsArcanumMob(data))
+				throw new InvalidDataException("This is not an object of Arcanum.");
+
+			return ReadObject(data, true);
+		}
+
+		/// <param name="bitmapOnly">True for an object of a map (the fields of the bitmap), false for a prototype (every field of its kind).</param>
+		private static ArcanumProto ReadObject(Byte[] data, Boolean bitmapOnly)
+		{
 			Int32 version = BinaryPrimitives.ReadInt32LittleEndian(data);
 
-			// The first number of the union that follows the 8 first bytes of the identifier of the object.
-			Int32 number = BinaryPrimitives.ReadInt32LittleEndian(data.AsSpan(4 + IdentifierSize + 8));
+			// The first number of the union that follows the 8 first bytes of an identifier: that of the object for a prototype
+			// (its own number), that of the prototype for an object of a map.
+			Int32 number = BinaryPrimitives.ReadInt32LittleEndian(data.AsSpan(4 + (bitmapOnly ? 0 : IdentifierSize) + 8));
 			UInt32 rawType = BinaryPrimitives.ReadUInt32LittleEndian(data.AsSpan(4 + IdentifierSize + IdentifierSize));
 			if (rawType > (UInt32)ArcanumObjectType.Trap)
 				throw new InvalidDataException("The kind of object is unknown.");
 
 			ArcanumObjectType type = (ArcanumObjectType)rawType;
 			Int32 position = 4 + IdentifierSize + IdentifierSize + 4;
+			// An object of a map has a 16 bit count (of the items of its collections) before the bitmap.
+			if (bitmapOnly)
+				position += 2;
 			Int32 bitmapSize = ArcanumFields.BitmapSize(type);
 			if (position + bitmapSize > data.Length)
 				throw new InvalidDataException("The file is shorter than its header.");
@@ -73,6 +108,9 @@ namespace DatExplorerIII.Formats.Prototypes
 			// and the ones all objects have) hold nothing.
 			for (Int32 bit = 0; bit < bitmapSize * 8 && note == null; bit++)
 			{
+				if (bitmapOnly && (bitmap[bit / 8] & (1 << (bit % 8))) == 0)
+					continue;
+
 				if (!ArcanumFields.TryGetWireType(type, bit, out ArcanumWireType wire))
 				{
 					if ((bitmap[bit / 8] & (1 << (bit % 8))) != 0)

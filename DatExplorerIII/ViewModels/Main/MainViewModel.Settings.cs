@@ -57,7 +57,7 @@ namespace DatExplorerIII.ViewModels.Main
 		/// <summary>A viewer for a file, set as the user wants (the other archives, the subtitles of the movies).</summary>
 		private ViewerViewModel CreateViewer()
 		{
-			ViewerViewModel viewer = new(_uiThread) { OtherArchives = OpenArchives, ShowSubtitles = _settings.Data.ShowSubtitles, DisabledMessageChecks = _settings.Data.DisabledMessageChecks, ProblemsRequested = ShowMessageReport };
+			ViewerViewModel viewer = new(_uiThread) { OtherArchives = OpenArchives, ShowSubtitles = _settings.Data.ShowSubtitles, OpenUnknownAsText = _settings.Data.UnknownExtensionsAsText, DisabledMessageChecks = _settings.Data.DisabledMessageChecks, ProblemsRequested = ShowMessageReport };
 
 			// The search of a text asks what to find through the dialogs of the program.
 			viewer.Text.Ask = (title, label, initial, validate) => _dialogs.Prompt(title, label, initial, validate);
@@ -103,6 +103,7 @@ namespace DatExplorerIII.ViewModels.Main
 		private void ApplySubtitlesOption()
 		{
 			Preview.ShowSubtitles = _settings.Data.ShowSubtitles;
+			Preview.OpenUnknownAsText = _settings.Data.UnknownExtensionsAsText;
 			Comparison.ApplySubtitles();
 		}
 
@@ -136,6 +137,14 @@ namespace DatExplorerIII.ViewModels.Main
 			_settings.Data.DoubleClickMessageProblems = model.DoubleClickMessageProblems;
 			_settings.Data.CompareSyncScroll = model.CompareSyncScroll;
 			_settings.Data.ShowSubtitles = model.ShowSubtitles;
+			_settings.Data.UnknownExtensionsAsText = model.UnknownExtensionsAsText;
+
+			// The list is made again only when the extensions that it shows are not the same (it keeps its entries otherwise).
+			HashSet<String>? shownBefore = _settings.Data.GetVisibleExtensionSet();
+			_settings.Data.ShowAllExtensions = model.ShowAllExtensions;
+			_settings.Data.VisibleExtensions = model.VisibleExtensionList();
+			HashSet<String>? shownNow = _settings.Data.GetVisibleExtensionSet();
+			Boolean extensionsChanged = shownBefore == null ? shownNow != null : shownNow == null || !shownBefore.SetEquals(shownNow);
 			_settings.Data.ScrollBarWidth = ScrollBarMetrics.Clamp((Int32)Math.Round(model.ScrollBarWidth), ScrollBarMetrics.MinimumWidth, ScrollBarMetrics.MaximumWidth);
 			_settings.Data.ScrollBarMinimumThumb = ScrollBarMetrics.Clamp((Int32)Math.Round(model.ScrollBarMinimumThumb), ScrollBarMetrics.MinimumThumbLength, ScrollBarMetrics.MaximumThumbLength);
 			_scrollBars.Update(_settings.Data.ScrollBarWidth, _settings.Data.ScrollBarMinimumThumb);
@@ -154,6 +163,9 @@ namespace DatExplorerIII.ViewModels.Main
 			OnPropertyChanged(nameof(IsCompareSyncScroll));
 			OnPropertyChanged(nameof(IsShowSubtitles));
 			OnPropertyChanged(nameof(ComparisonOptions));
+
+			if (extensionsChanged)
+				RefreshItems();
 
 			if (optionsChanged && Comparison.IsComparing)
 				await Comparison.CompareAgainAsync();

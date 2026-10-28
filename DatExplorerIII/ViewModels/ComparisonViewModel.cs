@@ -205,6 +205,9 @@ namespace DatExplorerIII.ViewModels
 		/// <summary>What the comparison ignored: the differences are shown the same way.</summary>
 		public ComparisonOptions Options { get; }
 
+		/// <summary>The message files (.msg, .mes) were compared by their ids only: the differences shown are the ids added or missing.</summary>
+		public Boolean MessageIdsOnly { get; init; }
+
 		/// <summary>The differences of the selected file, when the option to show them is on.</summary>
 		public DiffViewModel Diff { get; }
 
@@ -567,7 +570,8 @@ namespace DatExplorerIII.ViewModels
 
 			// What is ignored only applies to the files made of text (the others are shown field by field).
 			Boolean isText = TextContentComparer.IsText(name);
-			Boolean usesOptions = TextContentComparer.AppliesTo(name);
+			Boolean idsOnly = MessageIdsOnly && TextContentComparer.IsMessageFile(name);
+			Boolean usesOptions = TextContentComparer.AppliesTo(name) && !idsOnly;
 			ComparisonOptions options = Options.Effective;
 
 			(FileTextResult Result, IReadOnlyList<DiffRow> Rows, Boolean Exact, IReadOnlyList<DiffNote> Notes) outcome;
@@ -578,14 +582,31 @@ namespace DatExplorerIII.ViewModels
 					{
 						Byte[] leftData = Left.Archive.ReadData(left);
 						Byte[] rightData = Right.Archive.ReadData(right);
-						FileTextResult leftResult = FileTextView.TryGetLines(name, leftData, ResourcesFor(Left.Archive, others), GameOf(Left.Archive), out IReadOnlyList<String> leftLines);
-						FileTextResult rightResult = FileTextView.TryGetLines(name, rightData, ResourcesFor(Right.Archive, others), GameOf(Right.Archive), out IReadOnlyList<String> rightLines);
+						FileTextResult leftResult;
+						FileTextResult rightResult;
+						IReadOnlyList<String> leftLines;
+						IReadOnlyList<String> rightLines;
+						if (idsOnly)
+						{
+							// Only the ids count: one line per id.
+							IReadOnlyList<String>? leftIds = TextContentComparer.MessageIdLines(name, leftData);
+							IReadOnlyList<String>? rightIds = TextContentComparer.MessageIdLines(name, rightData);
+							leftLines = leftIds ?? [];
+							rightLines = rightIds ?? [];
+							leftResult = leftIds != null ? FileTextResult.Lines : FileTextResult.NotText;
+							rightResult = rightIds != null ? FileTextResult.Lines : FileTextResult.NotText;
+						}
+						else
+						{
+							leftResult = FileTextView.TryGetLines(name, leftData, ResourcesFor(Left.Archive, others), GameOf(Left.Archive), out leftLines);
+							rightResult = FileTextView.TryGetLines(name, rightData, ResourcesFor(Right.Archive, others), GameOf(Right.Archive), out rightLines);
+						}
 
 						if (leftResult != FileTextResult.Lines || rightResult != FileTextResult.Lines)
 							return (leftResult != FileTextResult.Lines ? leftResult : rightResult, (IReadOnlyList<DiffRow>)[], true, (IReadOnlyList<DiffNote>)[]);
 
 						IReadOnlyList<DiffRow> rows = TextDiff.Compare(leftLines, rightLines, usesOptions ? options : null, out Boolean exact);
-						return (FileTextResult.Lines, rows, exact, isText ? TextContentComparer.Notes(leftData, rightData, options) : []);
+						return (FileTextResult.Lines, rows, exact, isText && !idsOnly ? TextContentComparer.Notes(leftData, rightData, options) : []);
 					},
 					cancellation.Token);
 			}
