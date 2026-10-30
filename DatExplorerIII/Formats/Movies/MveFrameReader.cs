@@ -1,4 +1,4 @@
-namespace DatExplorerIII.Formats.Movies
+﻿namespace DatExplorerIII.Formats.Movies
 {
 	using System;
 	using System.Buffers.Binary;
@@ -117,6 +117,13 @@ namespace DatExplorerIII.Formats.Movies
 					case 0x11:
 						_videoOffset = segment.Offset;
 						_videoLength = segment.Length;
+						break;
+
+					case 0x01 when _videoOffset >= 0:
+						// The end of a chunk that had a picture but no order to show it: the picture is drawn, and the next one is drawn
+						// over it (the HD movies build a picture in several steps, each one changing some blocks).
+						DecodePicture();
+						_videoOffset = -1;
 						break;
 
 					case 0x07:
@@ -292,7 +299,8 @@ namespace DatExplorerIII.Formats.Movies
 					break;
 
 				case 0x1:
-					CopyBlock(_secondLast, bx, by, 0, 0);
+					// The block of two pictures ago, which the picture being drawn holds already (it is drawn over that one). A picture
+					// that is not shown is drawn over by the next one, so this keeps what the pictures before it drew.
 					break;
 
 				case 0x2:

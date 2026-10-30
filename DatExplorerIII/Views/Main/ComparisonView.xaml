@@ -453,6 +453,20 @@
                                 ToolTip="{DynamicResource Str.CompareDiffOnly}">
                                 <TextBlock Style="{StaticResource ToolIcon}" Text="&#xE71C;" />
                             </ToggleButton>
+                            <ToggleButton
+                                AutomationProperties.Name="{DynamicResource Str.CompareDiffSyncVertical}"
+                                IsChecked="{Binding Comparison.Current.Diff.SyncVertical}"
+                                Style="{StaticResource IconToggle}"
+                                ToolTip="{DynamicResource Str.CompareDiffSyncVertical}">
+                                <TextBlock Style="{StaticResource ToolIcon}" Text="&#xE8CB;" />
+                            </ToggleButton>
+                            <ToggleButton
+                                AutomationProperties.Name="{DynamicResource Str.CompareDiffSyncHorizontal}"
+                                IsChecked="{Binding Comparison.Current.Diff.SyncHorizontal}"
+                                Style="{StaticResource IconToggle}"
+                                ToolTip="{DynamicResource Str.CompareDiffSyncHorizontal}">
+                                <TextBlock Style="{StaticResource ToolIcon}" Text="&#xE8AB;" />
+                            </ToggleButton>
                             <TextBlock
                                 Margin="8,0,0,0"
                                 VerticalAlignment="Center"
@@ -464,18 +478,18 @@
                             Margin="4,0,17,2"
                             Visibility="{Binding Comparison.Current.Diff.HasRows, Converter={StaticResource BoolToVisibility}}">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="44" />
                                 <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="44" />
+                                <ColumnDefinition Width="6" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <TextBlock
-                                Grid.Column="1"
+                                Margin="44,0,0,0"
                                 FontWeight="SemiBold"
                                 Text="{Binding Comparison.Current.LeftTitle}"
                                 TextTrimming="CharacterEllipsis" />
                             <TextBlock
-                                Grid.Column="3"
+                                Grid.Column="2"
+                                Margin="44,0,0,0"
                                 FontWeight="SemiBold"
                                 Text="{Binding Comparison.Current.RightTitle}"
                                 TextTrimming="CharacterEllipsis" />
@@ -492,10 +506,20 @@
                             TextWrapping="Wrap"
                             Visibility="{Binding Comparison.Current.Diff.HasMessage, Converter={StaticResource BoolToVisibility}}" />
 
-                        <DataGrid
-                            x:Name="DiffGrid"
-                            Grid.Row="2"
+                        <Grid Grid.Row="2" Visibility="{Binding Comparison.Current.Diff.HasRows, Converter={StaticResource BoolToVisibility}}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="6" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <DataGrid
+                            x:Name="DiffLeftGrid"
+                            Grid.Column="0"
                             behaviors:ScrollIntoViewBehavior.Enabled="True"
+                            behaviors:ScrollSync.IsEnabled="True"
+                            behaviors:ScrollSync.Partner="{Binding ElementName=DiffRightGrid}"
+                            behaviors:ScrollSync.SyncHorizontal="{Binding Comparison.Current.Diff.SyncHorizontal}"
+                            behaviors:ScrollSync.SyncVertical="{Binding Comparison.Current.Diff.SyncVertical}"
                             AutoGenerateColumns="False"
                             CanUserAddRows="False"
                             CanUserDeleteRows="False"
@@ -504,6 +528,7 @@
                             FontFamily="Consolas"
                             GridLinesVisibility="None"
                             HeadersVisibility="None"
+                            HorizontalScrollBarVisibility="Auto"
                             IsReadOnly="True"
                             ItemsSource="{Binding Comparison.Current.Diff.Rows}"
                             RowHeight="20"
@@ -511,6 +536,7 @@
                             SelectedItem="{Binding Comparison.Current.Diff.SelectedRow, Mode=TwoWay}"
                             SelectionMode="Single"
                             SelectionUnit="FullRow"
+                            VerticalScrollBarVisibility="Hidden"
                             Visibility="{Binding Comparison.Current.Diff.HasRows, Converter={StaticResource BoolToVisibility}}">
                             <DataGrid.Columns>
                                 <DataGridTextColumn
@@ -521,6 +547,35 @@
                                     Width="*"
                                     MinWidth="100"
                                     Binding="{Binding LeftText}" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <DataGrid
+                            x:Name="DiffRightGrid"
+                            Grid.Column="2"
+                            behaviors:ScrollIntoViewBehavior.Enabled="True"
+                            behaviors:ScrollSync.IsEnabled="True"
+                            behaviors:ScrollSync.Partner="{Binding ElementName=DiffLeftGrid}"
+                            behaviors:ScrollSync.SyncHorizontal="{Binding Comparison.Current.Diff.SyncHorizontal}"
+                            behaviors:ScrollSync.SyncVertical="{Binding Comparison.Current.Diff.SyncVertical}"
+                            AutoGenerateColumns="False"
+                            CanUserAddRows="False"
+                            CanUserDeleteRows="False"
+                            CanUserReorderColumns="False"
+                            CanUserSortColumns="False"
+                            FontFamily="Consolas"
+                            GridLinesVisibility="None"
+                            HeadersVisibility="None"
+                            HorizontalScrollBarVisibility="Auto"
+                            IsReadOnly="True"
+                            ItemsSource="{Binding Comparison.Current.Diff.Rows}"
+                            RowHeight="20"
+                            RowStyle="{StaticResource DiffRowStyle}"
+                            SelectedItem="{Binding Comparison.Current.Diff.SelectedRow, Mode=TwoWay}"
+                            SelectionMode="Single"
+                            SelectionUnit="FullRow"
+                            VerticalScrollBarVisibility="Auto"
+                            Visibility="{Binding Comparison.Current.Diff.HasRows, Converter={StaticResource BoolToVisibility}}">
+                            <DataGrid.Columns>
                                 <DataGridTextColumn
                                     Width="44"
                                     Binding="{Binding RightNumberText}"
@@ -531,6 +586,7 @@
                                     Binding="{Binding RightText}" />
                             </DataGrid.Columns>
                         </DataGrid>
+                        </Grid>
                     </Grid>
                 </Grid>
             </views:SplitPair.Second>

@@ -137,6 +137,15 @@ namespace DatExplorerIII.Models.Interface
 		/// <summary>Whether a file of an extension that the program does not know is opened in the viewer as a text (the default), instead of not being viewable.</summary>
 		public Boolean UnknownExtensionsAsText { get; set; } = true;
 
+		/// <summary>The reader chosen for an extension (with the dot, in lower case), which comes before the one the program has for it.</summary>
+		public Dictionary<String, ViewerReader> ExtensionReaders { get; set; } = [];
+
+		/// <summary>The size in megabytes above which a file is not read for a preview.</summary>
+		public Int32 PreviewLimitMegabytes { get; set; } = PreviewLimits.DefaultMegabytes;
+
+		/// <summary>The limits of some extensions (with the dot), in megabytes: they come before <see cref="PreviewLimitMegabytes"/>.</summary>
+		public Dictionary<String, Int32> PreviewLimitsByExtension { get; set; } = PreviewLimits.DefaultByExtension();
+
 		/// <summary>Whether a double click on a file that has a viewer opens it there instead of in the default program.</summary>
 		public Boolean DoubleClickOpensViewer { get; set; } = true;
 

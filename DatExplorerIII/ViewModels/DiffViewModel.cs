@@ -17,6 +17,8 @@ namespace DatExplorerIII.ViewModels
 	{
 		private IReadOnlyList<DiffRow> _all = [];
 		private Boolean _onlyDifferences;
+		private Boolean _syncVertical = true;
+		private Boolean _syncHorizontal = true;
 		private List<DiffRow> _list = [];
 		private IReadOnlyList<DiffRow> _rows = [];
 		private IReadOnlyList<Int32> _starts = [];
@@ -47,6 +49,20 @@ namespace DatExplorerIII.ViewModels
 				if (SetProperty(ref _rows, value))
 					OnPropertyChanged(nameof(HasRows));
 			}
+		}
+
+		/// <summary>Whether the vertical scroll bars of the two texts follow each other.</summary>
+		public Boolean SyncVertical
+		{
+			get => _syncVertical;
+			set => SetProperty(ref _syncVertical, value);
+		}
+
+		/// <summary>Whether the horizontal scroll bars of the two texts follow each other.</summary>
+		public Boolean SyncHorizontal
+		{
+			get => _syncHorizontal;
+			set => SetProperty(ref _syncHorizontal, value);
 		}
 
 		/// <summary>Whether only the lines that differ are shown, not the ones that are the same.</summary>

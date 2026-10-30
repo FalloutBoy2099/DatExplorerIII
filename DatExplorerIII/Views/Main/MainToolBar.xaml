@@ -49,6 +49,16 @@
                 </StackPanel>
             </Button>
             <Button
+                Command="{Binding OpenFolderCommand, Mode=OneTime}"
+                Style="{StaticResource ToolButton}"
+                ToolTip="{DynamicResource Str.OpenFolder}">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource ToolIcon}" Text="&#xE838;" />
+                    <TextBlock Style="{StaticResource ToolLabel}" Text="{DynamicResource Str.OpenFolderShort}" />
+                </StackPanel>
+            </Button>
+            <Separator Margin="2,4" />
+            <Button
                 Command="{Binding NewFallout2Command, Mode=OneTime}"
                 Style="{StaticResource ToolButton}"
                 ToolTip="{DynamicResource Str.NewFallout2}">

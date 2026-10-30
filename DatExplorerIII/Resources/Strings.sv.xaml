@@ -46,6 +46,7 @@
 
     <!--  Tool bar  -->
     <sys:String x:Key="Str.OpenShort">Öppna</sys:String>
+    <sys:String x:Key="Str.OpenFolderShort">DAT-mapp</sys:String>
     <sys:String x:Key="Str.NewShort1">Ny F1</sys:String>
     <sys:String x:Key="Str.NewShort2">Ny F2</sys:String>
     <sys:String x:Key="Str.NewShortArcanum">Ny AR</sys:String>
@@ -335,6 +336,8 @@
     <sys:String x:Key="Str.CompareShowDifferences">Visa skillnaderna i textfilerna</sys:String>
     <sys:String x:Key="Str.CompareLanguage">Språkjämförelse: meddelandefiler (.msg, .mes) jämförs endast på sina id</sys:String>
     <sys:String x:Key="Str.CompareDiffOnly">Visa endast skillnaderna</sys:String>
+    <sys:String x:Key="Str.CompareDiffSyncVertical">Rulla båda texterna tillsammans vertikalt</sys:String>
+    <sys:String x:Key="Str.CompareDiffSyncHorizontal">Rulla båda texterna tillsammans horisontellt</sys:String>
     <sys:String x:Key="Str.CompareDiffPrevious">Föregående skillnad</sys:String>
     <sys:String x:Key="Str.CompareDiffNext">Nästa skillnad</sys:String>
     <sys:String x:Key="Str.CompareDiffCount">Skillnader: {0}</sys:String>
@@ -350,6 +353,34 @@
     <sys:String x:Key="Str.SettingsTabCompare">Jämförelse</sys:String>
     <sys:String x:Key="Str.SettingsTabMsg">.msg-filer</sys:String>
     <sys:String x:Key="Str.SettingsTabExtensions">Filändelser</sys:String>
+    <sys:String x:Key="Str.SettingsTabAssociations">Associationer</sys:String>
+    <sys:String x:Key="Str.SettingsTabLimits">Gränser</sys:String>
+    <sys:String x:Key="Str.SettingsLimitsHint">En fil som är större än sin gräns läses inte för förhandsvisningen. En film läses helt i minnet: en stor gräns kostar tid och minne.</sys:String>
+    <sys:String x:Key="Str.SettingsLimitGlobal">Gräns för alla filer</sys:String>
+    <sys:String x:Key="Str.SettingsLimitUnit">MB</sys:String>
+    <sys:String x:Key="Str.SettingsLimitByExtension">Gräns per tillägg</sys:String>
+    <sys:String x:Key="Str.SettingsAssociationsHint">Välj visaren som visar filerna med ett tillägg (den går före programmets egen).</sys:String>
+    <sys:String x:Key="Str.SettingsAssociationExtension">Tillägg (.xyz)</sys:String>
+    <sys:String x:Key="Str.SettingsAssociationReader">Visare</sys:String>
+    <sys:String x:Key="Str.SettingsAssociationAdd">Lägg till</sys:String>
+    <sys:String x:Key="Str.SettingsAssociationRemove">Ta bort</sys:String>
+    <sys:String x:Key="Str.ViewerBeautify">Formatera (ändra indrag)</sys:String>
+    <sys:String x:Key="Str.ViewerBeautifyFailed">Texten är ogiltig och kan inte formateras.</sys:String>
+    <sys:String x:Key="Str.ReaderText">Text</sys:String>
+    <sys:String x:Key="Str.ReaderIni">INI</sys:String>
+    <sys:String x:Key="Str.ReaderToml">TOML</sys:String>
+    <sys:String x:Key="Str.ReaderYaml">YAML</sys:String>
+    <sys:String x:Key="Str.ReaderJson">JSON</sys:String>
+    <sys:String x:Key="Str.ReaderXml">XML</sys:String>
+    <sys:String x:Key="Str.ReaderLua">Lua</sys:String>
+    <sys:String x:Key="Str.ReaderMessage">Meddelanden (.msg)</sys:String>
+    <sys:String x:Key="Str.ReaderScript">Skript (SSL)</sys:String>
+    <sys:String x:Key="Str.ReaderBiography">Biografi (.bio)</sys:String>
+    <sys:String x:Key="Str.ReaderList">Lista (.lst)</sys:String>
+    <sys:String x:Key="Str.ReaderImage">Bild</sys:String>
+    <sys:String x:Key="Str.ReaderAudio">Ljud</sys:String>
+    <sys:String x:Key="Str.ReaderTable">Meddelandetabell (.mes)</sys:String>
+    <sys:String x:Key="Str.ReaderDialog">Dialoger (.dlg)</sys:String>
     <sys:String x:Key="Str.SettingsShowAllExtensions">Visa alla filändelser</sys:String>
     <sys:String x:Key="Str.SettingsUnknownAsText">Öppna filer med okänd filändelse som text</sys:String>
     <sys:String x:Key="Str.SettingsVisibleExtensions">Filändelser som visas i fillistan:</sys:String>

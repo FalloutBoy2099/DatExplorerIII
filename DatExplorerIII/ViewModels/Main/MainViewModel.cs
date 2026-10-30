@@ -48,6 +48,8 @@ namespace DatExplorerIII.ViewModels.Main
 			_uiThread = uiThread;
 			_scrollBars = scrollBars;
 			_settings = settings;
+			FileViewers.SetAssociations(settings.Data.ExtensionReaders);
+			PreviewLimits.Set(settings.Data.PreviewLimitMegabytes, settings.Data.PreviewLimitsByExtension);
 			_temp = temp;
 			Busy = new BusyState(dialogs);
 			Preview = CreateViewer();

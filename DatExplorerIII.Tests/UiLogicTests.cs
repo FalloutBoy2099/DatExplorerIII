@@ -446,7 +446,7 @@ namespace DatExplorerIII.Tests
 				return;
 
 			HashSet<String> keys = EnglishKeys();
-			HashSet<String> prefixes = ["Str.Err", "Str.Issue", "Str.Theme", "Str.Stat", "Str.Damage", "Str.Skill", "Str.Trait", "Str.ProItem", "Str.ProScenery", "Str.ProBody", "Str.ArcProType", "Str.MapScriptType", "Str.MapExitKind", "Str.CompareState", "Str.MsgIssue", "Str.MsgSeverity", "Str.MsgCheck"];
+			HashSet<String> prefixes = ["Str.Err", "Str.Issue", "Str.Theme", "Str.Stat", "Str.Damage", "Str.Skill", "Str.Trait", "Str.ProItem", "Str.ProScenery", "Str.ProBody", "Str.ArcProType", "Str.MapScriptType", "Str.MapExitKind", "Str.CompareState", "Str.MsgIssue", "Str.MsgSeverity", "Str.MsgCheck", "Str.Reader"];
 			Regex usage = new(@"Str\.[A-Za-z0-9]+(\.[A-Za-z0-9]+)?", RegexOptions.Compiled);
 			List<String> missing = [];
 

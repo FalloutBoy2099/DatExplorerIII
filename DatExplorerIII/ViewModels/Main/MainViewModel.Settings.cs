@@ -7,6 +7,7 @@ namespace DatExplorerIII.ViewModels.Main
 	using Models.GameFiles;
 	using Models.Interface;
 	using Services.Interface;
+	using Services.Platform;
 	using ViewModels.Viewer;
 
 	/// <summary>
@@ -138,6 +139,11 @@ namespace DatExplorerIII.ViewModels.Main
 			_settings.Data.CompareSyncScroll = model.CompareSyncScroll;
 			_settings.Data.ShowSubtitles = model.ShowSubtitles;
 			_settings.Data.UnknownExtensionsAsText = model.UnknownExtensionsAsText;
+			_settings.Data.ExtensionReaders = model.ExtensionReaderMap();
+			FileViewers.SetAssociations(_settings.Data.ExtensionReaders);
+			_settings.Data.PreviewLimitMegabytes = PreviewLimits.Clamp(model.PreviewLimitMegabytes);
+			_settings.Data.PreviewLimitsByExtension = model.LimitMap();
+			PreviewLimits.Set(_settings.Data.PreviewLimitMegabytes, _settings.Data.PreviewLimitsByExtension);
 
 			// The list is made again only when the extensions that it shows are not the same (it keeps its entries otherwise).
 			HashSet<String>? shownBefore = _settings.Data.GetVisibleExtensionSet();

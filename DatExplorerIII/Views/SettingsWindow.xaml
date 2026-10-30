@@ -222,7 +222,14 @@
                 </StackPanel>
             </TabItem>
             <TabItem x:Name="ExtensionsTab" Header="{DynamicResource Str.SettingsTabExtensions}">
-                <StackPanel Margin="14,14,14,10">
+                <Grid Margin="14,14,14,10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
                     <CheckBox
                         x:Name="ShowAllExtensionsBox"
                         Content="{DynamicResource Str.SettingsShowAllExtensions}"
@@ -230,12 +237,20 @@
                         Style="{StaticResource OptionBox}" />
                     <CheckBox
                         x:Name="UnknownAsTextBox"
+                        Grid.Row="1"
                         Content="{DynamicResource Str.SettingsUnknownAsText}"
                         IsChecked="{Binding UnknownExtensionsAsText}"
                         Style="{StaticResource OptionBox}" />
-                    <Separator Margin="0,6" />
-                    <TextBlock Style="{StaticResource GroupTitle}" Text="{DynamicResource Str.SettingsVisibleExtensions}" />
-                    <StackPanel IsEnabled="{Binding ExtensionsEditable}">
+                    <Separator Grid.Row="2" Margin="0,6" />
+                    <TextBlock
+                        Grid.Row="3"
+                        Style="{StaticResource GroupTitle}"
+                        Text="{DynamicResource Str.SettingsVisibleExtensions}" />
+                    <Grid Grid.Row="4" IsEnabled="{Binding ExtensionsEditable}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
                         <StackPanel Margin="0,0,0,6" Orientation="Horizontal">
                             <Button
                                 x:Name="SelectAllExtensionsButton"
@@ -249,7 +264,7 @@
                                 Click="OnSelectNoExtensions"
                                 Content="{DynamicResource Str.SettingsSelectNone}" />
                         </StackPanel>
-                        <ScrollViewer MaxHeight="230" VerticalScrollBarVisibility="Auto">
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
                             <ItemsControl x:Name="ExtensionsList" ItemsSource="{Binding Extensions}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
@@ -266,8 +281,189 @@
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
                         </ScrollViewer>
-                    </StackPanel>
-                </StackPanel>
+                    </Grid>
+                </Grid>
+            </TabItem>
+            <TabItem x:Name="AssociationsTab" Header="{DynamicResource Str.SettingsTabAssociations}">
+                <Grid Margin="14,14,14,10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <TextBlock
+                        Margin="0,0,0,10"
+                        Opacity="0.7"
+                        Text="{DynamicResource Str.SettingsAssociationsHint}"
+                        TextWrapping="Wrap" />
+                    <Grid Grid.Row="1" Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="110" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBox
+                            x:Name="NewExtensionBox"
+                            AutomationProperties.Name="{DynamicResource Str.SettingsAssociationExtension}"
+                            KeyDown="OnNewExtensionKeyDown"
+                            Text="{Binding NewExtension, UpdateSourceTrigger=PropertyChanged}"
+                            ToolTip="{DynamicResource Str.SettingsAssociationExtension}" />
+                        <ComboBox
+                            Grid.Column="1"
+                            Margin="8,0,0,0"
+                            AutomationProperties.Name="{DynamicResource Str.SettingsAssociationReader}"
+                            DisplayMemberPath="Name"
+                            ItemsSource="{Binding Readers}"
+                            SelectedItem="{Binding NewReader}" />
+                        <Button
+                            Grid.Column="2"
+                            MinWidth="88"
+                            Margin="8,0,0,0"
+                            Click="OnAddAssociation"
+                            Content="{DynamicResource Str.SettingsAssociationAdd}"
+                            IsEnabled="{Binding CanAddAssociation}" />
+                    </Grid>
+                    <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+                        <ItemsControl x:Name="AssociationsList" ItemsSource="{Binding Associations}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,0,0,4">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="110" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock VerticalAlignment="Center" Text="{Binding Extension}" />
+                                        <ComboBox
+                                            Grid.Column="1"
+                                            Margin="8,0,0,0"
+                                            DisplayMemberPath="Name"
+                                            ItemsSource="{Binding DataContext.Readers, RelativeSource={RelativeSource AncestorType=Window}}"
+                                            SelectedItem="{Binding Reader}" />
+                                        <Button
+                                            Grid.Column="2"
+                                            Margin="8,0,0,0"
+                                            AutomationProperties.Name="{DynamicResource Str.SettingsAssociationRemove}"
+                                            Click="OnRemoveAssociation"
+                                            ToolTip="{DynamicResource Str.SettingsAssociationRemove}">
+                                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE74D;" />
+                                        </Button>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
+            </TabItem>
+            <TabItem x:Name="LimitsTab" Header="{DynamicResource Str.SettingsTabLimits}">
+                <Grid Margin="14,14,14,10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <TextBlock
+                        Margin="0,0,0,10"
+                        Opacity="0.7"
+                        Text="{DynamicResource Str.SettingsLimitsHint}"
+                        TextWrapping="Wrap" />
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="80" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock VerticalAlignment="Center" Text="{DynamicResource Str.SettingsLimitGlobal}" />
+                        <TextBox
+                            Grid.Column="1"
+                            AutomationProperties.Name="{DynamicResource Str.SettingsLimitGlobal}"
+                            Text="{Binding PreviewLimitMegabytes, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBlock
+                            Grid.Column="2"
+                            Margin="8,0,0,0"
+                            VerticalAlignment="Center"
+                            Text="{DynamicResource Str.SettingsLimitUnit}" />
+                    </Grid>
+                    <Separator Grid.Row="2" Margin="0,10" />
+                    <TextBlock
+                        Grid.Row="3"
+                        Style="{StaticResource GroupTitle}"
+                        Text="{DynamicResource Str.SettingsLimitByExtension}" />
+                    <Grid Grid.Row="4">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="110" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox
+                                x:Name="NewLimitExtensionBox"
+                                AutomationProperties.Name="{DynamicResource Str.SettingsAssociationExtension}"
+                                KeyDown="OnNewLimitKeyDown"
+                                Text="{Binding NewLimitExtension, UpdateSourceTrigger=PropertyChanged}"
+                                ToolTip="{DynamicResource Str.SettingsAssociationExtension}" />
+                            <TextBox
+                                Grid.Column="1"
+                                Margin="8,0,0,0"
+                                AutomationProperties.Name="{DynamicResource Str.SettingsLimitGlobal}"
+                                KeyDown="OnNewLimitKeyDown"
+                                Text="{Binding NewLimitMegabytes, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock
+                                Grid.Column="2"
+                                Margin="8,0,0,0"
+                                VerticalAlignment="Center"
+                                Text="{DynamicResource Str.SettingsLimitUnit}" />
+                            <Button
+                                Grid.Column="3"
+                                MinWidth="88"
+                                Margin="8,0,0,0"
+                                Click="OnAddLimit"
+                                Content="{DynamicResource Str.SettingsAssociationAdd}"
+                                IsEnabled="{Binding CanAddLimit}" />
+                        </Grid>
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding Limits}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="0,0,0,4">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="110" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock VerticalAlignment="Center" Text="{Binding Extension}" />
+                                            <TextBox
+                                                Grid.Column="1"
+                                                Margin="8,0,0,0"
+                                                Text="{Binding Megabytes, UpdateSourceTrigger=PropertyChanged}" />
+                                            <TextBlock
+                                                Grid.Column="2"
+                                                Margin="8,0,0,0"
+                                                VerticalAlignment="Center"
+                                                Text="{DynamicResource Str.SettingsLimitUnit}" />
+                                            <Button
+                                                Grid.Column="3"
+                                                Margin="8,0,0,0"
+                                                                AutomationProperties.Name="{DynamicResource Str.SettingsAssociationRemove}"
+                                                Click="OnRemoveLimit"
+                                                ToolTip="{DynamicResource Str.SettingsAssociationRemove}">
+                                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE74D;" />
+                                            </Button>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Grid>
+                </Grid>
             </TabItem>
             <TabItem x:Name="MessagesTab" Header="{DynamicResource Str.SettingsTabMsg}">
                 <StackPanel Margin="14,14,14,10">

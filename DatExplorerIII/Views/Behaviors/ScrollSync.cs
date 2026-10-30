@@ -25,6 +25,20 @@ namespace DatExplorerIII.Views.Behaviors
 			typeof(ScrollSync),
 			new PropertyMetadata(false));
 
+		/// <summary>Whether the vertical scroll bars follow each other (the default).</summary>
+		public static readonly DependencyProperty SyncVerticalProperty = DependencyProperty.RegisterAttached(
+			"SyncVertical",
+			typeof(Boolean),
+			typeof(ScrollSync),
+			new PropertyMetadata(true));
+
+		/// <summary>Whether the horizontal scroll bars follow each other (the default).</summary>
+		public static readonly DependencyProperty SyncHorizontalProperty = DependencyProperty.RegisterAttached(
+			"SyncHorizontal",
+			typeof(Boolean),
+			typeof(ScrollSync),
+			new PropertyMetadata(true));
+
 		/// <summary>The scroll bars that were moved by the program to follow the other part (not by the user), and where it put them.</summary>
 		private static readonly ConditionalWeakTable<ScrollViewer, Followed> FollowedBars = [];
 
@@ -48,6 +62,26 @@ namespace DatExplorerIII.Views.Behaviors
 			element.SetValue(IsEnabledProperty, value);
 		}
 
+		public static Boolean GetSyncVertical(DependencyObject element)
+		{
+			return (Boolean)element.GetValue(SyncVerticalProperty);
+		}
+
+		public static void SetSyncVertical(DependencyObject element, Boolean value)
+		{
+			element.SetValue(SyncVerticalProperty, value);
+		}
+
+		public static Boolean GetSyncHorizontal(DependencyObject element)
+		{
+			return (Boolean)element.GetValue(SyncHorizontalProperty);
+		}
+
+		public static void SetSyncHorizontal(DependencyObject element, Boolean value)
+		{
+			element.SetValue(SyncHorizontalProperty, value);
+		}
+
 		private static void OnPartnerChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
 		{
 			if (sender is not UIElement element)
@@ -61,7 +95,9 @@ namespace DatExplorerIII.Views.Behaviors
 		private static void OnScrollChanged(Object sender, ScrollChangedEventArgs e)
 		{
 			DependencyObject own = (DependencyObject)sender;
-			if (!GetIsEnabled(own) || GetPartner(own) is not { } other || e.OriginalSource is not ScrollViewer source || (e.VerticalChange == 0 && e.HorizontalChange == 0))
+			Boolean vertical = GetSyncVertical(own);
+			Boolean horizontal = GetSyncHorizontal(own);
+			if (!GetIsEnabled(own) || GetPartner(own) is not { } other || e.OriginalSource is not ScrollViewer source || ((e.VerticalChange == 0 || !vertical) && (e.HorizontalChange == 0 || !horizontal)))
 				return;
 
 			// The scroll bar that was just moved by the program is not followed back.
@@ -78,14 +114,14 @@ namespace DatExplorerIII.Views.Behaviors
 				return;
 
 			ScrollViewer target = candidates[index];
-			Double vertical = Math.Min(source.VerticalOffset, target.ScrollableHeight);
-			Double horizontal = Math.Min(source.HorizontalOffset, target.ScrollableWidth);
-			if (Math.Abs(target.VerticalOffset - vertical) < 0.5 && Math.Abs(target.HorizontalOffset - horizontal) < 0.5)
+			Double toVertical = vertical ? Math.Min(source.VerticalOffset, target.ScrollableHeight) : target.VerticalOffset;
+			Double toHorizontal = horizontal ? Math.Min(source.HorizontalOffset, target.ScrollableWidth) : target.HorizontalOffset;
+			if (Math.Abs(target.VerticalOffset - toVertical) < 0.5 && Math.Abs(target.HorizontalOffset - toHorizontal) < 0.5)
 				return;
 
-			FollowedBars.AddOrUpdate(target, new Followed(vertical, horizontal));
-			target.ScrollToVerticalOffset(vertical);
-			target.ScrollToHorizontalOffset(horizontal);
+			FollowedBars.AddOrUpdate(target, new Followed(toVertical, toHorizontal));
+			target.ScrollToVerticalOffset(toVertical);
+			target.ScrollToHorizontalOffset(toHorizontal);
 		}
 
 		private sealed record Followed(Double Vertical, Double Horizontal);

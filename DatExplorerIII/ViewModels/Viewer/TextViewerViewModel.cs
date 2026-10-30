@@ -44,6 +44,8 @@ namespace DatExplorerIII.ViewModels.Viewer
 		private Boolean _isList;
 		private Boolean _mayBeIni;
 		private Boolean _isLua;
+		private String _extension = String.Empty;
+		private String? _beautified;
 		private readonly IUiThread _uiThread;
 		private Boolean _tooLongForColors;
 		private String _note = String.Empty;
@@ -69,6 +71,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 			FindNextCommand = new RelayCommand(() => FindFrom(_findText), () => CanSearch && _findText.Length > 0);
 			GoToLineCommand = new RelayCommand(GoToLine, () => CanSearch);
 			GoToIdCommand = new RelayCommand(GoToId, () => CanSearch && _isMessageFile);
+			BeautifyCommand = new RelayCommand(Beautify, () => CanBeautify);
 			ShowProblemsCommand = new RelayCommand(
 				() => _problemsRequested?.Invoke(new MsgFileReport(SourcePath, MsgValidator.Validate(_text))),
 				() => CanShowProblems);
@@ -138,6 +141,12 @@ namespace DatExplorerIII.ViewModels.Viewer
 
 		/// <summary>The viewer shows a message file and can list its problems: the button is there.</summary>
 		public Boolean CanShowProblems => _isMessageFile && _problemsRequested != null;
+
+		/// <summary>The text is a JSON, an XML or a YAML that the button can write again with a regular indentation.</summary>
+		public Boolean CanBeautify => _beautified == null && TextBeautifier.CanBeautify(_extension) && _text.Length > 0;
+
+		/// <summary>Writes the text again with a regular indentation (the file is not changed).</summary>
+		public ICommand BeautifyCommand { get; }
 
 		/// <summary>Lists the problems of the message file that is shown.</summary>
 		public ICommand ShowProblemsCommand { get; }
@@ -302,6 +311,8 @@ namespace DatExplorerIII.ViewModels.Viewer
 			_isBiography = String.Equals(extension, ".bio", StringComparison.OrdinalIgnoreCase);
 			_isList = String.Equals(extension, ".lst", StringComparison.OrdinalIgnoreCase);
 			_isLua = String.Equals(extension, ".lua", StringComparison.OrdinalIgnoreCase);
+			_extension = (extension ?? String.Empty).ToLowerInvariant();
+			_beautified = null;
 			_mayBeIni = extension != null && (extension.Equals(".txt", StringComparison.OrdinalIgnoreCase) || extension.Equals(".ini", StringComparison.OrdinalIgnoreCase) || extension.Equals(".cfg", StringComparison.OrdinalIgnoreCase));
 			_note = note ?? String.Empty;
 			_noteTip = null;
@@ -313,6 +324,19 @@ namespace DatExplorerIII.ViewModels.Viewer
 				_missingLines = list.MissingLines;
 			}
 
+			Decode();
+		}
+
+		private void Beautify()
+		{
+			String? result = TextBeautifier.Beautify(_extension, _text);
+			if (result == null)
+			{
+				Notice = Loc.Get("Str.ViewerBeautifyFailed");
+				return;
+			}
+
+			_beautified = result;
 			Decode();
 		}
 
@@ -365,6 +389,8 @@ namespace DatExplorerIII.ViewModels.Viewer
 			_isBiography = false;
 			_isList = false;
 			_isLua = false;
+			_extension = String.Empty;
+			_beautified = null;
 			_mayBeIni = false;
 			_note = String.Empty;
 			_noteTip = null;
@@ -404,9 +430,14 @@ namespace DatExplorerIII.ViewModels.Viewer
 		private void Decode()
 		{
 			DecodedText decoded = TextDecoder.Decode(_data, _selectedEncoding.CodePage);
+			if (_beautified != null)
+				decoded = decoded with { Text = _beautified };
+
 			Text = decoded.Text;
 			SyntaxSpans = Colorize(decoded);
 			PlainText = SyntaxSpans == null ? decoded.Text : String.Empty;
+			OnPropertyChanged(nameof(CanBeautify));
+			CommandRequery.Invalidate();
 
 			String encoding = decoded.IsDetected ? Loc.Format("Str.EncodingDetected", decoded.EncodingName) : decoded.EncodingName;
 			Int32 lines = 1 + decoded.Text.Count(character => character == '\n');
@@ -450,6 +481,19 @@ namespace DatExplorerIII.ViewModels.Viewer
 		{
 			_tooLongForColors = false;
 			Func<String, IReadOnlyList<SyntaxSpan>>? tokenize = _isMessageFile ? MsgSyntax.Tokenize : _isScript ? SslSyntax.Tokenize : _isBiography ? BioSyntax.Tokenize : _isLua ? LuaSyntax.Tokenize : _isList ? (text => LstSyntax.Tokenize(text, _missingLines)) : null;
+
+			if (tokenize == null)
+			{
+				tokenize = _extension switch
+				{
+					".json" => JsonSyntax.Tokenize,
+					".xml" => XmlSyntax.Tokenize,
+					".yaml" or ".yml" => YamlSyntax.Tokenize,
+					".toml" => TomlSyntax.Tokenize,
+					".ini" => IniSyntax.Tokenize,
+					_ => null,
+				};
+			}
 
 			// Some text files are configurations in the INI form: the content tells, not the extension.
 			if (tokenize == null && _mayBeIni && !decoded.LooksBinary && decoded.Text.Length <= MaxColoredLength && IniSyntax.LooksLikeIni(decoded.Text))

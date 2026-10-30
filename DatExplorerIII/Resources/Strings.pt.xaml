@@ -46,6 +46,7 @@
 
     <!--  Tool bar  -->
     <sys:String x:Key="Str.OpenShort">Abrir</sys:String>
+    <sys:String x:Key="Str.OpenFolderShort">Pasta DAT</sys:String>
     <sys:String x:Key="Str.NewShort1">Novo F1</sys:String>
     <sys:String x:Key="Str.NewShort2">Novo F2</sys:String>
     <sys:String x:Key="Str.NewShortArcanum">Novo AR</sys:String>
@@ -335,6 +336,8 @@
     <sys:String x:Key="Str.CompareShowDifferences">Mostrar as diferenças dos arquivos de texto</sys:String>
     <sys:String x:Key="Str.CompareLanguage">Comparação de idioma: os arquivos de mensagens (.msg, .mes) são comparados apenas pelos seus ids</sys:String>
     <sys:String x:Key="Str.CompareDiffOnly">Mostrar apenas as diferenças</sys:String>
+    <sys:String x:Key="Str.CompareDiffSyncVertical">Rolar os dois textos juntos na vertical</sys:String>
+    <sys:String x:Key="Str.CompareDiffSyncHorizontal">Rolar os dois textos juntos na horizontal</sys:String>
     <sys:String x:Key="Str.CompareDiffPrevious">Diferença anterior</sys:String>
     <sys:String x:Key="Str.CompareDiffNext">Próxima diferença</sys:String>
     <sys:String x:Key="Str.CompareDiffCount">Diferenças: {0}</sys:String>
@@ -350,6 +353,34 @@
     <sys:String x:Key="Str.SettingsTabCompare">Comparação</sys:String>
     <sys:String x:Key="Str.SettingsTabMsg">Arquivos .msg</sys:String>
     <sys:String x:Key="Str.SettingsTabExtensions">Extensões</sys:String>
+    <sys:String x:Key="Str.SettingsTabAssociations">Associações</sys:String>
+    <sys:String x:Key="Str.SettingsTabLimits">Limites</sys:String>
+    <sys:String x:Key="Str.SettingsLimitsHint">Um arquivo maior que o seu limite não é lido para a pré-visualização. Um filme é lido inteiro na memória: um limite grande exige tempo e memória.</sys:String>
+    <sys:String x:Key="Str.SettingsLimitGlobal">Limite para todos os arquivos</sys:String>
+    <sys:String x:Key="Str.SettingsLimitUnit">MB</sys:String>
+    <sys:String x:Key="Str.SettingsLimitByExtension">Limite por extensão</sys:String>
+    <sys:String x:Key="Str.SettingsAssociationsHint">Escolha o leitor que mostra os arquivos de uma extensão (tem prioridade sobre o do programa).</sys:String>
+    <sys:String x:Key="Str.SettingsAssociationExtension">Extensão (.xyz)</sys:String>
+    <sys:String x:Key="Str.SettingsAssociationReader">Leitor</sys:String>
+    <sys:String x:Key="Str.SettingsAssociationAdd">Adicionar</sys:String>
+    <sys:String x:Key="Str.SettingsAssociationRemove">Remover</sys:String>
+    <sys:String x:Key="Str.ViewerBeautify">Embelezar (reindentar o texto)</sys:String>
+    <sys:String x:Key="Str.ViewerBeautifyFailed">O texto não é válido e não pode ser embelezado.</sys:String>
+    <sys:String x:Key="Str.ReaderText">Texto</sys:String>
+    <sys:String x:Key="Str.ReaderIni">INI</sys:String>
+    <sys:String x:Key="Str.ReaderToml">TOML</sys:String>
+    <sys:String x:Key="Str.ReaderYaml">YAML</sys:String>
+    <sys:String x:Key="Str.ReaderJson">JSON</sys:String>
+    <sys:String x:Key="Str.ReaderXml">XML</sys:String>
+    <sys:String x:Key="Str.ReaderLua">Lua</sys:String>
+    <sys:String x:Key="Str.ReaderMessage">Mensagens (.msg)</sys:String>
+    <sys:String x:Key="Str.ReaderScript">Script (SSL)</sys:String>
+    <sys:String x:Key="Str.ReaderBiography">Biografia (.bio)</sys:String>
+    <sys:String x:Key="Str.ReaderList">Lista (.lst)</sys:String>
+    <sys:String x:Key="Str.ReaderImage">Imagem</sys:String>
+    <sys:String x:Key="Str.ReaderAudio">Áudio</sys:String>
+    <sys:String x:Key="Str.ReaderTable">Tabela de mensagens (.mes)</sys:String>
+    <sys:String x:Key="Str.ReaderDialog">Diálogos (.dlg)</sys:String>
     <sys:String x:Key="Str.SettingsShowAllExtensions">Mostrar todas as extensões</sys:String>
     <sys:String x:Key="Str.SettingsUnknownAsText">Abrir como texto os ficheiros de extensão desconhecida</sys:String>
     <sys:String x:Key="Str.SettingsVisibleExtensions">Extensões mostradas na lista de ficheiros:</sys:String>

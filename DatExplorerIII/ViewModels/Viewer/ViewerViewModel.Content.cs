@@ -17,6 +17,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 	using Models.GameFiles;
 	using Models.Interface;
 	using Services.Checks;
+	using Services.Platform;
 	using Scripts;
 
 	/// <summary>The content of a file: what is made of each kind of file to show it.</summary>
@@ -31,25 +32,25 @@ namespace DatExplorerIII.ViewModels.Viewer
 			switch (kind)
 			{
 				case FileViewerKind.Text:
-					if (Path.GetExtension(entry.Name).Equals(".int", StringComparison.OrdinalIgnoreCase))
+					if (FileViewers.EffectiveExtension(entry.Name).Equals(".int", StringComparison.OrdinalIgnoreCase))
 					{
 						await ShowScriptAsync(archive, data, token);
 						break;
 					}
 
-					if (Path.GetExtension(entry.Name).Equals(".scr", StringComparison.OrdinalIgnoreCase))
+					if (FileViewers.EffectiveExtension(entry.Name).Equals(".scr", StringComparison.OrdinalIgnoreCase))
 					{
 						ShowScr(archive, data);
 						break;
 					}
 
-					if (ArcanumFileText.Handles(Path.GetExtension(entry.Name)))
+					if (ArcanumFileText.Handles(FileViewers.EffectiveExtension(entry.Name)))
 					{
 						ShowArcanumFile(archive, entry, data);
 						break;
 					}
 
-					if (Path.GetExtension(entry.Name).Equals(".ent", StringComparison.OrdinalIgnoreCase) || Path.GetExtension(entry.Name).Equals(".chr", StringComparison.OrdinalIgnoreCase))
+					if (FileViewers.EffectiveExtension(entry.Name).Equals(".ent", StringComparison.OrdinalIgnoreCase) || FileViewers.EffectiveExtension(entry.Name).Equals(".chr", StringComparison.OrdinalIgnoreCase))
 					{
 						ShowEnt(data);
 						break;
@@ -61,14 +62,14 @@ namespace DatExplorerIII.ViewModels.Viewer
 					// A list of files says which files it names that are not in its folder (the other open archives count: the game reads
 					// all its archives as one).
 					LstReport? list = null;
-					if (Path.GetExtension(entry.Name).Equals(".lst", StringComparison.OrdinalIgnoreCase) && data.Length <= MaxTextBytes)
+					if (FileViewers.EffectiveExtension(entry.Name).Equals(".lst", StringComparison.OrdinalIgnoreCase) && data.Length <= MaxTextBytes)
 					{
 						IReadOnlyList<DatArchive> archives = GameArchives(archive);
 						list = await Task.Run(() => LstChecker.Check(entry.Directory, entry.Name, TextDecoder.Decode(data).Text, archives), token);
 						token.ThrowIfCancellationRequested();
 					}
 
-					Text.Show(shown, data.Length, Path.GetExtension(entry.Name), null, list);
+					Text.Show(shown, data.Length, FileViewers.EffectiveExtension(entry.Name), null, list);
 					Show(kind, String.Empty);
 					break;
 
@@ -90,7 +91,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 					break;
 
 				case FileViewerKind.Character:
-					if (Path.GetExtension(entry.Name).Equals(".lip", StringComparison.OrdinalIgnoreCase))
+					if (FileViewers.EffectiveExtension(entry.Name).Equals(".lip", StringComparison.OrdinalIgnoreCase))
 					{
 						LipFile lip = LipReader.Read(data);
 						Character.ShowSheet(() => LipSheet.Build(lip));
@@ -129,7 +130,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 					break;
 
 				case FileViewerKind.Table:
-					String tableExtension = Path.GetExtension(entry.Name).ToLowerInvariant();
+					String tableExtension = FileViewers.EffectiveExtension(entry.Name).ToLowerInvariant();
 					switch (tableExtension)
 					{
 						case ".dlg":

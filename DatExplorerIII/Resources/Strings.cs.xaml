@@ -46,6 +46,7 @@
 
     <!--  Tool bar  -->
     <sys:String x:Key="Str.OpenShort">Otevřít</sys:String>
+    <sys:String x:Key="Str.OpenFolderShort">Složka DAT</sys:String>
     <sys:String x:Key="Str.NewShort1">Nový F1</sys:String>
     <sys:String x:Key="Str.NewShort2">Nový F2</sys:String>
     <sys:String x:Key="Str.NewShortArcanum">Nový AR</sys:String>
@@ -335,6 +336,8 @@
     <sys:String x:Key="Str.CompareShowDifferences">Zobrazit rozdíly textových souborů</sys:String>
     <sys:String x:Key="Str.CompareLanguage">Porovnání jazyka: soubory zpráv (.msg, .mes) se porovnávají jen podle svých id</sys:String>
     <sys:String x:Key="Str.CompareDiffOnly">Zobrazit pouze rozdíly</sys:String>
+    <sys:String x:Key="Str.CompareDiffSyncVertical">Posouvat oba texty společně svisle</sys:String>
+    <sys:String x:Key="Str.CompareDiffSyncHorizontal">Posouvat oba texty společně vodorovně</sys:String>
     <sys:String x:Key="Str.CompareDiffPrevious">Předchozí rozdíl</sys:String>
     <sys:String x:Key="Str.CompareDiffNext">Další rozdíl</sys:String>
     <sys:String x:Key="Str.CompareDiffCount">Rozdíly: {0}</sys:String>
@@ -350,6 +353,34 @@
     <sys:String x:Key="Str.SettingsTabCompare">Porovnání</sys:String>
     <sys:String x:Key="Str.SettingsTabMsg">Soubory .msg</sys:String>
     <sys:String x:Key="Str.SettingsTabExtensions">Přípony</sys:String>
+    <sys:String x:Key="Str.SettingsTabAssociations">Přiřazení</sys:String>
+    <sys:String x:Key="Str.SettingsTabLimits">Limity</sys:String>
+    <sys:String x:Key="Str.SettingsLimitsHint">Soubor větší než jeho limit se pro náhled nečte. Film se čte celý do paměti: velký limit vyžaduje čas a paměť.</sys:String>
+    <sys:String x:Key="Str.SettingsLimitGlobal">Limit pro všechny soubory</sys:String>
+    <sys:String x:Key="Str.SettingsLimitUnit">MB</sys:String>
+    <sys:String x:Key="Str.SettingsLimitByExtension">Limit podle přípony</sys:String>
+    <sys:String x:Key="Str.SettingsAssociationsHint">Vyberte čtečku, která zobrazí soubory s danou příponou (má přednost před výchozí).</sys:String>
+    <sys:String x:Key="Str.SettingsAssociationExtension">Přípona (.xyz)</sys:String>
+    <sys:String x:Key="Str.SettingsAssociationReader">Čtečka</sys:String>
+    <sys:String x:Key="Str.SettingsAssociationAdd">Přidat</sys:String>
+    <sys:String x:Key="Str.SettingsAssociationRemove">Odebrat</sys:String>
+    <sys:String x:Key="Str.ViewerBeautify">Zformátovat (upravit odsazení)</sys:String>
+    <sys:String x:Key="Str.ViewerBeautifyFailed">Text není platný a nelze jej zformátovat.</sys:String>
+    <sys:String x:Key="Str.ReaderText">Text</sys:String>
+    <sys:String x:Key="Str.ReaderIni">INI</sys:String>
+    <sys:String x:Key="Str.ReaderToml">TOML</sys:String>
+    <sys:String x:Key="Str.ReaderYaml">YAML</sys:String>
+    <sys:String x:Key="Str.ReaderJson">JSON</sys:String>
+    <sys:String x:Key="Str.ReaderXml">XML</sys:String>
+    <sys:String x:Key="Str.ReaderLua">Lua</sys:String>
+    <sys:String x:Key="Str.ReaderMessage">Zprávy (.msg)</sys:String>
+    <sys:String x:Key="Str.ReaderScript">Skript (SSL)</sys:String>
+    <sys:String x:Key="Str.ReaderBiography">Životopis (.bio)</sys:String>
+    <sys:String x:Key="Str.ReaderList">Seznam (.lst)</sys:String>
+    <sys:String x:Key="Str.ReaderImage">Obrázek</sys:String>
+    <sys:String x:Key="Str.ReaderAudio">Zvuk</sys:String>
+    <sys:String x:Key="Str.ReaderTable">Tabulka zpráv (.mes)</sys:String>
+    <sys:String x:Key="Str.ReaderDialog">Dialogy (.dlg)</sys:String>
     <sys:String x:Key="Str.SettingsShowAllExtensions">Zobrazit všechny přípony</sys:String>
     <sys:String x:Key="Str.SettingsUnknownAsText">Soubory s neznámou příponou otevírat jako text</sys:String>
     <sys:String x:Key="Str.SettingsVisibleExtensions">Přípony zobrazené v seznamu souborů:</sys:String>

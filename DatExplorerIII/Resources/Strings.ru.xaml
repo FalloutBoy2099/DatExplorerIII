@@ -46,6 +46,7 @@
 
     <!--  Tool bar  -->
     <sys:String x:Key="Str.OpenShort">Открыть</sys:String>
+    <sys:String x:Key="Str.OpenFolderShort">Папка DAT</sys:String>
     <sys:String x:Key="Str.NewShort1">Новый F1</sys:String>
     <sys:String x:Key="Str.NewShort2">Новый F2</sys:String>
     <sys:String x:Key="Str.NewShortArcanum">Новый AR</sys:String>
@@ -335,6 +336,8 @@
     <sys:String x:Key="Str.CompareShowDifferences">Показать различия текстовых файлов</sys:String>
     <sys:String x:Key="Str.CompareLanguage">Сравнение языка: файлы сообщений (.msg, .mes) сравниваются только по идентификаторам</sys:String>
     <sys:String x:Key="Str.CompareDiffOnly">Показать только различия</sys:String>
+    <sys:String x:Key="Str.CompareDiffSyncVertical">Прокручивать оба текста вместе по вертикали</sys:String>
+    <sys:String x:Key="Str.CompareDiffSyncHorizontal">Прокручивать оба текста вместе по горизонтали</sys:String>
     <sys:String x:Key="Str.CompareDiffPrevious">Предыдущее различие</sys:String>
     <sys:String x:Key="Str.CompareDiffNext">Следующее различие</sys:String>
     <sys:String x:Key="Str.CompareDiffCount">Различий: {0}</sys:String>
@@ -350,6 +353,34 @@
     <sys:String x:Key="Str.SettingsTabCompare">Сравнение</sys:String>
     <sys:String x:Key="Str.SettingsTabMsg">Файлы .msg</sys:String>
     <sys:String x:Key="Str.SettingsTabExtensions">Расширения</sys:String>
+    <sys:String x:Key="Str.SettingsTabAssociations">Ассоциации</sys:String>
+    <sys:String x:Key="Str.SettingsTabLimits">Ограничения</sys:String>
+    <sys:String x:Key="Str.SettingsLimitsHint">Файл больше своего ограничения не читается для предпросмотра. Фильм читается в память целиком: большое ограничение требует времени и памяти.</sys:String>
+    <sys:String x:Key="Str.SettingsLimitGlobal">Ограничение для всех файлов</sys:String>
+    <sys:String x:Key="Str.SettingsLimitUnit">МБ</sys:String>
+    <sys:String x:Key="Str.SettingsLimitByExtension">Ограничение по расширению</sys:String>
+    <sys:String x:Key="Str.SettingsAssociationsHint">Выберите средство просмотра для файлов с этим расширением (оно приоритетнее встроенного).</sys:String>
+    <sys:String x:Key="Str.SettingsAssociationExtension">Расширение (.xyz)</sys:String>
+    <sys:String x:Key="Str.SettingsAssociationReader">Средство просмотра</sys:String>
+    <sys:String x:Key="Str.SettingsAssociationAdd">Добавить</sys:String>
+    <sys:String x:Key="Str.SettingsAssociationRemove">Удалить</sys:String>
+    <sys:String x:Key="Str.ViewerBeautify">Форматировать (расставить отступы)</sys:String>
+    <sys:String x:Key="Str.ViewerBeautifyFailed">Текст некорректен, форматирование невозможно.</sys:String>
+    <sys:String x:Key="Str.ReaderText">Текст</sys:String>
+    <sys:String x:Key="Str.ReaderIni">INI</sys:String>
+    <sys:String x:Key="Str.ReaderToml">TOML</sys:String>
+    <sys:String x:Key="Str.ReaderYaml">YAML</sys:String>
+    <sys:String x:Key="Str.ReaderJson">JSON</sys:String>
+    <sys:String x:Key="Str.ReaderXml">XML</sys:String>
+    <sys:String x:Key="Str.ReaderLua">Lua</sys:String>
+    <sys:String x:Key="Str.ReaderMessage">Сообщения (.msg)</sys:String>
+    <sys:String x:Key="Str.ReaderScript">Скрипт (SSL)</sys:String>
+    <sys:String x:Key="Str.ReaderBiography">Биография (.bio)</sys:String>
+    <sys:String x:Key="Str.ReaderList">Список (.lst)</sys:String>
+    <sys:String x:Key="Str.ReaderImage">Изображение</sys:String>
+    <sys:String x:Key="Str.ReaderAudio">Аудио</sys:String>
+    <sys:String x:Key="Str.ReaderTable">Таблица сообщений (.mes)</sys:String>
+    <sys:String x:Key="Str.ReaderDialog">Диалоги (.dlg)</sys:String>
     <sys:String x:Key="Str.SettingsShowAllExtensions">Показывать все расширения</sys:String>
     <sys:String x:Key="Str.SettingsUnknownAsText">Открывать файлы с неизвестным расширением как текст</sys:String>
     <sys:String x:Key="Str.SettingsVisibleExtensions">Расширения в списке файлов:</sys:String>

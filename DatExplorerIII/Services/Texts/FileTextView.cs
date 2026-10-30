@@ -65,22 +65,22 @@ namespace DatExplorerIII.Services.Texts
 			{
 				switch (kind)
 				{
-					case FileViewerKind.Text when Path.GetExtension(fileName).Equals(".int", StringComparison.OrdinalIgnoreCase):
+					case FileViewerKind.Text when FileViewers.EffectiveExtension(fileName).Equals(".int", StringComparison.OrdinalIgnoreCase):
 						// A compiled script is compared as the source it decompiles to.
 						lines = SplitLines(ScriptDecompiler.DecompileLeniently(data, new ScriptDecompilerOptions { Game = game }).Text);
 						return FileTextResult.Lines;
 
-					case FileViewerKind.Text when Path.GetExtension(fileName).Equals(".scr", StringComparison.OrdinalIgnoreCase):
+					case FileViewerKind.Text when FileViewers.EffectiveExtension(fileName).Equals(".scr", StringComparison.OrdinalIgnoreCase):
 						// A script of Arcanum is compared as the text it is shown as.
 						lines = SplitLines(ScrText.Render(data));
 						return FileTextResult.Lines;
 
-					case FileViewerKind.Text when ArcanumFileText.Handles(Path.GetExtension(fileName)):
+					case FileViewerKind.Text when ArcanumFileText.Handles(FileViewers.EffectiveExtension(fileName)):
 						// The files of the saved games of Arcanum are compared as the text they are shown as.
-						lines = SplitLines(ArcanumFileText.Render(Path.GetExtension(fileName), data));
+						lines = SplitLines(ArcanumFileText.Render(FileViewers.EffectiveExtension(fileName), data));
 						return FileTextResult.Lines;
 
-					case FileViewerKind.Text when Path.GetExtension(fileName).Equals(".ent", StringComparison.OrdinalIgnoreCase) || Path.GetExtension(fileName).Equals(".chr", StringComparison.OrdinalIgnoreCase):
+					case FileViewerKind.Text when FileViewers.EffectiveExtension(fileName).Equals(".ent", StringComparison.OrdinalIgnoreCase) || FileViewers.EffectiveExtension(fileName).Equals(".chr", StringComparison.OrdinalIgnoreCase):
 						// An entity of Fallout Tactics is compared as the text it is shown as.
 						lines = SplitLines(EntReader.ToText(EntReader.Read(data)));
 						return FileTextResult.Lines;
@@ -100,7 +100,7 @@ namespace DatExplorerIII.Services.Texts
 						return FileTextResult.Lines;
 
 					case FileViewerKind.Character:
-						lines = SheetLines(Path.GetExtension(fileName).Equals(".lip", StringComparison.OrdinalIgnoreCase) ? LipSheet.Build(LipReader.Read(data)) : CharacterViewerViewModel.Build(GcdReader.Read(data)));
+						lines = SheetLines(FileViewers.EffectiveExtension(fileName).Equals(".lip", StringComparison.OrdinalIgnoreCase) ? LipSheet.Build(LipReader.Read(data)) : CharacterViewerViewModel.Build(GcdReader.Read(data)));
 						return FileTextResult.Lines;
 
 					case FileViewerKind.Map:
@@ -108,7 +108,7 @@ namespace DatExplorerIII.Services.Texts
 						return FileTextResult.Lines;
 
 					case FileViewerKind.Table:
-						lines = Path.GetExtension(fileName).Equals(".dlg", StringComparison.OrdinalIgnoreCase) ? DialogLines(DlgReader.Read(data)) : MessageLines(MesReader.Read(data));
+						lines = FileViewers.EffectiveExtension(fileName).Equals(".dlg", StringComparison.OrdinalIgnoreCase) ? DialogLines(DlgReader.Read(data)) : MessageLines(MesReader.Read(data));
 						return FileTextResult.Lines;
 
 					default:

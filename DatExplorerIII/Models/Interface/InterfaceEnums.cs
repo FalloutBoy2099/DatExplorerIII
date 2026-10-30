@@ -82,4 +82,25 @@ namespace DatExplorerIII.Models.Interface
 		/// <summary>As what a map of the game holds.</summary>
 		Map,
 	}
+
+	/// <summary>The reader that shows the files of an extension: what the user can choose in the associations.</summary>
+	[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+	public enum ViewerReader
+	{
+		Text,
+		Ini,
+		Toml,
+		Yaml,
+		Json,
+		Xml,
+		Message,
+		Script,
+		Biography,
+		List,
+		Lua,
+		Image,
+		Audio,
+		Table,
+		Dialog,
+	}
 }

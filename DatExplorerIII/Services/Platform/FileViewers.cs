@@ -14,6 +14,63 @@ namespace DatExplorerIII.Services.Platform
 	{
 		private static readonly Dictionary<String, FileViewerKind> Kinds = Build();
 
+		private static IReadOnlyDictionary<String, ViewerReader> _associations = new Dictionary<String, ViewerReader>();
+
+		/// <summary>The extensions (lower case, with the dot) that the user gave a reader to, with that reader.</summary>
+		public static IReadOnlyDictionary<String, ViewerReader> Associations => _associations;
+
+		/// <summary>Sets the readers that the user chose for extensions; they come before what the program knows.</summary>
+		public static void SetAssociations(IEnumerable<KeyValuePair<String, ViewerReader>>? associations)
+		{
+			_associations = (associations ?? []).ToDictionary(pair => Normalize(pair.Key), pair => pair.Value, StringComparer.OrdinalIgnoreCase);
+		}
+
+		/// <summary>An extension as it is kept: lower case, with a dot; empty when there is none.</summary>
+		public static String Normalize(String? extension)
+		{
+			String text = (extension ?? String.Empty).Trim().ToLowerInvariant();
+			return text.Length == 0 ? text : text.StartsWith('.') ? text : "." + text;
+		}
+
+		/// <summary>The kind of viewer a reader belongs to.</summary>
+		public static FileViewerKind KindOf(ViewerReader reader) => reader switch
+		{
+			ViewerReader.Image => FileViewerKind.Image,
+			ViewerReader.Audio => FileViewerKind.Audio,
+			ViewerReader.Table or ViewerReader.Dialog => FileViewerKind.Table,
+			_ => FileViewerKind.Text,
+		};
+
+		/// <summary>
+		/// The extension that decides how a file is read: the one of its reader when the user chose one, else its own. A reader
+		/// stands for the extension that is read that way by default (JSON for .json...).
+		/// </summary>
+		public static String EffectiveExtension(String fileName)
+		{
+			String extension = Path.GetExtension(fileName);
+			return _associations.TryGetValue(extension, out ViewerReader reader) ? CanonicalExtension(reader) : extension;
+		}
+
+		/// <summary>The extension whose way of reading a reader stands for.</summary>
+		public static String CanonicalExtension(ViewerReader reader) => reader switch
+		{
+			ViewerReader.Ini => ".ini",
+			ViewerReader.Toml => ".toml",
+			ViewerReader.Yaml => ".yaml",
+			ViewerReader.Json => ".json",
+			ViewerReader.Xml => ".xml",
+			ViewerReader.Message => ".msg",
+			ViewerReader.Script => ".ssl",
+			ViewerReader.Biography => ".bio",
+			ViewerReader.List => ".lst",
+			ViewerReader.Lua => ".lua",
+			ViewerReader.Image => ".png",
+			ViewerReader.Audio => ".wav",
+			ViewerReader.Table => ".mes",
+			ViewerReader.Dialog => ".dlg",
+			_ => ".log",
+		};
+
 		/// <summary>The extensions (with the dot) that are shown as a text.</summary>
 		public static IEnumerable<String> TextExtensions => ExtensionsOf(FileViewerKind.Text);
 
@@ -33,7 +90,7 @@ namespace DatExplorerIII.Services.Platform
 				return false;
 
 			// A compiled script (.int, .scr) is shown as the source it decompiles to, but what it holds is not text.
-			String extension = Path.GetExtension(fileName);
+			String extension = EffectiveExtension(fileName);
 			return (kind == FileViewerKind.Text && !extension.Equals(".int", StringComparison.OrdinalIgnoreCase) && !extension.Equals(".scr", StringComparison.OrdinalIgnoreCase) && !extension.Equals(".ent", StringComparison.OrdinalIgnoreCase) && !extension.Equals(".chr", StringComparison.OrdinalIgnoreCase) && !ArcanumFileText.Handles(extension)) || extension.Equals(".gam", StringComparison.OrdinalIgnoreCase) || extension.Equals(".sve", StringComparison.OrdinalIgnoreCase);
 		}
 
@@ -64,7 +121,14 @@ namespace DatExplorerIII.Services.Platform
 		/// <summary>Finds how a file is shown, from its extension.</summary>
 		public static Boolean TryGetKind(String fileName, out FileViewerKind kind)
 		{
-			return Kinds.TryGetValue(Path.GetExtension(fileName), out kind);
+			String extension = Path.GetExtension(fileName);
+			if (_associations.TryGetValue(extension, out ViewerReader reader))
+			{
+				kind = KindOf(reader);
+				return true;
+			}
+
+			return Kinds.TryGetValue(extension, out kind);
 		}
 
 		private static IEnumerable<String> ExtensionsOf(FileViewerKind kind)
@@ -81,7 +145,7 @@ namespace DatExplorerIII.Services.Platform
 			Dictionary<String, FileViewerKind> kinds = new(StringComparer.OrdinalIgnoreCase);
 
 			// Texts: lists, dialogs, game variables, scripts and configuration files.
-			foreach (String extension in new[] { ".lst", ".txt", ".msg", ".bio", ".cfg", ".ini", ".log", ".ssl", ".int", ".scr", ".ent", ".chr", ".jmp", ".tfai", ".tfaf", ".gsi", ".tmf", ".tmi", ".lua", ".h", ".csv", ".xml", ".json", ".md", ".bat", ".cmd", ".ps1", ".vbs" })
+			foreach (String extension in new[] { ".lst", ".txt", ".msg", ".bio", ".cfg", ".ini", ".log", ".ssl", ".int", ".scr", ".ent", ".chr", ".jmp", ".tfai", ".tfaf", ".gsi", ".tmf", ".tmi", ".lua", ".h", ".csv", ".xml", ".json", ".toml", ".yaml", ".yml", ".md", ".bat", ".cmd", ".ps1", ".vbs" })
 			{
 				kinds[extension] = FileViewerKind.Text;
 			}

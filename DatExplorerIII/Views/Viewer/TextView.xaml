@@ -82,6 +82,15 @@
                 <TextBlock FontFamily="{StaticResource IconFont}" Text="&#xE8C8;" />
             </Button>
             <Button
+                Margin="4,0,0,4"
+                VerticalAlignment="Center"
+                AutomationProperties.Name="{DynamicResource Str.ViewerBeautify}"
+                Command="{Binding BeautifyCommand, Mode=OneTime}"
+                ToolTip="{DynamicResource Str.ViewerBeautify}"
+                Visibility="{Binding CanBeautify, Converter={StaticResource BoolToVisibility}}">
+                <TextBlock FontFamily="{StaticResource IconFont}" Text="&#xE943;" />
+            </Button>
+            <Button
                 x:Name="MessageProblemsButton"
                 Margin="4,0,0,4"
                 VerticalAlignment="Center"

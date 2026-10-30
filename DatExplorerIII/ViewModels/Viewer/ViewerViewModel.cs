@@ -22,9 +22,6 @@ namespace DatExplorerIII.ViewModels.Viewer
 	/// </summary>
 	public sealed partial class ViewerViewModel : ObservableObject, IDisposable
 	{
-		/// <summary>A file larger than this is not read for a preview.</summary>
-		private const Int64 MaxEntryBytes = 64L * 1024 * 1024;
-
 		/// <summary>Only the beginning of a larger text is shown.</summary>
 		private const Int32 MaxTextBytes = 4 * 1024 * 1024;
 
@@ -100,12 +97,17 @@ namespace DatExplorerIII.ViewModels.Viewer
 			}
 		}
 
-		public Boolean HasMessage => _message.Length > 0;
+		/// <summary>The message is shown unless a file is loading (the text of the loading takes its place).</summary>
+		public Boolean HasMessage => _message.Length > 0 && !_isLoading;
 
 		public Boolean IsLoading
 		{
 			get => _isLoading;
-			private set => SetProperty(ref _isLoading, value);
+			private set
+			{
+				if (SetProperty(ref _isLoading, value))
+					OnPropertyChanged(nameof(HasMessage));
+			}
 		}
 
 		/// <summary>Whether a file of an extension that is not known is shown as a text (otherwise the viewer says it cannot show it).</summary>
@@ -171,7 +173,7 @@ namespace DatExplorerIII.ViewModels.Viewer
 				return;
 			}
 
-			if (entry.UnpackedSize > MaxEntryBytes)
+			if (entry.UnpackedSize > PreviewLimits.For(entry.Name))
 			{
 				Show(null, Loc.Format("Str.ViewerTooLarge", SizeFormatter.Format(entry.UnpackedSize)));
 				return;

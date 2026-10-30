@@ -46,6 +46,7 @@
 
     <!--  Tool bar  -->
     <sys:String x:Key="Str.OpenShort">打开</sys:String>
+    <sys:String x:Key="Str.OpenFolderShort">DAT 文件夹</sys:String>
     <sys:String x:Key="Str.NewShort1">新建 F1</sys:String>
     <sys:String x:Key="Str.NewShort2">新建 F2</sys:String>
     <sys:String x:Key="Str.NewShortArcanum">新建 AR</sys:String>
@@ -335,6 +336,8 @@
     <sys:String x:Key="Str.CompareShowDifferences">显示文本文件的差异</sys:String>
     <sys:String x:Key="Str.CompareLanguage">语言比较:消息文件(.msg、.mes)只比较其 ID</sys:String>
     <sys:String x:Key="Str.CompareDiffOnly">仅显示差异</sys:String>
+    <sys:String x:Key="Str.CompareDiffSyncVertical">垂直同步滚动两个文本</sys:String>
+    <sys:String x:Key="Str.CompareDiffSyncHorizontal">水平同步滚动两个文本</sys:String>
     <sys:String x:Key="Str.CompareDiffPrevious">上一处差异</sys:String>
     <sys:String x:Key="Str.CompareDiffNext">下一处差异</sys:String>
     <sys:String x:Key="Str.CompareDiffCount">差异数：{0}</sys:String>
@@ -350,6 +353,34 @@
     <sys:String x:Key="Str.SettingsTabCompare">比较</sys:String>
     <sys:String x:Key="Str.SettingsTabMsg">.msg 文件</sys:String>
     <sys:String x:Key="Str.SettingsTabExtensions">扩展名</sys:String>
+    <sys:String x:Key="Str.SettingsTabAssociations">关联</sys:String>
+    <sys:String x:Key="Str.SettingsTabLimits">限制</sys:String>
+    <sys:String x:Key="Str.SettingsLimitsHint">超过限制的文件不会被读取预览。影片会整体读入内存:限制过大会耗费时间和内存。</sys:String>
+    <sys:String x:Key="Str.SettingsLimitGlobal">所有文件的限制</sys:String>
+    <sys:String x:Key="Str.SettingsLimitUnit">MB</sys:String>
+    <sys:String x:Key="Str.SettingsLimitByExtension">按扩展名限制</sys:String>
+    <sys:String x:Key="Str.SettingsAssociationsHint">选择用于显示某扩展名文件的查看器(优先于程序自带的设置)。</sys:String>
+    <sys:String x:Key="Str.SettingsAssociationExtension">扩展名(.xyz)</sys:String>
+    <sys:String x:Key="Str.SettingsAssociationReader">查看器</sys:String>
+    <sys:String x:Key="Str.SettingsAssociationAdd">添加</sys:String>
+    <sys:String x:Key="Str.SettingsAssociationRemove">移除</sys:String>
+    <sys:String x:Key="Str.ViewerBeautify">美化(重新缩进文本)</sys:String>
+    <sys:String x:Key="Str.ViewerBeautifyFailed">文本无效,无法美化。</sys:String>
+    <sys:String x:Key="Str.ReaderText">文本</sys:String>
+    <sys:String x:Key="Str.ReaderIni">INI</sys:String>
+    <sys:String x:Key="Str.ReaderToml">TOML</sys:String>
+    <sys:String x:Key="Str.ReaderYaml">YAML</sys:String>
+    <sys:String x:Key="Str.ReaderJson">JSON</sys:String>
+    <sys:String x:Key="Str.ReaderXml">XML</sys:String>
+    <sys:String x:Key="Str.ReaderLua">Lua</sys:String>
+    <sys:String x:Key="Str.ReaderMessage">消息 (.msg)</sys:String>
+    <sys:String x:Key="Str.ReaderScript">脚本 (SSL)</sys:String>
+    <sys:String x:Key="Str.ReaderBiography">传记 (.bio)</sys:String>
+    <sys:String x:Key="Str.ReaderList">列表 (.lst)</sys:String>
+    <sys:String x:Key="Str.ReaderImage">图像</sys:String>
+    <sys:String x:Key="Str.ReaderAudio">音频</sys:String>
+    <sys:String x:Key="Str.ReaderTable">消息表 (.mes)</sys:String>
+    <sys:String x:Key="Str.ReaderDialog">对话 (.dlg)</sys:String>
     <sys:String x:Key="Str.SettingsShowAllExtensions">显示所有扩展名</sys:String>
     <sys:String x:Key="Str.SettingsUnknownAsText">将未知扩展名的文件作为文本打开</sys:String>
     <sys:String x:Key="Str.SettingsVisibleExtensions">文件列表中显示的扩展名：</sys:String>
